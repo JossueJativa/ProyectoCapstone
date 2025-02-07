@@ -1,0 +1,9 @@
+# Python ignores
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore .env file containing credentials, API keys, tokens, passwords, etc.
+env/
+.env
