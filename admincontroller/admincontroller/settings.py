@@ -42,6 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Api rest
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
+    'django_extensions',
+
     # Custom apps
     'authAPI',
     'dishesAPI'
@@ -76,6 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'admincontroller.wsgi.application'
+AUTH_USER_MODEL = 'authAPI.User'
 
 
 # Database
