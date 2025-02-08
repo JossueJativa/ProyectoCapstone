@@ -90,7 +90,7 @@ Para ejecutar las pruebas, sigue estos pasos:
     python manage.py test
     ```
 
-Las pruebas se encuentran en el directorio `admincontroller/tests`.
+Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py` y en `admincontroller/dishesAPI/tests.py`.
 
 ## Endpoints
 
