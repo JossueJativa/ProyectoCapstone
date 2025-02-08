@@ -29,7 +29,7 @@ Este proyecto es una aplicación web desarrollada con Django y Django REST Frame
 2. Crea un entorno virtual e instálalo:
     ```bash
     python -m venv venv
-    source venv/bin/activate  # En Windows usa `venv\Scripts\activate`
+    source env/bin/activate  # En Windows usa `env\Scripts\activate`
     pip install -r requirements.txt
     ```
 
