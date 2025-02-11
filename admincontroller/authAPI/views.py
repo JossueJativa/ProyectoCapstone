@@ -10,7 +10,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import User
-from .serializer import UserSerializer # type: ignore
+from .serializer import UserSerializer
 
 # Create your views here.
 
