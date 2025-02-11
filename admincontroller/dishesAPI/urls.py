@@ -10,5 +10,5 @@ router.register(r'dish', DishViewSet)
 router.register(r'order', OrderViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]
