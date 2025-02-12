@@ -2,8 +2,9 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from ..authAPI.models import User
+from authAPI.models import User
 from .models import Desk, Allergens, Ingredient, Dish, Order
+from datetime import timedelta
 
 class DeskModelTest(TestCase):
     def setUp(self):
@@ -97,7 +98,7 @@ class DeskViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_desk_expired_token(self):
-        self.refresh.set_exp(lifetime=-1)
+        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
         self.desk_data['user_token'] = str(self.refresh)
         response = self.client.post('/api/desk/', self.desk_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -106,27 +107,30 @@ class AllergensViewSetTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.refresh = RefreshToken.for_user(self.user)
-        self.invalid_token = 'invalidtoken'
-        self.allergen_data = {'allergen_name': "Peanuts", 'user_token': str(self.refresh)}
+        self.refresh = RefreshToken.for_user(self.user)  # Genera refresh token
+        self.access_token = str(self.refresh.access_token)  # Obtiene el access token
+        self.invalid_token = "invalidtoken"
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')  # Usa el token en la cabecera
+        
         self.allergen = Allergens.objects.create(allergen_name="Gluten")
         self.allergen_url = f'/api/allergens/{self.allergen.id}/'
-
+    
     def test_create_allergen(self):
-        response = self.client.post('/api/allergens/', self.allergen_data, format='json')
+        data = {'allergen_name': "Peanuts"}
+        response = self.client.post('/api/allergens/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_retrieve_allergen(self):
-        response = self.client.get(self.allergen_url, format='json')
+        response = self.client.get(self.allergen_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_allergen(self):
-        updated_data = {'allergen_name': "Soy"}
+        updated_data = {"allergen_name": "Dairy"}
         response = self.client.put(self.allergen_url, updated_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_delete_allergen(self):
-        response = self.client.delete(self.allergen_url, format='json')
+        response = self.client.delete(self.allergen_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_partial_update_allergen(self):
@@ -134,14 +138,15 @@ class AllergensViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_create_allergen_invalid_token(self):
-        self.allergen_data['user_token'] = self.invalid_token
-        response = self.client.post('/api/allergens/', self.allergen_data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.invalid_token}')
+        response = self.client.post('/api/allergens/', {'allergen_name': "Peanuts"}, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_allergen_expired_token(self):
-        self.refresh.set_exp(lifetime=-1)
-        self.allergen_data['user_token'] = str(self.refresh)
-        response = self.client.post('/api/allergens/', self.allergen_data, format='json')
+        self.refresh.set_exp(lifetime=timedelta(seconds=-1))  # Expira el refresh token
+        expired_access_token = str(self.refresh.access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {expired_access_token}')
+        response = self.client.post('/api/allergens/', {'allergen_name': "Peanuts"}, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 class IngredientViewSetTest(TestCase):
@@ -183,7 +188,7 @@ class IngredientViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_ingredient_expired_token(self):
-        self.refresh.set_exp(lifetime=-1)
+        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
         self.ingredient_data['user_token'] = str(self.refresh)
         response = self.client.post('/api/ingredient/', self.ingredient_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -227,7 +232,7 @@ class DishViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_dish_expired_token(self):
-        self.refresh.set_exp(lifetime=-1)
+        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
         self.dish_data['user_token'] = str(self.refresh)
         response = self.client.post('/api/dish/', self.dish_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -272,7 +277,7 @@ class OrderViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_order_expired_token(self):
-        self.refresh.set_exp(lifetime=-1)
+        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
         self.order_data['user_token'] = str(self.refresh)
         response = self.client.post('/api/order/', self.order_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

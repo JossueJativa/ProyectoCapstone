@@ -49,7 +49,10 @@ INSTALLED_APPS = [
 
     # Custom apps
     'authAPI',
-    'dishesAPI'
+    'dishesAPI',
+
+    # Documentation
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
