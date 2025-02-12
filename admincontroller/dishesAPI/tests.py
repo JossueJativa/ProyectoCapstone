@@ -2,9 +2,17 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from authAPI.models import User
 from .models import Desk, Allergens, Ingredient, Dish, Order
-from datetime import timedelta
+from .serializer import DeskSerializer, AllergensSerializer, IngredientSerializer, DishSerializer, OrderSerializer
+from authAPI.models import User
+from datetime import time
+
+class BaseTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
 class DeskModelTest(TestCase):
     def setUp(self):
@@ -50,234 +58,197 @@ class OrderModelTest(TestCase):
     def setUp(self):
         self.desk = Desk.objects.create(desk_number=1, capacity=4)
         self.dish = Dish.objects.create(dish_name="Pizza", description="Delicious pizza", time_elaboration="00:30:00", price=10, link_ar="http://example.com")
-        self.order = Order.objects.create(desk=self.desk, date="2023-01-01", time="12:00:00", total_price=10, status="Pending")
+        self.order = Order.objects.create(desk=self.desk, date="2023-10-10", time="12:00:00", total_price=10, status="Pending")
         self.order.dish.add(self.dish)
 
     def test_order_creation(self):
         self.assertEqual(self.order.desk, self.desk)
-        self.assertEqual(self.order.date, "2023-01-01")
+        self.assertEqual(self.order.date, "2023-10-10")
         self.assertEqual(self.order.time, "12:00:00")
         self.assertEqual(self.order.total_price, 10)
         self.assertEqual(self.order.status, "Pending")
         self.assertIn(self.dish, self.order.dish.all())
 
-class DeskViewSetTest(TestCase):
+class DeskViewSetTest(BaseTestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.refresh = RefreshToken.for_user(self.user)
-        self.invalid_token = 'invalidtoken'
-        self.desk_data = {'desk_number': 1, 'capacity': 4, 'user_token': str(self.refresh)}
-        self.desk = Desk.objects.create(desk_number=2, capacity=6)
-        self.desk_url = f'/api/desk/{self.desk.id}/'
+        super().setUp()
+        self.desk = Desk.objects.create(desk_number=1, capacity=4)
+
+    def test_get_desk(self):
+        response = self.client.get(f'/api/desk/{self.desk.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, DeskSerializer(self.desk).data)
 
     def test_create_desk(self):
-        response = self.client.post('/api/desk/', self.desk_data, format='json')
+        response = self.client.post('/api/desk/', {'desk_number': 2, 'capacity': 4})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_retrieve_desk(self):
-        response = self.client.get(self.desk_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_create_desk_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.post('/api/desk/', {'desk_number': 2, 'capacity': 4})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_desk(self):
-        updated_data = {'desk_number': 2, 'capacity': 8}
-        response = self.client.put(self.desk_url, updated_data, format='json')
+        response = self.client.put(f'/api/desk/{self.desk.id}/', {'desk_number': 3, 'capacity': 5})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.desk.refresh_from_db()
+        self.assertEqual(self.desk.desk_number, 3)
+        self.assertEqual(self.desk.capacity, 5)
+
+    def test_update_desk_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.put(f'/api/desk/{self.desk.id}/', {'desk_number': 3, 'capacity': 5})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_desk(self):
-        response = self.client.delete(self.desk_url, format='json')
+        response = self.client.delete(f'/api/desk/{self.desk.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Desk.objects.filter(id=self.desk.id).exists())
 
-    def test_partial_update_desk(self):
-        response = self.client.patch(self.desk_url, {'capacity': 10}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_create_desk_invalid_token(self):
-        self.desk_data['user_token'] = self.invalid_token
-        response = self.client.post('/api/desk/', self.desk_data, format='json')
+    def test_delete_desk_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.delete(f'/api/desk/{self.desk.id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_create_desk_expired_token(self):
-        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
-        self.desk_data['user_token'] = str(self.refresh)
-        response = self.client.post('/api/desk/', self.desk_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-class AllergensViewSetTest(TestCase):
+class AllergensViewSetTest(BaseTestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.refresh = RefreshToken.for_user(self.user)  # Genera refresh token
-        self.access_token = str(self.refresh.access_token)  # Obtiene el access token
-        self.invalid_token = "invalidtoken"
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')  # Usa el token en la cabecera
-        
-        self.allergen = Allergens.objects.create(allergen_name="Gluten")
-        self.allergen_url = f'/api/allergens/{self.allergen.id}/'
-    
+        super().setUp()
+        self.allergen = Allergens.objects.create(allergen_name="Peanuts")
+
+    def test_get_allergen(self):
+        response = self.client.get(f'/api/allergens/{self.allergen.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, AllergensSerializer(self.allergen).data)
+
     def test_create_allergen(self):
-        data = {'allergen_name': "Peanuts"}
-        response = self.client.post('/api/allergens/', data, format='json')
+        response = self.client.post('/api/allergens/', {'allergen_name': 'Gluten'})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_retrieve_allergen(self):
-        response = self.client.get(self.allergen_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_create_allergen_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.post('/api/allergens/', {'allergen_name': 'Gluten'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_allergen(self):
-        updated_data = {"allergen_name": "Dairy"}
-        response = self.client.put(self.allergen_url, updated_data, format='json')
+        response = self.client.put(f'/api/allergens/{self.allergen.id}/', {'allergen_name': 'Soy'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.allergen.refresh_from_db()
+        self.assertEqual(self.allergen.allergen_name, 'Soy')
+
+    def test_update_allergen_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.put(f'/api/allergens/{self.allergen.id}/', {'allergen_name': 'Soy'})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_allergen(self):
-        response = self.client.delete(self.allergen_url)
+        response = self.client.delete(f'/api/allergens/{self.allergen.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Allergens.objects.filter(id=self.allergen.id).exists())
 
-    def test_partial_update_allergen(self):
-        response = self.client.patch(self.allergen_url, {'allergen_name': "Dairy"}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_create_allergen_invalid_token(self):
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.invalid_token}')
-        response = self.client.post('/api/allergens/', {'allergen_name': "Peanuts"}, format='json')
+    def test_delete_allergen_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.delete(f'/api/allergens/{self.allergen.id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_create_allergen_expired_token(self):
-        self.refresh.set_exp(lifetime=timedelta(seconds=-1))  # Expira el refresh token
-        expired_access_token = str(self.refresh.access_token)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {expired_access_token}')
-        response = self.client.post('/api/allergens/', {'allergen_name': "Peanuts"}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-class IngredientViewSetTest(TestCase):
+class IngredientViewSetTest(BaseTestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.refresh = RefreshToken.for_user(self.user)
-        self.invalid_token = 'invalidtoken'
+        super().setUp()
         self.allergen = Allergens.objects.create(allergen_name="Peanuts")
-        self.ingredient_data = {'ingredient_name': "Flour", 'quantity': 2, 'allergen': [self.allergen.id], 'user_token': str(self.refresh)}
-        self.ingredient = Ingredient.objects.create(ingredient_name="Sugar", quantity=5)
+        self.ingredient = Ingredient.objects.create(ingredient_name="Flour", quantity=2)
         self.ingredient.allergen.add(self.allergen)
-        self.ingredient_url = f'/api/ingredient/{self.ingredient.id}/'
+
+    def test_get_ingredient(self):
+        response = self.client.get(f'/api/ingredient/{self.ingredient.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, IngredientSerializer(self.ingredient).data)
 
     def test_create_ingredient(self):
-        response = self.client.post('/api/ingredient/', self.ingredient_data, format='json')
+        response = self.client.post('/api/ingredient/', {'ingredient_name': 'Sugar', 'quantity': 5, 'allergen': [self.allergen.id]})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_retrieve_ingredient(self):
-        response = self.client.get(self.ingredient_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_create_ingredient_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.post('/api/ingredient/', {'ingredient_name': 'Sugar', 'quantity': 5, 'allergen': [self.allergen.id]})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_ingredient(self):
-        updated_data = {'ingredient_name': "Salt", 'quantity': 3, 'allergen': [self.allergen.id]}
-        response = self.client.put(self.ingredient_url, updated_data, format='json')
+        response = self.client.put(f'/api/ingredient/{self.ingredient.id}/', {'ingredient_name': 'Salt', 'quantity': 3, 'allergen': [self.allergen.id]})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.ingredient.refresh_from_db()
+        self.assertEqual(self.ingredient.ingredient_name, 'Salt')
+        self.assertEqual(self.ingredient.quantity, 3)
+
+    def test_update_ingredient_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.put(f'/api/ingredient/{self.ingredient.id}/', {'ingredient_name': 'Salt', 'quantity': 3, 'allergen': [self.allergen.id]})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_ingredient(self):
-        response = self.client.delete(self.ingredient_url, format='json')
+        response = self.client.delete(f'/api/ingredient/{self.ingredient.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Ingredient.objects.filter(id=self.ingredient.id).exists())
 
-    def test_partial_update_ingredient(self):
-        response = self.client.patch(self.ingredient_url, {'quantity': 10}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_create_ingredient_invalid_token(self):
-        self.ingredient_data['user_token'] = self.invalid_token
-        response = self.client.post('/api/ingredient/', self.ingredient_data, format='json')
+    def test_delete_ingredient_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.delete(f'/api/ingredient/{self.ingredient.id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_create_ingredient_expired_token(self):
-        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
-        self.ingredient_data['user_token'] = str(self.refresh)
-        response = self.client.post('/api/ingredient/', self.ingredient_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-class DishViewSetTest(TestCase):
+class DishViewSetTest(BaseTestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.refresh = RefreshToken.for_user(self.user)
-        self.invalid_token = 'invalidtoken'
+        super().setUp()
         self.ingredient = Ingredient.objects.create(ingredient_name="Flour", quantity=2)
-        self.dish_data = {'dish_name': "Pizza", 'description': "Delicious pizza", 'time_elaboration': "00:30:00", 'price': 10, 'ingredient': [self.ingredient.id], 'link_ar': "http://example.com", 'user_token': str(self.refresh)}
-        self.dish = Dish.objects.create(dish_name="Burger", description="Tasty burger", time_elaboration="00:15:00", price=8, link_ar="http://example.com")
+        self.dish = Dish.objects.create(dish_name="Pizza", description="Delicious pizza", time_elaboration="00:30:00", price=10, link_ar="http://example.com")
         self.dish.ingredient.add(self.ingredient)
-        self.dish_url = f'/api/dish/{self.dish.id}/'
+
+    def test_get_dish(self):
+        response = self.client.get(f'/api/dish/{self.dish.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, DishSerializer(self.dish).data)
 
     def test_create_dish(self):
-        response = self.client.post('/api/dish/', self.dish_data, format='json')
+        response = self.client.post('/api/dish/', {'dish_name': 'Burger', 'description': 'Tasty burger', 'time_elaboration': '00:20:00', 'price': 8, 'link_ar': 'http://example.com', 'ingredient': [self.ingredient.id]})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_retrieve_dish(self):
-        response = self.client.get(self.dish_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_create_dish_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.post('/api/dish/', {'dish_name': 'Burger', 'description': 'Tasty burger', 'time_elaboration': '00:20:00', 'price': 8, 'link_ar': 'http://example.com', 'ingredient': [self.ingredient.id]})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_dish(self):
-        updated_data = {'dish_name': "Pasta", 'description': "Delicious pasta", 'time_elaboration': "00:20:00", 'price': 12, 'ingredient': [self.ingredient.id], 'link_ar': "http://example.com"}
-        response = self.client.put(self.dish_url, updated_data, format='json')
+        response = self.client.put(f'/api/dish/{self.dish.id}/', {
+            'dish_name': 'Pasta', 
+            'description': 'Delicious pasta', 
+            'time_elaboration': '00:25:00', 
+            'price': 12, 
+            'link_ar': 'http://example.com', 
+            'ingredient': [self.ingredient.id]
+        })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.dish.refresh_from_db()
+        self.assertEqual(self.dish.dish_name, 'Pasta')
+        self.assertEqual(self.dish.description, 'Delicious pasta')
+        self.assertEqual(self.dish.time_elaboration, time(0, 25))
+        self.assertEqual(self.dish.price, 12)
+        self.assertIn(self.ingredient, self.dish.ingredient.all())
+
+    def test_update_dish_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.put(f'/api/dish/{self.dish.id}/', {
+            'dish_name': 'Pasta', 
+            'description': 'Delicious pasta', 
+            'time_elaboration': '00:25:00', 
+            'price': 12, 
+            'link_ar': 'http://example.com', 
+            'ingredient': [self.ingredient.id]
+        })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_dish(self):
-        response = self.client.delete(self.dish_url, format='json')
+        response = self.client.delete(f'/api/dish/{self.dish.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Dish.objects.filter(id=self.dish.id).exists())
 
-    def test_partial_update_dish(self):
-        response = self.client.patch(self.dish_url, {'price': 15}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_create_dish_invalid_token(self):
-        self.dish_data['user_token'] = self.invalid_token
-        response = self.client.post('/api/dish/', self.dish_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_create_dish_expired_token(self):
-        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
-        self.dish_data['user_token'] = str(self.refresh)
-        response = self.client.post('/api/dish/', self.dish_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-class OrderViewSetTest(TestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.refresh = RefreshToken.for_user(self.user)
-        self.invalid_token = 'invalidtoken'
-        self.desk = Desk.objects.create(desk_number=1, capacity=4)
-        self.dish = Dish.objects.create(dish_name="Pizza", description="Delicious pizza", time_elaboration="00:30:00", price=10, link_ar="http://example.com")
-        self.order_data = {'desk': self.desk.id, 'date': "2023-01-01", 'time': "12:00:00", 'total_price': 10, 'status': "Pending", 'dish': [self.dish.id], 'user_token': str(self.refresh)}
-        self.order = Order.objects.create(desk=self.desk, date="2023-01-02", time="13:00:00", total_price=20, status="Completed")
-        self.order.dish.add(self.dish)
-        self.order_url = f'/api/order/{self.order.id}/'
-
-    def test_create_order(self):
-        response = self.client.post('/api/order/', self.order_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_retrieve_order(self):
-        response = self.client.get(self.order_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_update_order(self):
-        updated_data = {'desk': self.desk.id, 'date': "2023-01-03", 'time': "14:00:00", 'total_price': 30, 'status': "Pending", 'dish': [self.dish.id]}
-        response = self.client.put(self.order_url, updated_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_delete_order(self):
-        response = self.client.delete(self.order_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-    def test_partial_update_order(self):
-        response = self.client.patch(self.order_url, {'status': "Cancelled"}, format='json')
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_create_order_invalid_token(self):
-        self.order_data['user_token'] = self.invalid_token
-        response = self.client.post('/api/order/', self.order_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_create_order_expired_token(self):
-        self.refresh.set_exp(lifetime=timedelta(seconds=-1))
-        self.order_data['user_token'] = str(self.refresh)
-        response = self.client.post('/api/order/', self.order_data, format='json')
+    def test_delete_dish_without_auth(self):
+        self.client.credentials()  # Remove authentication
+        response = self.client.delete(f'/api/dish/{self.dish.id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
