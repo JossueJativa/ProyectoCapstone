@@ -22,9 +22,13 @@ class Dish(models.Model):
     link_ar = models.CharField(max_length=1000)
 
 class Order(models.Model):
-    dish = models.ManyToManyField(Dish)
     desk = models.ForeignKey(Desk, on_delete=models.CASCADE)
     date = models.DateField()
     time = models.TimeField()
     total_price = models.IntegerField()
     status = models.CharField(max_length=100)
+
+class OrderDish(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
+    quantity = models.IntegerField()

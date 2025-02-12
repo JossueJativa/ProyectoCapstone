@@ -4,7 +4,8 @@ from .models import (
     Allergens,
     Ingredient,
     Dish,
-    Order
+    Order,
+    OrderDish
 )
 
 class DeskSerializer(serializers.ModelSerializer):
@@ -30,4 +31,9 @@ class DishSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
+        fields = '__all__'
+
+class OrderDishSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderDish
         fields = '__all__'
