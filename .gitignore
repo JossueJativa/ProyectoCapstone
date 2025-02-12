@@ -7,3 +7,6 @@ __pycache__/
 # Ignore .env file containing credentials, API keys, tokens, passwords, etc.
 env/
 .env
+
+# Node ignores
+node_modules/

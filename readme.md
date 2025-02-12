@@ -10,6 +10,7 @@ Este proyecto es una aplicación web desarrollada con Django y Django REST Frame
 5. [Hacer migraciones en la base de datos](#hacer-migraciones-en-la-base-de-datos)
 6. [Ejecutar pruebas](#ejecutar-pruebas)
 7. [Endpoints](#endpoints)
+8. [Datos para solicitudes](#datos-para-solicitudes)
 
 ## Requisitos
 
@@ -94,7 +95,111 @@ Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py` y 
 
 ## Endpoints
 
+### Autenticación
+- `POST /api/token/` - Obtiene un token de acceso
+- `POST /api/token/refresh/` - Refresca el token de acceso
+
 ### Usuarios
 - `POST /users/login/` - Inicia sesión de un usuario
 - `POST /users/register/` - Registra un nuevo usuario
 - `POST /users/logout/` - Cierra sesión de un usuario
+- `GET /users/` - Obtiene la lista de usuarios (requiere autenticación)
+- `GET /users/{id}/` - Obtiene los detalles de un usuario específico (requiere autenticación)
+- `PUT /users/{id}/` - Actualiza la información de un usuario (requiere autenticación)
+- `DELETE /users/{id}/` - Elimina un usuario (requiere autenticación)
+
+### Platos
+- `GET /dishes/` - Obtiene la lista de platos (requiere autenticación)
+- `GET /dishes/{id}/` - Obtiene los detalles de un plato específico (requiere autenticación)
+- `POST /dishes/` - Crea un nuevo plato (requiere autenticación)
+- `PUT /dishes/{id}/` - Actualiza la información de un plato (requiere autenticación)
+- `DELETE /dishes/{id}/` - Elimina un plato (requiere autenticación)
+
+## Datos para solicitudes
+
+### Usuarios
+- **Registro**:
+    ```json
+    {
+        "username": "usuario",
+        "password": "contraseña",
+        "email": "correo@ejemplo.com"
+    }
+    ```
+- **Inicio de sesión**:
+    ```json
+    {
+        "username": "usuario",
+        "password": "contraseña"
+    }
+    ```
+
+### Platos
+- **Crear/Actualizar plato**:
+    ```json
+    {
+        "dish_name": "Nombre del plato",
+        "description": "Descripción del plato",
+        "time_elaboration": "00:30:00",
+        "price": 10,
+        "ingredient": [1, 2],
+        "link_ar": "http://example.com",
+        "category": 1
+    }
+    ```
+
+### Mesas
+- **Crear/Actualizar mesa**:
+    ```json
+    {
+        "desk_number": 1,
+        "capacity": 4
+    }
+    ```
+
+### Alérgenos
+- **Crear/Actualizar alérgeno**:
+    ```json
+    {
+        "allergen_name": "Gluten"
+    }
+    ```
+
+### Ingredientes
+- **Crear/Actualizar ingrediente**:
+    ```json
+    {
+        "ingredient_name": "Tomate",
+        "quantity": 10,
+        "allergen": [1]
+    }
+    ```
+
+### Pedidos
+- **Crear/Actualizar pedido**:
+    ```json
+    {
+        "dish": [1, 2],
+        "desk": 1,
+        "date": "2023-10-01",
+        "time": "12:00:00",
+        "total_price": 20,
+        "status": "Pendiente"
+    }
+    ```
+
+## Autenticación
+
+Para los endpoints que requieren autenticación, es necesario enviar el token de acceso en el encabezado de la solicitud. Aquí hay un ejemplo de cómo hacerlo:
+
+### Encabezado de Autenticación
+
+```http
+Authorization: Bearer <tu_token_de_acceso>
+```
+
+### Ejemplo de Solicitud Autenticada
+
+```bash
+curl -X GET "http://localhost:8000/api/dishes/" -H "Authorization: Bearer <tu_token_de_acceso>"
+```
