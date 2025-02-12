@@ -1,0 +1,28 @@
+{
+  "name": "websocket",
+  "version": "1.0.0",
+  "description": "Websocket para la comunicación entre las distintas mesas para pedir ordenes",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JossueJativa/ProyectoCapstone.git"
+  },
+  "keywords": [
+    "Websocket",
+    "comunicación",
+    "tiempo-real"
+  ],
+  "author": "Jossue Játiva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JossueJativa/ProyectoCapstone/issues"
+  },
+  "homepage": "https://github.com/JossueJativa/ProyectoCapstone#readme",
+  "dependencies": {
+    "tsc": "^2.0.4",
+    "typescript": "^5.7.3"
+  }
+}
