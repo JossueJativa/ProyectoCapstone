@@ -11,6 +11,7 @@ Este proyecto es una aplicación web desarrollada con Django y Django REST Frame
 6. [Ejecutar pruebas](#ejecutar-pruebas)
 7. [Endpoints](#endpoints)
 8. [Datos para solicitudes](#datos-para-solicitudes)
+9. [WebSockets](#websockets)
 
 ## Requisitos
 
@@ -240,3 +241,84 @@ Authorization: Bearer <tu_token_de_acceso>
 ```bash
 curl -X GET "http://localhost:8000/api/dishes/" -H "Authorization: Bearer <tu_token_de_acceso>"
 ```
+
+## WebSockets
+
+### Configuración del Servidor
+
+El servidor de WebSockets está configurado utilizando TypeScript y la biblioteca `socket.io`. La configuración del servidor se encuentra en la carpeta `websocket`.
+
+### Endpoints
+
+El servidor de WebSockets escucha en el puerto `3000` y permite conexiones desde cualquier origen.
+
+### Comunicación
+
+Para comunicarse con el servidor de WebSockets, puedes utilizar la biblioteca `socket.io-client` en el lado del cliente. Aquí hay un ejemplo de cómo conectarse y enviar/recibir mensajes:
+
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000", {
+    transports: ["websocket"]
+});
+
+socket.on("connect", () => {
+    console.log("Conectado al servidor de WebSockets");
+
+    // Enviar un mensaje
+    socket.emit("mensaje", { data: "Hola, servidor!" });
+
+    // Escuchar un mensaje
+    socket.on("respuesta", (data) => {
+        console.log("Respuesta del servidor:", data);
+    });
+});
+
+socket.on("disconnect", () => {
+    console.log("Desconectado del servidor de WebSockets");
+});
+```
+
+### Datos para Enviar
+
+Para enviar datos al servidor de WebSockets, utiliza el método `emit` del socket. Aquí hay un ejemplo de cómo enviar un mensaje:
+
+```javascript
+socket.emit("mensaje", { data: "Hola, servidor!" });
+```
+
+### Datos para Recibir
+
+Para recibir datos del servidor de WebSockets, utiliza el método `on` del socket. Aquí hay un ejemplo de cómo escuchar un mensaje:
+
+```javascript
+socket.on("respuesta", (data) => {
+    console.log("Respuesta del servidor:", data);
+});
+```
+
+## Puntos de Conexión
+
+### Base de Datos
+- **Host**: localhost
+- **Puerto**: 5432
+- **Nombre de la Base de Datos**: admincontroller
+- **Usuario**: postgres
+- **Contraseña**: admincontroller
+
+### Servidor de Aplicaciones
+- **Host**: localhost
+- **Puerto**: 8000
+
+### Servidor de WebSockets
+- **Host**: localhost
+- **Puerto**: 3000
+
+### Eventos de WebSocket
+- **order:create**: Crear una nueva orden.
+- **order:detail:create**: Crear un nuevo detalle de orden.
+- **order:detail:delete**: Eliminar un detalle de orden.
+- **order:detail:update**: Actualizar un detalle de orden.
+- **order:status:update**: Actualizar el estado de una orden.
+- **order:delete**: Eliminar una orden.
