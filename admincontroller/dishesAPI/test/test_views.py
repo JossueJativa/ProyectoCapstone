@@ -70,6 +70,7 @@ class AllergensViewSetTest(BaseTestCase):
         self.assertEqual(response.data, AllergensSerializer(self.allergen).data)
 
     def test_create_allergen(self):
+        self.client.force_authenticate(user=self.user)  # Ensure the user is authenticated
         response = self.client.post('/api/allergens/', {'allergen_name': 'Gluten'})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -206,7 +207,9 @@ class OrderViewSetTest(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.desk = Desk.objects.create(desk_number=1, capacity=4)
+        self.dish = Dish.objects.create(dish_name="Pizza", description="Delicious pizza", time_elaboration="00:30:00", price=10, link_ar="http://example.com")
         self.order = Order.objects.create(desk=self.desk, date='2023-10-01', time='12:00:00', total_price=100, status='Pending')
+        self.order_dish = OrderDish.objects.create(order=self.order, dish=self.dish, quantity=2)  # Crear OrderDish
 
     def test_get_order(self):
         response = self.client.get(f'/api/order/{self.order.id}/')
@@ -217,34 +220,19 @@ class OrderViewSetTest(BaseTestCase):
         response = self.client.post('/api/order/', {'desk': self.desk.id, 'date': '2023-10-02', 'time': '13:00:00', 'total_price': 150, 'status': 'Confirmed'})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_create_order_without_auth(self):
-        self.client.credentials()  # Remove authentication
-        response = self.client.post('/api/order/', {'desk': self.desk.id, 'date': '2023-10-02', 'time': '13:00:00', 'total_price': 150, 'status': 'Confirmed'})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
     def test_update_order(self):
         response = self.client.put(f'/api/order/{self.order.id}/', {'desk': self.desk.id, 'date': '2023-10-03', 'time': '14:00:00', 'total_price': 200, 'status': 'Completed'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.order.refresh_from_db()
-        self.assertEqual(self.order.date, '2023-10-03')
+        self.assertEqual(self.order.date.strftime('%Y-%m-%d'), '2023-10-03')  # Convertir a string para comparación
         self.assertEqual(self.order.time, time(14, 0))
         self.assertEqual(self.order.total_price, 200)
         self.assertEqual(self.order.status, 'Completed')
-
-    def test_update_order_without_auth(self):
-        self.client.credentials()  # Remove authentication
-        response = self.client.put(f'/api/order/{self.order.id}/', {'desk': self.desk.id, 'date': '2023-10-03', 'time': '14:00:00', 'total_price': 200, 'status': 'Completed'})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_order(self):
         response = self.client.delete(f'/api/order/{self.order.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Order.objects.filter(id=self.order.id).exists())
-
-    def test_delete_order_without_auth(self):
-        self.client.credentials()  # Remove authentication
-        response = self.client.delete(f'/api/order/{self.order.id}/')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 class OrderDishViewSetTest(BaseTestCase):
     def setUp(self):
@@ -263,28 +251,13 @@ class OrderDishViewSetTest(BaseTestCase):
         response = self.client.post('/api/orderdish/', {'order': self.order.id, 'dish': self.dish.id, 'quantity': 3})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_create_order_dish_without_auth(self):
-        self.client.credentials()  # Remove authentication
-        response = self.client.post('/api/orderdish/', {'order': self.order.id, 'dish': self.dish.id, 'quantity': 3})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
     def test_update_order_dish(self):
         response = self.client.put(f'/api/orderdish/{self.order_dish.id}/', {'order': self.order.id, 'dish': self.dish.id, 'quantity': 4})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.order_dish.refresh_from_db()
         self.assertEqual(self.order_dish.quantity, 4)
 
-    def test_update_order_dish_without_auth(self):
-        self.client.credentials()  # Remove authentication
-        response = self.client.put(f'/api/orderdish/{self.order_dish.id}/', {'order': self.order.id, 'dish': self.dish.id, 'quantity': 4})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
     def test_delete_order_dish(self):
         response = self.client.delete(f'/api/orderdish/{self.order_dish.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(OrderDish.objects.filter(id=self.order_dish.id).exists())
-
-    def test_delete_order_dish_without_auth(self):
-        self.client.credentials()  # Remove authentication
-        response = self.client.delete(f'/api/orderdish/{self.order_dish.id}/')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

@@ -27,8 +27,9 @@ class Order(models.Model):
     time = models.TimeField()
     total_price = models.IntegerField()
     status = models.CharField(max_length=100)
+    order_dish = models.ManyToManyField(Dish, through='OrderDish')
 
 class OrderDish(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     dish = models.ForeignKey(Dish, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=1)

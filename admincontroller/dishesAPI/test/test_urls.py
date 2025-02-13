@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import resolve, reverse
-from ..views import DeskViewSet, AllergensViewSet, IngredientViewSet, DishViewSet, OrderViewSet
+from ..views import DeskViewSet, AllergensViewSet, IngredientViewSet, DishViewSet, OrderViewSet, OrderDishViewSet
 
 class URLTests(TestCase):
     def test_desk_list_url_resolves(self):
@@ -102,3 +102,23 @@ class URLTests(TestCase):
     def test_order_delete_url_resolves(self):
         url = reverse('order-detail', args=[1])
         self.assertEqual(resolve(url).func.__name__, OrderViewSet.as_view({'delete': 'destroy'}).__name__)
+
+    def test_orderdish_list_url_resolves(self):
+        url = reverse('orderdish-list')
+        self.assertEqual(resolve(url).func.__name__, OrderDishViewSet.as_view({'get': 'list'}).__name__)
+
+    def test_orderdish_detail_url_resolves(self):
+        url = reverse('orderdish-detail', args=[1])
+        self.assertEqual(resolve(url).func.__name__, OrderDishViewSet.as_view({'get': 'retrieve'}).__name__)
+
+    def test_orderdish_create_url_resolves(self):
+        url = reverse('orderdish-list')
+        self.assertEqual(resolve(url).func.__name__, OrderDishViewSet.as_view({'post': 'create'}).__name__)
+
+    def test_orderdish_update_url_resolves(self):
+        url = reverse('orderdish-detail', args=[1])
+        self.assertEqual(resolve(url).func.__name__, OrderDishViewSet.as_view({'put': 'update'}).__name__)
+
+    def test_orderdish_delete_url_resolves(self):
+        url = reverse('orderdish-detail', args=[1])
+        self.assertEqual(resolve(url).func.__name__, OrderDishViewSet.as_view({'delete': 'destroy'}).__name__)

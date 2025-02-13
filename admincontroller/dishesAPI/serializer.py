@@ -29,6 +29,8 @@ class DishSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
+    dishes = DishSerializer(many=True, read_only=True)  # Incluir el campo dishes
+
     class Meta:
         model = Order
         fields = '__all__'
