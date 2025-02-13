@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from dotenv import load_dotenv
+from django.core.management.utils import get_random_secret_key
 
 from pathlib import Path
 
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -93,11 +94,11 @@ AUTH_USER_MODEL = 'authAPI.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('NAME_DB'),
-        'USER': os.getenv('USER_DB'),
-        'PASSWORD': os.getenv('PASSWORD_DB'),
-        'HOST': os.getenv('HOST_DB'),
-        'PORT': os.getenv('PORT_DB'),
+        'NAME': os.getenv('NAME_DB', 'admincontroller'),
+        'USER': os.getenv('USER_DB', 'postgres'),
+        'PASSWORD': os.getenv('PASSWORD_DB', 'admincontroller'),
+        'HOST': os.getenv('HOST_DB', 'localhost'),
+        'PORT': os.getenv('PORT_DB', '5432'),
     }
 }
 
