@@ -54,8 +54,8 @@ const SocketController = (socket: Socket) => {
 
     socket.on('order:detail:update', async (data, callback) => {
         try {
-            const orderDetail = new OrderDetail(data.order_header_id, data.product_id, data.quantity);
-            await OrderDetail.update(orderDetail);
+            const orderDetail = await OrderDetail.get(data.order_detail_id);
+            await OrderDetail.update(orderDetail, orderDetail.id);
 
             socket.broadcast.emit('order:detail:updated', orderDetail);
             callback(null, orderDetail);
@@ -68,7 +68,7 @@ const SocketController = (socket: Socket) => {
         try {
             const orderHeader = await OrderHeader.get(data.order_header_id);
             orderHeader.status = data.status;
-            await OrderHeader.update(orderHeader);
+            await OrderHeader.update(orderHeader, orderHeader.id);
 
             socket.broadcast.emit('order:status:updated', orderHeader);
             callback(null, orderHeader);

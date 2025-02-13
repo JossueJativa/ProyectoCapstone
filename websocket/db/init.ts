@@ -4,20 +4,20 @@ import { dbPromise } from './database';
     const db = await dbPromise;
     await db.exec(`
         CREATE TABLE IF NOT EXISTS order_headers (
-            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            desk_id INTEGER,
-            order_time TEXT,
-            order_date TEXT,
-            order_status TEXT
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            desk_id INTEGER NOT NULL,
+            order_time TEXT NOT NULL,
+            order_date TEXT NOT NULL,
+            order_status TEXT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS order_details (
-            order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_header_id INTEGER,
-            product_id INTEGER,
-            quantity INTEGER,
-            FOREIGN KEY (order_header_id) REFERENCES order_headers(order_id)
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_header_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            FOREIGN KEY(order_header_id) REFERENCES order_headers(id)
         );
     `);
     console.log('Database initialized');
-})
+})();
