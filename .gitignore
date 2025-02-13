@@ -1,8 +1,3 @@
 # Ignore .env file containing credentials, API keys, tokens, passwords, etc.
 env/
 .env
-
-# Node ignores
-node_modules/
-websocket/src
-websocket/db/database.sqlite

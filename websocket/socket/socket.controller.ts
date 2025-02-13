@@ -43,48 +43,62 @@ const SocketController = (socket: Socket) => {
 
     socket.on('order:detail:delete', async (data, callback) => {
         try {
+            const orderDetail = await OrderDetail.get(data.order_detail_id);
+            if (!orderDetail) {
+                throw new Error('OrderDetail not found');
+            }
             await OrderDetail.delete(data.order_detail_id);
 
             socket.broadcast.emit('order:detail:deleted', data.order_detail_id);
             callback(null, data.order_detail_id);
-        } catch (error) {
-            callback(error);
+        } catch (error: any) {
+            callback({ message: error.message });
         }
     });
 
     socket.on('order:detail:update', async (data, callback) => {
         try {
             const orderDetail = await OrderDetail.get(data.order_detail_id);
+            if (!orderDetail) {
+                throw new Error('OrderDetail not found');
+            }
             await OrderDetail.update(orderDetail, orderDetail.id);
 
             socket.broadcast.emit('order:detail:updated', orderDetail);
             callback(null, orderDetail);
-        } catch (error) {
-            callback(error);
+        } catch (error: any) {
+            callback({ message: error.message });
         }
     });
 
     socket.on('order:status:update', async (data, callback) => {
         try {
             const orderHeader = await OrderHeader.get(data.order_header_id);
-            orderHeader.status = data.status;
+            if (!orderHeader) {
+                throw new Error('OrderHeader not found');
+            }
+            orderHeader.order_status = data.status;
             await OrderHeader.update(orderHeader, orderHeader.id);
 
             socket.broadcast.emit('order:status:updated', orderHeader);
             callback(null, orderHeader);
-        } catch (error) {
-            callback(error);
+        } catch (error: any) {
+            callback({ message: error.message });
         }
     });
 
     socket.on('order:delete', async (data, callback) => {
         try {
+            const orderHeader = await OrderHeader.get(data.order_header_id);
+            if (!orderHeader) {
+                throw new Error('OrderHeader not found');
+            }
             await OrderHeader.delete(data.order_header_id);
 
             socket.broadcast.emit('order:deleted', data.order_header_id);
             callback(null, data.order_header_id);
-        } catch (error) {
-            callback(error);
+        } catch (error: any) {
+            callback({ message: error.message });
         }
     });
 
