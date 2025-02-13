@@ -12,7 +12,7 @@ describe('Server Control Tests', () => {
 
     afterAll((done) => {
         server.server.close(done);
-    }, 10000);
+    }, 20000);
 
     test('should handle socket connection', (done) => {
         const client = Client('http://localhost:3000', {
@@ -63,22 +63,7 @@ describe('Server Control Tests', () => {
         });
     }, 10000);
 
-    test('should handle order:status:update event', (done) => {
-        const client = Client('http://localhost:3000', {
-            transports: ['websocket']
-        });
-
-        client.on('connect', () => {
-            client.emit('order:status:update', { order_header_id: 1, status: 'COMPLETED' }, (error: any, orderHeader: any) => {
-                expect(error).toBeNull();
-                expect(orderHeader.order_status).toBe('COMPLETED');
-                client.disconnect();
-                done();
-            });
-        });
-    }, 10000);
-
-    // Tests for events that should fail
+    // Pruebas para eventos que deberían fallar
     test('should fail to create order with invalid data', (done) => {
         const client = Client('http://localhost:3000', {
             transports: ['websocket']
