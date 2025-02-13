@@ -10,3 +10,4 @@ env/
 
 # Node ignores
 node_modules/
+websocket/src/

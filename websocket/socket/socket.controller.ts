@@ -66,7 +66,8 @@ const SocketController = (socket: Socket) => {
 
     socket.on('order:status:update', async (data, callback) => {
         try {
-            const orderHeader = new OrderHeader(data.desk_id, data.time, data.date, data.status);
+            const orderHeader = await OrderHeader.get(data.order_header_id);
+            orderHeader.status = data.status;
             await OrderHeader.update(orderHeader);
 
             socket.broadcast.emit('order:status:updated', orderHeader);
