@@ -1,6 +1,6 @@
 # Proyecto Capstone - Admin Controller
 
-Este proyecto es una aplicación web desarrollada con Django y Django REST Framework para la gestión de usuarios y platos. Utiliza PostgreSQL como base de datos y Docker para la contenedorización.
+Este proyecto es una aplicación web desarrollada con Django y Django REST Framework para la gestión de usuarios, platos, mesas, alérgenos, ingredientes y pedidos. Utiliza PostgreSQL como base de datos y Docker para la contenedorización.
 
 ## Índice
 1. [Requisitos](#requisitos)
@@ -91,7 +91,7 @@ Para ejecutar las pruebas, sigue estos pasos:
     python manage.py test
     ```
 
-Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py` y en `admincontroller/dishesAPI/tests.py`.
+Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py`, `admincontroller/dishesAPI/tests.py`, `admincontroller/desksAPI/tests.py`, `admincontroller/allergensAPI/tests.py`, `admincontroller/ingredientsAPI/tests.py` y `admincontroller/ordersAPI/tests.py`.
 
 ## Endpoints
 
@@ -114,6 +114,34 @@ Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py` y 
 - `POST /dishes/` - Crea un nuevo plato (requiere autenticación)
 - `PUT /dishes/{id}/` - Actualiza la información de un plato (requiere autenticación)
 - `DELETE /dishes/{id}/` - Elimina un plato (requiere autenticación)
+
+### Mesas
+- `GET /desks/` - Obtiene la lista de mesas (requiere autenticación)
+- `GET /desks/{id}/` - Obtiene los detalles de una mesa específica (requiere autenticación)
+- `POST /desks/` - Crea una nueva mesa (requiere autenticación)
+- `PUT /desks/{id}/` - Actualiza la información de una mesa (requiere autenticación)
+- `DELETE /desks/{id}/` - Elimina una mesa (requiere autenticación)
+
+### Alérgenos
+- `GET /allergens/` - Obtiene la lista de alérgenos (requiere autenticación)
+- `GET /allergens/{id}/` - Obtiene los detalles de un alérgeno específico (requiere autenticación)
+- `POST /allergens/` - Crea un nuevo alérgeno (requiere autenticación)
+- `PUT /allergens/{id}/` - Actualiza la información de un alérgeno (requiere autenticación)
+- `DELETE /allergens/{id}/` - Elimina un alérgeno (requiere autenticación)
+
+### Ingredientes
+- `GET /ingredients/` - Obtiene la lista de ingredientes (requiere autenticación)
+- `GET /ingredients/{id}/` - Obtiene los detalles de un ingrediente específico (requiere autenticación)
+- `POST /ingredients/` - Crea un nuevo ingrediente (requiere autenticación)
+- `PUT /ingredients/{id}/` - Actualiza la información de un ingrediente (requiere autenticación)
+- `DELETE /ingredients/{id}/` - Elimina un ingrediente (requiere autenticación)
+
+### Pedidos
+- `GET /orders/` - Obtiene la lista de pedidos (requiere autenticación)
+- `GET /orders/{id}/` - Obtiene los detalles de un pedido específico (requiere autenticación)
+- `POST /orders/` - Crea un nuevo pedido (requiere autenticación)
+- `PUT /orders/{id}/` - Actualiza la información de un pedido (requiere autenticación)
+- `DELETE /orders/{id}/` - Elimina un pedido (requiere autenticación)
 
 ## Datos para solicitudes
 
@@ -179,12 +207,21 @@ Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py` y 
 - **Crear/Actualizar pedido**:
     ```json
     {
-        "dish": [1, 2],
         "desk": 1,
         "date": "2023-10-01",
         "time": "12:00:00",
         "total_price": 20,
-        "status": "Pendiente"
+        "status": "Pendiente",
+        "order_dish": [
+            {
+                "dish": 1,
+                "quantity": 2
+            },
+            {
+                "dish": 2,
+                "quantity": 1
+            }
+        ]
     }
     ```
 
