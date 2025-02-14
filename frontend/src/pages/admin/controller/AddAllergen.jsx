@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
-import { createDesk } from '../../../controller';
+import { createAllergen } from '../../../controller';
 import { InputText, TransparentButton } from '../../../components';
 
-export const AddDesk = () => {
+
+export const AddAllergen = () => {
     const [data, setData] = useState({
-        number: '',
-        capacity: ''
+        name: ''
     });
 
     const handleChange = (e) => {
@@ -18,32 +18,23 @@ export const AddDesk = () => {
 
     const handleSubmit = async(e) => {
         e.preventDefault();
-        const response = await createDesk(data);
+        const response = await createAllergen(data);
         console.log(response);
         setData({
-            number: '',
-            capacity: ''
+            name: ''
         });
     }
+
     return (
         <>
-            <p>Agregar una mesa</p>
+            <p>Agregar un alérgeno</p>
             <br />
             <InputText
-                label="Número de Mesa"
-                name="number"
-                value={data.number}
+                label="Nombre del alérgeno"
+                name="name"
+                value={data.name}
                 onChange={handleChange}
                 isRequired={true}
-                isNumber={true}
-            />
-            <InputText
-                label="Capacidad"
-                name="capacity"
-                value={data.capacity}
-                onChange={handleChange}
-                isRequired={true}
-                isNumber={true}
             />
             <TransparentButton
                 text={"Agregar"}

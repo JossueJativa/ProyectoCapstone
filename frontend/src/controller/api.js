@@ -1,13 +1,45 @@
 import axios from "axios";
 
+import { verifyToken } from './auth';
+
 class API {
     constructor() {
         this.url = "http://localhost:8000";
         this.url_api = `${this.url}/api`;
-        this.token = `Bearer ${localStorage.getItem('token')}`;
+        this.token = `Bearer ${localStorage.getItem('access_token')}`;
         this.headers = {
             "Content-Type": "application/json"
         };
+    }
+
+    async updateToken() {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            return;
+        }
+
+        const isTokenValid = await verifyToken(token);
+        if (isTokenValid) {
+            return;
+        }
+
+        const { access, refresh } = await axios.post(`${this.url}/token/refresh/`, {
+            refresh: localStorage.getItem('refresh_token')
+        })
+            .then(response => {
+                return response.data;
+            })
+            .catch(error => {
+                return null;
+            });
+
+        if (!newToken) {
+            return;
+        }
+
+        localStorage.setItem('access_token', access);
+        localStorage.setItem('refresh_token', refresh);
+        this.token = `Bearer ${access}`;
     }
 
     // Auth controller
@@ -29,6 +61,7 @@ class API {
 
     // Admin controller
     async post(url, data) {
+        this.updateToken();
         try{
             return await axios.post(`${this.url_api}${url}/`, data, {
                 headers: {
@@ -42,6 +75,7 @@ class API {
     }
 
     async put(url, data) {
+        this.updateToken();
         try {
             return await axios.put(`${this.url_api}${url}/`, data, {
                 headers: {
@@ -55,6 +89,7 @@ class API {
     }
 
     async delete(url) {
+        this.updateToken();
         try {
             return await axios.delete(`${this.url_api}${url}/`, {
                 headers: {

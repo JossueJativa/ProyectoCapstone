@@ -2,8 +2,12 @@ export {
     LoginAuth
 } from './auth';
 export {
-    getDesk
+    getDesk,
+    getAllergens,
+    getIngredients
 } from './getinformation';
 export {
-    createDesk
+    createDesk,
+    createAllergen,
+    createIngredient
 } from './setInformation';
