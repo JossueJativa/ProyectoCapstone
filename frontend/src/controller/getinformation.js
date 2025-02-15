@@ -18,4 +18,15 @@ const getIngredients = async() => {
     return response.data;
 }
 
-export { getDesk, getAllergens, getIngredients };
+const getDishes = async() => {
+    const api = new API();
+    const response = await api.get('/dish');
+    return response.data;
+}
+
+export { 
+    getDesk, 
+    getAllergens, 
+    getIngredients,
+    getDishes
+};

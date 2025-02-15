@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+
 import { createIngredient, getAllergens } from '../../../controller';
-import { InputText, TransparentButton } from '../../../components';
+import { InputText, SelectList, TransparentButton } from '../../../components';
 
 export const AddIngredients = () => {
     const [data, setData] = useState({
@@ -73,18 +74,13 @@ export const AddIngredients = () => {
             <label>Alérgenos</label>
             <br />
             {listAllergens.length > 0 ? (
-                listAllergens.map((allergen) => (
-                    <div key={allergen.id}>
-                        <input
-                            type="checkbox"
-                            name="allergens"
-                            value={allergen.id}
-                            checked={data.allergens.includes(allergen.id)}  // Corrección aquí
-                            onChange={handleChange}
-                        />
-                        <label>{allergen.allergen_name}</label>
-                    </div>
-                ))
+                <SelectList 
+                    list={listAllergens} 
+                    name="allergens" 
+                    checked={data.allergens} 
+                    onChange={handleChange} 
+                    labelKey="allergen_name" 
+                />            
             ) : (
                 <p>Cargando alérgenos...</p>
             )}

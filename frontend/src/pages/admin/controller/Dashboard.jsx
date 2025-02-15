@@ -2,6 +2,7 @@ import { OrangeButton } from '../../../components';
 import { AddDesk } from './AddDesk';
 import { AddAllergen } from './AddAllergen';
 import { AddIngredients } from './AddIngredients';
+import { AddDish } from './AddDish';
 
 export const Dashboard = () => {
     return (
@@ -13,6 +14,8 @@ export const Dashboard = () => {
             <AddAllergen />
             <br />
             <AddIngredients />
+            <br />
+            <AddDish />
             <OrangeButton
                 text={"Logout"}
                 onClick={() => {
@@ -20,7 +23,6 @@ export const Dashboard = () => {
                     window.location.href = '/admin';
                 }}
             />
-
         </>
     )
 }

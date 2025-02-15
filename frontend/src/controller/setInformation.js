@@ -30,8 +30,30 @@ const createIngredient = async(data) => {
     return response.data;
 }
 
+const createDish = async(data) => {
+    const { 
+        name,
+        description,
+        time_elaboration,
+        price,
+        link_ar,
+        ingredients
+    } = data;
+    const api = new API();
+    const response = await api.post('/dish', {
+        dish_name: name,
+        description,
+        time_elaboration,
+        price,
+        link_ar,
+        ingredient: ingredients
+    });
+    return response.data;
+}
+
 export {
     createDesk,
     createAllergen,
-    createIngredient
+    createIngredient,
+    createDish
 };
