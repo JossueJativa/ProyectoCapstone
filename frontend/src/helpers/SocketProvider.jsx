@@ -29,8 +29,16 @@ export const SocketProvider = ({ children }) => {
         };
     }, []);
 
+    // Función para unirse a una mesa específica
+    const joinDesk = (desk_id) => {
+        if (socket) {
+            socket.emit("join:desk", desk_id);
+            console.log(`🪑 Joined desk_${desk_id}`);
+        }
+    };
+
     return (
-        <SocketContext.Provider value={socket}>
+        <SocketContext.Provider value={{ socket, joinDesk }}>
             {children}
         </SocketContext.Provider>
     );
