@@ -1,59 +1,53 @@
 import { ThemeProvider, createTheme, Theme } from '@mui/material';
+import { ReactNode } from 'react';
 
-const GlobalTheme = ({ children }: { children: React.ReactNode }) => {
-    const theme: Theme = createTheme({
-        palette: {
-            primary: {
-                main: '#b15c39',
-            },
-            secondary: {
-                main: '#1b5758',
-            },
-            background: {
-                default: '#e0dcd3'
-            },
-            button: {
-                primary: '#da9600',
-                secondary: '#c14a34',
-                ternary: '#184669',
-                fourth: '#1b5758',
-            },
-            error: {
-                main: '#f44336',
-            },
-            warning: {
-                main: '#ff9800',
-            },
-            info: {
-                main: '#2196f3',
-            },
-            success: {
-                main: '#4caf50',
-            },
-        },
-        typography: {
-            title: {
-                fontWeight: 'bold',
-                fontSize: '2rem',
-            },
-            subtitle: {
-                fontWeight: 'normal',
-                fontSize: '1.5rem',
-            },
-            body1: {
-                fontWeight: 'lighter',
-                fontSize: '1rem',
-            },
-            body2: {
-                fontWeight: 'lighter',
-                fontSize: '0.8rem',
-            },
-        },
-        shape: {
-            borderRadius: 10,
+const theme: Theme = createTheme({
+    button: {
+        cafeMedio: '#B15C39',
+        transparente: 'transparent',
+        beige: '#E0DCD3',
+        mostaza: '#DA9600',
+        verde: '#1B5758',
+        border: {
+            rounded: '50px',
+            corners: '10px',
         }
-    });
+    },
+    menu: {
+        mostaza: '#DA9600',
+        ladrillo: '#C14A34',
+        azul: '#184669',
+        verde: '#1B5758',
+        selected: '#B15C39',
+    },
+    typography: {
+        title: {
+            fontWeight: 'bold',
+            fontSize: '2rem',
+        },
+        subtitle: {
+            fontWeight: 'normal',
+            fontSize: '1.5rem',
+        },
+        body1: {
+            fontWeight: 'lighter',
+            fontSize: '1rem',
+        },
+        body2: {
+            fontWeight: 'lighter',
+            fontSize: '0.8rem',
+        },
+    },
+    shape: {
+        borderRadius: '10px',
+    }
+});
 
+interface GlobalThemeProps {
+    children: ReactNode;
+}
+
+const GlobalTheme = ({ children }: GlobalThemeProps) => {
     return (
         <ThemeProvider theme={theme}>
             {children}

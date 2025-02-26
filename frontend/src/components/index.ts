@@ -1,6 +1,6 @@
 export {
-    Navbar
+    Navbar, ButtonType
 } from './common';
 export {
-    LabelText
+    LabelText, IconText
 } from './decorator';

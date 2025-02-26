@@ -25,9 +25,9 @@ export const LabelText: FC<LabelTextProps> = ({ typeText = 'title', text }) => {
             variant={variant}
             sx={{
                 color: 'black',
-                fontFamily: theme.typography.fontFamily,
                 fontWeight: theme.typography[variant]?.fontWeight,
                 fontSize: theme.typography[variant]?.fontSize,
+                textAlign: 'center',
             }}
         >
             {text}
