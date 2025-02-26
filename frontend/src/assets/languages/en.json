@@ -1,0 +1,17 @@
+{
+    "tables": {
+        "welcome": "Welcome to Bistro al paso",
+        "select": "Please select your table number to start"
+    },
+    "buttons": {
+        "start": "Start",
+        "cart": "Cart",
+        "ar": "AR",
+        "read": "Read",
+        "add": "Add to cart",
+        "back": "Back"
+    },
+    "labels": {
+        "selectedDesk": "Table selected"
+    }
+}
