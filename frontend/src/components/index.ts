@@ -1,5 +1,6 @@
 export {
-    Navbar, ButtonType
+    Navbar, ButtonType, ButtonLogic,
+    DishBox
 } from './common';
 export {
     LabelText, IconText

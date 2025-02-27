@@ -13,12 +13,17 @@ const theme: Theme = createTheme({
             corners: '10px',
         }
     },
+    background: {
+        primary: '#FFFFFF',
+        secondary: '#D4D4D4',
+    },
     menu: {
         mostaza: '#DA9600',
         ladrillo: '#C14A34',
         azul: '#184669',
         verde: '#1B5758',
         selected: '#B15C39',
+        black: '#000000',
     },
     typography: {
         title: {

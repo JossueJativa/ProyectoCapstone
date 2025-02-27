@@ -1,17 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Container, useTheme } from '@mui/material';
 import { Restaurant } from '@mui/icons-material';
+
 import { IconText, ButtonType, LabelText } from '@/components';
 import { useLanguage } from "@/helpers";
-
-const desk = Array.from({ length: 16 }, (_, i) => ({
-    desk_number: i + 1,
-    capacity: 4
-}));
+import { getDesk } from '@/controller';
 
 export const SelectDesk = () => {
     const { texts } = useLanguage();
     const theme = useTheme();
+
+    const [desk, setDesk] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchDesks = async () => {
+            const deskList = await getDesk();
+            setDesk(deskList);
+        };
+        fetchDesks();
+    }, []);
 
     const [selectedDesk, setSelectedDesk] = useState<number | null>(null);
 
@@ -95,7 +102,7 @@ export const SelectDesk = () => {
                         }}>
                             <LabelText typeText="body1" text={`${texts.labels.selectedDesk} ${selectedDesk}`} />
                             <br />
-                            <ButtonType text={texts.buttons.start} typeButton="primary" />
+                            <ButtonType text={texts.buttons.start} typeButton="primary" urlLink={`/menu?desk_id=${selectedDesk}`} />
                         </Box>
                     )
                 }

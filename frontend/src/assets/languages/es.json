@@ -12,6 +12,9 @@
         "back": "Atrás"
     },
     "labels": {
-        "selectedDesk": "Mesa seleccionada"
+        "selectedDesk": "Mesa seleccionada",
+        "dishes": "Platos destacados",
+        "desk": "Mesa",
+        "noDesk": "No hay mesa"
     }
 }

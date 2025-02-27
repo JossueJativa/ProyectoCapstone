@@ -1,17 +1,22 @@
 import { Grid } from '@mui/material';
 import { ArrowBackIos } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 import { Logo, ENFlag, ESFlag } from '@/assets';
 import { useLanguage } from "@/helpers";
 
 export const Navbar = () => {
-    const { language, changeLanguage, texts } = useLanguage();
+    const navigate = useNavigate(); // Hook para navegar entre páginas
+    const { language, changeLanguage } = useLanguage();
 
     return (
         <Grid container spacing={0} alignItems="center" sx={{ width: '100%', padding: '5px 20px', backgroundColor: 'white' }}>
             {/* Columna de la flecha */}
             <Grid item xs={4} container justifyContent="start">
-                <ArrowBackIos />
+                <ArrowBackIos 
+                    onClick={() => navigate(-1)} // Regresa a la pantalla anterior
+                    sx={{ cursor: 'pointer' }} 
+                />
             </Grid>
 
             {/* Columna del logotipo */}

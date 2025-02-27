@@ -12,6 +12,9 @@
         "back": "Back"
     },
     "labels": {
-        "selectedDesk": "Table selected"
+        "selectedDesk": "Table selected",
+        "dishes": "Featured dishes",
+        "desk": "Table",
+        "noDesk": "No table"
     }
 }
