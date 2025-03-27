@@ -6,7 +6,7 @@ import { ProtectedRoute } from './ProtectedRouter';
 export const AdminRouter = () => {
     return (
         <Routes>
-            <Route path="login" element={<Login />} />
+            <Route path="" element={<Login />} />
             <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
         </Routes>
     )
