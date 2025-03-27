@@ -9,7 +9,6 @@ interface DishBoxProps {
   name: string;
   price: number;
   description: string;
-  arEmbebed: string;
   linkAR: string;
   linkTo: string;
 }

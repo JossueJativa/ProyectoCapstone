@@ -73,7 +73,6 @@ export const Menu = () => {
                             name={d.dish_name}
                             price={d.price}
                             description={d.description}
-                            arEmbebed={d.embebedAR}
                             linkAR={d.link_ar}
                             linkTo={`/dish/${d.id}?desk_id=${deskId}`}
                         />
