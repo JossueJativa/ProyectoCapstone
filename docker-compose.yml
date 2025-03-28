@@ -18,7 +18,22 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
+
+  admincontroller:
+    build:
+      context: ./admincontroller
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./admincontroller:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    env_file:
+      - ./admincontroller/.env
 
 volumes:
   postgres_data:
+  websocket_db:
