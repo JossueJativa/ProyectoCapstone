@@ -16,5 +16,26 @@
         "dishes": "Featured dishes",
         "desk": "Table",
         "noDesk": "No table"
+    },
+    "allergens": {
+        "gluten": "Gluten",
+        "crustaceans": "Crustaceans",
+        "eggs": "Eggs",
+        "fish": "Fish",
+        "peanuts": "Peanuts",
+        "soy": "Soy",
+        "milk": "Milk",
+        "nuts": "Nuts",
+        "celery": "Celery",
+        "mustard": "Mustard",
+        "sesame": "Sesame",
+        "sulphur": "Sulphites",
+        "lupin": "Lupins",
+        "molluscs": "Molluscs",
+        "none": "None"
+    },
+    "errors": {
+        "notFoundTitle": "Not Found",
+        "notFoundMessage": "The page you are looking for does not exist."
     }
 }

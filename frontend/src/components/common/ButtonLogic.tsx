@@ -51,6 +51,7 @@ export const ButtonLogic: FC<ButtonLogicProps> = ({ text, typeButton, urlLink, o
                 variant={typeButton === 'outlined' ? 'outlined' : 'contained'}
                 sx={buttonStyles[typeButton]}
                 onClick={onClick}
+                style={{ zIndex: 10 }}
             >
                 {text}
             </Button>
@@ -62,7 +63,8 @@ export const ButtonLogic: FC<ButtonLogicProps> = ({ text, typeButton, urlLink, o
                     fullWidth
                     variant={typeButton === 'outlined' ? 'outlined' : 'contained'}
                     sx={{ ...buttonStyles[typeButton], 
-                        display: 'flex', gap: '10px' }}
+                        display: 'flex', gap: '10px',
+                        zIndex: 10 }}
                 >
                     {text}
                     {icon}

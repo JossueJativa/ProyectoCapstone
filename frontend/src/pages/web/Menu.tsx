@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { RoomService } from '@mui/icons-material';
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Grid, Typography, useTheme, Fade } from '@mui/material';
 
 import { useSocket, useLanguage } from "@/helpers";
 import { IconText, DishBox } from '@/components';
@@ -13,7 +13,9 @@ export const Menu = () => {
     const theme = useTheme();
     const location = useLocation();
     const [dishes, setDishes] = useState<any[]>([]);
+    const [visibleDishes, setVisibleDishes] = useState<number>(10); // Número inicial de platos visibles
     const [deskId, setDeskId] = useState<string | null>(null);
+    const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -41,6 +43,27 @@ export const Menu = () => {
         fetchDishes();
     }, []);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setVisibleDishes((prev) => Math.min(prev + 10, dishes.length)); // Cargar 10 más
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => {
+            if (observerRef.current) {
+                observer.unobserve(observerRef.current);
+            }
+        };
+    }, [dishes]);
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
             <Grid container spacing={2} pb={2}>
@@ -65,20 +88,25 @@ export const Menu = () => {
                 </Grid>
             </Grid>
 
-            {/* Mostrar los platos */}
+            {/* Mostrar los platos con animación */}
             <Grid container spacing={2}>
-                {dishes.map((d) => (
+                {dishes.slice(0, visibleDishes).map((d, index) => (
                     <Grid item xs={12} key={d.id}>
-                        <DishBox
-                            name={d.dish_name}
-                            price={d.price}
-                            description={d.description}
-                            linkAR={d.link_ar}
-                            linkTo={`/dish/${d.id}?desk_id=${deskId}`}
-                        />
+                        <Fade in={index < visibleDishes} timeout={500}>
+                            <DishBox
+                                name={d.dish_name}
+                                price={d.price}
+                                description={d.description}
+                                linkAR={d.link_ar}
+                                linkTo={`/dish/${d.id}?desk_id=${deskId}`}
+                            />
+                        </Fade>
                     </Grid>
                 ))}
             </Grid>
+
+            {/* Observador para cargar más platos */}
+            <div ref={observerRef} style={{ height: '2px' }} />
         </Box>
     );
 };

@@ -10,7 +10,7 @@ const theme: Theme = createTheme({
         verde: '#1B5758',
         border: {
             rounded: '50px',
-            corners: '10px',
+            corners: '15px',
         }
     },
     background: {

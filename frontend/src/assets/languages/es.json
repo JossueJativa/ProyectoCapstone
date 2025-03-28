@@ -16,5 +16,26 @@
         "dishes": "Platos destacados",
         "desk": "Mesa",
         "noDesk": "No hay mesa"
+    },
+    "allergens": {
+        "gluten": "Gluten",
+        "crustaceans": "Crustáceos",
+        "eggs": "Huevos",
+        "fish": "Pescado",
+        "peanuts": "Cacahuetes",
+        "soy": "Soja",
+        "milk": "Leche",
+        "nuts": "Frutos secos",
+        "celery": "Apio",
+        "mustard": "Mostaza",
+        "sesame": "Sésamo",
+        "sulphur": "Sulfitos",
+        "lupin": "Altramuces",
+        "molluscs": "Moluscos",
+        "none": "Ninguno"
+    },
+    "errors": {
+        "notFoundTitle": "No encontrado",
+        "notFoundMessage": "La página que estás buscando no existe."
     }
 }

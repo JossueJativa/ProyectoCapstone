@@ -4,8 +4,11 @@ export {
 export {
     getDesk,
     getAllergens,
+    getAllergensByDish,
     getIngredients,
-    getDishes
+    getDishes,
+    getDish,
+    getIngredient
 } from './getInformation';
 export {
     createDesk,
