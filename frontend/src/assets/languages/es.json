@@ -9,13 +9,14 @@
         "ar": "AR",
         "read": "Leer",
         "add": "Agregar al carrito",
-        "back": "Atrás"
+        "back": "Regresar"
     },
     "labels": {
         "selectedDesk": "Mesa seleccionada",
         "dishes": "Platos destacados",
         "desk": "Mesa",
-        "noDesk": "No hay mesa"
+        "noDesk": "No hay mesa",
+        "allergens": "Alérgenos"
     },
     "allergens": {
         "gluten": "Gluten",

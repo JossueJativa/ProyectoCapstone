@@ -1,25 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Box, Grid, useTheme, Typography } from "@mui/material";
 import { ViewInAr, VolumeUp } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/helpers"; // Adjust the import path as necessary
+import { useLanguage, useSocket } from "@/helpers";
 import {
-  Grain,
-  Restaurant,
-  Egg,
-  SetMeal,
-  EmojiFoodBeverage,
-  Spa,
-  LocalDrink,
-  AcUnit,
-  Grass,
-  Star,
-  Opacity,
-  FilterVintage,
-  Pets,
-  Waves,
-  CheckCircle,
-} from "@mui/icons-material"; // Replace Fish with SetMeal
+  Grain, Restaurant, Egg,
+  SetMeal, EmojiFoodBeverage,
+  Spa, LocalDrink, AcUnit,
+  Grass, Star, Opacity,
+  FilterVintage, Pets,
+  Waves, CheckCircle,
+} from "@mui/icons-material";
 
 import { ButtonLogic } from "@/components";
 
@@ -51,11 +43,30 @@ const allergenIcons: Record<string, JSX.Element> = {
 };
 
 export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
-  ({ name, price, description, linkAR, linkTo, allergens }, ref) => {
+  ({ name, price, description, linkAR, linkTo, allergens, dish_id }, ref) => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { texts } = useLanguage(); // Obtén los textos traducidos
-    const { allergens: allergensText } = texts; // Accede a los textos de alérgenos
+    const { texts } = useLanguage();
+    const { allergens: allergensText } = texts;
+    const { socket } = useSocket();
+    const location = useLocation();
+
+    useEffect(() => {
+      const params = new URLSearchParams(location.search);
+      const desk_id = params.get("desk_id");
+
+      if (socket && desk_id) {
+        const handleDeskNotification = (notification: any) => {
+          console.log(`📢 Notification for desk_${desk_id}:`, notification);
+        };
+
+        socket.on(`desk:notification:${desk_id}`, handleDeskNotification);
+
+        return () => {
+          socket.off(`desk:notification:${desk_id}`, handleDeskNotification);
+        };
+      }
+    })
 
     const allergenNames: Record<string, string> = {
       "1": allergensText.gluten,
@@ -73,6 +84,35 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
       "13": allergensText.lupin,
       "14": allergensText.molluscs,
       "15": allergensText.none,
+    };
+
+    const handleAddDish = async (dish_id: number) => {
+      const params = new URLSearchParams(location.search);
+      const desk_id = params.get("desk_id");
+
+      if (!socket || !desk_id || !dish_id) return;
+
+      socket.emit('order:create', { desk_id: desk_id }, (error: any, orderHeader: any) => {
+        if (error) {
+          console.error('Error creating or fetching order:', error);
+          return;
+        }
+
+        console.log('OrderHeader:', orderHeader);
+
+        socket.emit('order:detail:create', {
+          order_header_id: orderHeader.id,
+          product_id: dish_id,
+          quantity: 1,
+          desk_id: desk_id,
+        }, (error: any, orderDetail: any) => {
+          if (error) {
+            console.error('Error creating order detail:', error);
+          } else {
+            console.log('Order detail created:', orderDetail);
+          }
+        });
+      });
     };
 
     return (
@@ -203,7 +243,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
                   </Grid>
                 ) : (
                   allergens
-                    .filter((allergen) => allergen !== 15) // Excluye "15" si hay otros alérgenos
+                    .filter((allergen) => allergen !== 15)
                     .map((allergen) => (
                       <Grid item xs="auto" key={allergen}>
                         <Box
@@ -274,7 +314,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
             <ButtonLogic
               text={texts.buttons.add}
               typeButton="primary"
-              onClick={() => console.log("Button pressed")}
+              onClick={() => handleAddDish(dish_id)}
             />
           </Grid>
         </Grid>

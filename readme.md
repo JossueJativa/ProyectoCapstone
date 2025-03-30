@@ -317,8 +317,8 @@ socket.on("respuesta", (data) => {
 
 ### Eventos de WebSocket
 - **order:create**: Crear una nueva orden.
-- **order:detail:create**: Crear un nuevo detalle de orden.
-- **order:detail:delete**: Eliminar un detalle de orden.
-- **order:detail:update**: Actualizar un detalle de orden.
-- **order:status:update**: Actualizar el estado de una orden.
+- **order:get**: Obtener todos los pedido de la orden.
+- **order:update**: Actualizar un detalle de orden.
+- **order:delete**: Eliminar un detalle de orden.
+- **order:delete:all**: Eliminar todos los detalles del pedido.
 - **order:delete**: Eliminar una orden.

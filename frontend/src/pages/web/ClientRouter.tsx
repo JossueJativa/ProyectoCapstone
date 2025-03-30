@@ -1,13 +1,14 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Fab, Button, useTheme, Box } from '@mui/material';
-import { Help, ShoppingCart } from '@mui/icons-material';
+import { Help, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 
 import { SocketProvider, useLanguage } from '@/helpers';
 import { Navbar } from '@/components';
 
 import { Error404 } from '../errors';
 import {
-    SelectDesk, Menu, DishSelected
+    SelectDesk, Menu, DishSelected,
+    ShoppingCart
 } from './index';
 
 
@@ -17,6 +18,7 @@ export const ClientRouter = () => {
     const isErrorPage = location.pathname === '/404'; // Verifica si es la página de error
     const theme = useTheme();
     const { texts } = useLanguage();
+    const navigate = useNavigate();
 
     return (
         <Box mb={'25px'}>
@@ -26,6 +28,8 @@ export const ClientRouter = () => {
                     <Route path="/" element={<SelectDesk />} />
                     <Route path="/menu" element={<Menu />} />
                     <Route path="/dish/:dishId" element={<DishSelected />} />
+                    <Route path="/cart" element={<ShoppingCart />} />
+                    
                     {/* Navegaciones no permitidas */}
                     <Route path="*" element={<Error404 />} />
                 </Routes>
@@ -51,7 +55,10 @@ export const ClientRouter = () => {
                         <Button
                             variant="contained"
                             color="secondary"
-                            endIcon={<ShoppingCart />}
+                            endIcon={<ShoppingCartIcon />}
+                            onClick={() => { 
+                                navigate(`/cart?desk_id=${new URLSearchParams(location.search).get('desk_id')}`);
+                            }}
                             style={{
                                 height: '50px',
                                 width: '200px',

@@ -1,12 +1,9 @@
 import { useParams, useLocation } from 'react-router-dom';
-import { useTheme, Box, Grid, Typography, Skeleton } from '@mui/material';
-import { 
-    RoomService, Egg
-} from '@mui/icons-material';
+import { useTheme, Box, Grid, Skeleton } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { Error404 } from '../errors';
-import { IconText, DishBox } from '@/components';
+import { LabelText, DishBox, ButtonType } from '@/components';
 import { useSocket, useLanguage } from "@/helpers";
 import { getDish, getAllergensByDish } from '@/controller';
 
@@ -79,36 +76,31 @@ export const DishSelected = () => {
     }
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
-            <Grid container spacing={2} pb={2}>
-                <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconText icon={<RoomService />} text={texts.labels.dishes} />
-                </Grid>
-                <Grid item xs={4}>
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        backgroundColor: theme.background.primary,
-                        borderRadius: theme.shape.borderRadius,
-                    }}>
-                        <Typography variant="h6" sx={{
-                            fontSize: theme.typography.body1.fontSize,
-                            fontWeight: theme.typography.body1.fontWeight,
-                            padding: '3px',
-                        }}>
-                            {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
-                        </Typography>
-                    </Box>
-                </Grid>
-            </Grid>
-
-            <DishBox
-                name={dish.dish_name}
-                price={dish.price}
-                description={dish.description}
-                linkAR={dish.link_ar}
-                allergens={allergens}
-            />
-        </Box>
+        <>
+            <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
+                <DishBox
+                    name={dish.dish_name}
+                    price={dish.price}
+                    description={dish.description}
+                    linkAR={dish.link_ar}
+                    allergens={allergens}
+                    dish_id={dish.id}
+                />
+            </Box>
+            <Box sx={{
+                marginTop: '20px',
+                width: '100%',
+                bottom: '0',
+                pb: '40px',
+            }}>
+                <Box sx={{
+                    borderRadius: theme.shape.borderRadius,
+                    borderTop: '2px solid white',
+                    padding: '10px',
+                }}>
+                    <ButtonType text={texts.buttons.back} typeButton="outlined" urlLink={`/menu?desk_id=${deskId}`} />
+                </Box>
+            </Box>
+        </>
     );
 };

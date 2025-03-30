@@ -15,7 +15,8 @@
         "selectedDesk": "Table selected",
         "dishes": "Featured dishes",
         "desk": "Table",
-        "noDesk": "No table"
+        "noDesk": "No table",
+        "allergens": "Allergens"
     },
     "allergens": {
         "gluten": "Gluten",

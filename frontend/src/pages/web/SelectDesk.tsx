@@ -92,6 +92,8 @@ export const SelectDesk = () => {
             <Box sx={{
                 marginTop: '20px',
                 width: '100%',
+                position: 'fixed',
+                bottom: '0',
             }}>
                 {
                     selectedDesk !== null && (

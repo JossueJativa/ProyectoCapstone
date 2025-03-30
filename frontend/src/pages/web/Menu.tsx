@@ -99,6 +99,7 @@ export const Menu = () => {
                                 description={d.description}
                                 linkAR={d.link_ar}
                                 linkTo={`/dish/${d.id}?desk_id=${deskId}`}
+                                dish_id={d.id}
                             />
                         </Fade>
                     </Grid>

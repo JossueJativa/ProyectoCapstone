@@ -1,101 +1,105 @@
 import { Socket } from 'socket.io';
-import moment from 'moment';
-import { OrderHeader, OrderDetail } from '../model';
-import { IDate, ITime } from '../interface';
+import { OrderDetail } from '../model';
+
+const validateDeskId = (desk_id: string, callback: Function): boolean => {
+    if (!desk_id) {
+        callback({ message: 'Desk ID is required' }, null);
+        return false;
+    }
+    return true;
+};
 
 const SocketController = (socket: Socket) => {
     console.log('New connection', socket.id);
 
-    // Unir el socket a una sala específica basada en desk_id
     socket.on('join:desk', (desk_id) => {
         socket.join(desk_id);
-        console.log(`Socket ${socket.id} joined desk ${desk_id}`);
+        socket.emit('joined:desk', desk_id);
     });
 
     socket.on('order:create', async (data, callback) => {
+        const { product_id, quantity, desk_id } = data;
         try {
-            const year = moment().year();
-            const month = moment().month() + 1;
-            const day = moment().date();
-            const hours = moment().hour();
-            const minutes = moment().minute();
-            const seconds = moment().second();
-            const date: IDate = { year, month, day };
-            const time: ITime = { hours, minutes, seconds };
-            const orderHeader = new OrderHeader(data.desk_id, time, date, 'PENDING');
-            await OrderHeader.save(orderHeader);
-
-            // Emitir solo a la mesa correspondiente
-            socket.to(data.desk_id).emit('order:created', orderHeader);
-            callback(null, orderHeader);
-        } catch (error) {
-            callback(error);
-        }
-    });
-
-    socket.on('order:detail:create', async (data, callback) => {
-        try {
-            const orderDetail = new OrderDetail(data.order_header_id, data.product_id, data.quantity);
+            const orderDetail = new OrderDetail(product_id, quantity, desk_id);
             await OrderDetail.save(orderDetail);
 
-            // Emitir solo a la mesa correspondiente
-            socket.to(data.desk_id).emit('order:detail:created', orderDetail);
+            socket.to(desk_id).emit('order:created', orderDetail);
             callback(null, orderDetail);
         } catch (error) {
             callback(error);
         }
     });
 
-    socket.on('order:detail:delete', async (data, callback) => {
-        try {
-            const orderDetail = await OrderDetail.get(data.order_detail_id);
-            if (!orderDetail) throw new Error('OrderDetail not found');
+    socket.on('order:get', async (data, callback) => {
+        const { desk_id } = data;
+        if (!validateDeskId(desk_id, callback)) return;
 
-            await OrderDetail.delete(data.order_detail_id);
-            socket.to(data.desk_id).emit('order:detail:deleted', data.order_detail_id);
-            callback(null, data.order_detail_id);
+        try {
+            const orderDetails = await OrderDetail.getAll(desk_id);
+            if (!orderDetails) {
+                callback({ message: 'No orders found for the specified desk' }, null);
+                return;
+            }
+
+            socket.to(desk_id).emit('order:details', orderDetails);
+            callback(null, orderDetails);
         } catch (error: any) {
-            callback({ message: error.message });
+            callback({ message: error.message }, null);
         }
     });
 
-    socket.on('order:detail:update', async (data, callback) => {
+    socket.on('order:update', async (data, callback) => {
+        const { order_detail_id, desk_id } = data;
+        if (!validateDeskId(desk_id, callback)) return;
+
         try {
-            const orderDetail = await OrderDetail.get(data.order_detail_id);
-            if (!orderDetail) throw new Error('OrderDetail not found');
+            const orderDetail = await OrderDetail.get(order_detail_id);
+            if (!orderDetail) {
+                callback({ message: 'OrderDetail not found' }, null);
+                return;
+            }
 
             await OrderDetail.update(orderDetail, orderDetail.id);
-            socket.to(data.desk_id).emit('order:detail:updated', orderDetail);
+            socket.to(desk_id).emit('order:detail:updated', orderDetail);
             callback(null, orderDetail);
         } catch (error: any) {
-            callback({ message: error.message });
-        }
-    });
-
-    socket.on('order:status:update', async (data, callback) => {
-        try {
-            const orderHeader = await OrderHeader.get(data.order_header_id);
-            if (!orderHeader) throw new Error('OrderHeader not found');
-
-            orderHeader.order_status = data.status;
-            await OrderHeader.update(orderHeader, orderHeader.id);
-            socket.to(data.desk_id).emit('order:status:updated', orderHeader);
-            callback(null, orderHeader);
-        } catch (error: any) {
-            callback({ message: error.message });
+            callback({ message: error.message }, null);
         }
     });
 
     socket.on('order:delete', async (data, callback) => {
-        try {
-            const orderHeader = await OrderHeader.get(data.order_header_id);
-            if (!orderHeader) throw new Error('OrderHeader not found');
+        const { order_detail_id, desk_id } = data;
+        if (!validateDeskId(desk_id, callback)) return;
 
-            await OrderHeader.delete(data.order_header_id);
-            socket.to(data.desk_id).emit('order:deleted', data.order_header_id);
-            callback(null, data.order_header_id);
+        try {
+            const orderDetail = await OrderDetail.get(order_detail_id);
+            if (!orderDetail) {
+                callback({ message: 'OrderDetail not found' }, null);
+                return;
+            }
+
+            await OrderDetail.delete(order_detail_id);
+            socket.to(desk_id).emit('order:deleted', order_detail_id);
+            callback(null, order_detail_id);
         } catch (error: any) {
-            callback({ message: error.message });
+            callback({ message: error.message }, null);
+        }
+    });
+
+    socket.on('order:delete:all', async (data, callback) => {
+        const { desk_id } = data;
+        if (!validateDeskId(desk_id, callback)) return;
+
+        try {
+            const rowsDeleted = await OrderDetail.deleteAll(desk_id);
+            if (rowsDeleted > 0) {
+                socket.to(desk_id).emit('order:deleted:all', desk_id);
+                callback(null, { desk_id, rowsDeleted });
+            } else {
+                callback({ message: 'No orders found to delete for the specified desk' }, null);
+            }
+        } catch (error: any) {
+            callback({ message: error.message }, null);
         }
     });
 
