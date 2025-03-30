@@ -16,7 +16,9 @@
         "dishes": "Featured dishes",
         "desk": "Table",
         "noDesk": "No table",
-        "allergens": "Allergens"
+        "allergens": "Allergens",
+        "delete": "Delete",
+        "details": "Show details"
     },
     "allergens": {
         "gluten": "Gluten",

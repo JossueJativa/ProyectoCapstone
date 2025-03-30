@@ -4,14 +4,8 @@ import { Box, Grid, useTheme, Typography } from "@mui/material";
 import { ViewInAr, VolumeUp } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useLanguage, useSocket } from "@/helpers";
-import {
-  Grain, Restaurant, Egg,
-  SetMeal, EmojiFoodBeverage,
-  Spa, LocalDrink, AcUnit,
-  Grass, Star, Opacity,
-  FilterVintage, Pets,
-  Waves, CheckCircle,
-} from "@mui/icons-material";
+import { useCart } from "@/context/CartContext";
+import { AllergensList } from "./AllergensList";
 
 import { ButtonLogic } from "@/components";
 
@@ -21,35 +15,18 @@ interface DishBoxProps {
   description: string;
   linkAR: string;
   linkTo: string | null;
-  allergens: string[] | null;
+  allergens: number[] | null;
+  dish_id: number;
 }
-
-const allergenIcons: Record<string, JSX.Element> = {
-  "1": <Grain />, // Gluten
-  "2": <Restaurant />, // Crustaceos
-  "3": <Egg />, // Huevos
-  "4": <SetMeal />, // Pescados (replaced Fish with SetMeal)
-  "5": <EmojiFoodBeverage />, // Cacahuates
-  "6": <Spa />, // Soja
-  "7": <LocalDrink />, // Lacteos
-  "8": <AcUnit />, // Frutos con cascara
-  "9": <Grass />, // Apio
-  "10": <Star />, // Mostaza
-  "11": <Opacity />, // Sesamo
-  "12": <FilterVintage />, // Sulfitos
-  "13": <Pets />, // Altramuces
-  "14": <Waves />, // Moluscos
-  15: <CheckCircle />, // No tiene
-};
 
 export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
   ({ name, price, description, linkAR, linkTo, allergens, dish_id }, ref) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { texts } = useLanguage();
-    const { allergens: allergensText } = texts;
     const { socket } = useSocket();
     const location = useLocation();
+    const { syncCart } = useCart();
 
     useEffect(() => {
       const params = new URLSearchParams(location.search);
@@ -66,25 +43,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
           socket.off(`desk:notification:${desk_id}`, handleDeskNotification);
         };
       }
-    })
-
-    const allergenNames: Record<string, string> = {
-      "1": allergensText.gluten,
-      "2": allergensText.crustaceans,
-      "3": allergensText.eggs,
-      "4": allergensText.fish,
-      "5": allergensText.peanuts,
-      "6": allergensText.soy,
-      "7": allergensText.milk,
-      "8": allergensText.nuts,
-      "9": allergensText.celery,
-      "10": allergensText.mustard,
-      "11": allergensText.sesame,
-      "12": allergensText.sulphur,
-      "13": allergensText.lupin,
-      "14": allergensText.molluscs,
-      "15": allergensText.none,
-    };
+    });
 
     const handleAddDish = async (dish_id: number) => {
       const params = new URLSearchParams(location.search);
@@ -94,15 +53,9 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
 
       socket.emit('order:create', { product_id: dish_id, quantity: 1, desk_id: desk_id }, (error: any, response: any) => {
         if (error) {
-          console.error('Error creating or fetching order:', error);
           return;
         }
-        console.log('Order created successfully:', response);
-
-        // Listen for the 'order:created' event
-        socket.on('order:created', (orderDetail: any) => {
-          console.log('Order created event received:', orderDetail);
-        });
+        syncCart(); // Sync cart after adding a dish
       });
     };
 
@@ -206,53 +159,10 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
         </Box>
 
         {allergens && allergens.length > 0 && (
-          <Grid container spacing={2} pb={2}>
-            <Grid item xs={12}>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: theme.menu.black,
-                  fontSize: theme.typography.body1.fontSize,
-                  fontWeight: theme.typography.body1.fontWeight,
-                }}
-              >
-                {texts.labels.allergens}:
-              </Typography>
-              <Grid container spacing={2} mt={1}>
-                {allergens.length === 1 && allergens[0] === 15 ? (
-                  <Grid item xs="auto">
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      {allergenIcons[15]}
-                      <Typography>{allergenNames[15]}</Typography>
-                    </Box>
-                  </Grid>
-                ) : (
-                  allergens
-                    .filter((allergen) => allergen !== 15)
-                    .map((allergen) => (
-                      <Grid item xs="auto" key={allergen}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                          }}
-                        >
-                          {allergenIcons[allergen]}
-                          <Typography>{allergenNames[allergen]}</Typography>
-                        </Box>
-                      </Grid>
-                    ))
-                )}
-              </Grid>
-            </Grid>
-          </Grid>
+          <AllergensList
+            allergens={allergens}
+            allergenTexts={texts.allergens}
+          />
         )}
 
         {/* Botón AR y lectura en voz alta */}

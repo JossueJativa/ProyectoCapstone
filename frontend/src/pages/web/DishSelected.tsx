@@ -3,7 +3,7 @@ import { useTheme, Box, Grid, Skeleton } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { Error404 } from '../errors';
-import { LabelText, DishBox, ButtonType } from '@/components';
+import { DishBox, ButtonType, CartButton } from '@/components';
 import { useSocket, useLanguage } from "@/helpers";
 import { getDish, getAllergensByDish } from '@/controller';
 
@@ -101,6 +101,7 @@ export const DishSelected = () => {
                     <ButtonType text={texts.buttons.back} typeButton="outlined" urlLink={`/menu?desk_id=${deskId}`} />
                 </Box>
             </Box>
+            <CartButton />
         </>
     );
 };

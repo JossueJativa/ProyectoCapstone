@@ -21,7 +21,9 @@ export const Navbar = () => {
 
             {/* Columna del logotipo */}
             <Grid item xs={4} container justifyContent="center">
-                <img src={Logo} alt='Bistro al paso' style={{ maxWidth: '100%', height: 'auto' }} />
+                <a href={`/menu?desk_id=${new URLSearchParams(window.location.search).get('desk_id')}`} style={{ textDecoration: 'none' }}>
+                    <img src={Logo} alt='Bistro al paso' style={{ maxWidth: '100%', height: 'auto' }} />
+                </a>
             </Grid>
 
             {/* Columna de los idiomas */}

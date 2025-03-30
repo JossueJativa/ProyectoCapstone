@@ -16,7 +16,9 @@
         "dishes": "Platos destacados",
         "desk": "Mesa",
         "noDesk": "No hay mesa",
-        "allergens": "Alérgenos"
+        "allergens": "Alérgenos",
+        "delete": "Eliminar",
+        "details": "Ver detalles"
     },
     "allergens": {
         "gluten": "Gluten",

@@ -4,7 +4,7 @@ import { RoomService } from '@mui/icons-material';
 import { Box, Grid, Typography, useTheme, Fade } from '@mui/material';
 
 import { useSocket, useLanguage } from "@/helpers";
-import { IconText, DishBox } from '@/components';
+import { IconText, DishBox, CartButton } from '@/components';
 import { getDishes } from '@/controller';
 
 export const Menu = () => {
@@ -65,49 +65,52 @@ export const Menu = () => {
     }, [dishes]);
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
-            <Grid container spacing={2} pb={2}>
-                <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconText icon={<RoomService />} text={texts.labels.dishes} />
-                </Grid>
-                <Grid item xs={4}>
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        backgroundColor: theme.background.primary,
-                        borderRadius: theme.shape.borderRadius,
-                    }}>
-                        <Typography variant="h6" sx={{
-                            fontSize: theme.typography.body1.fontSize,
-                            fontWeight: theme.typography.body1.fontWeight,
-                            padding: '3px',
-                        }}>
-                            {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
-                        </Typography>
-                    </Box>
-                </Grid>
-            </Grid>
-
-            {/* Mostrar los platos con animación */}
-            <Grid container spacing={2}>
-                {dishes.slice(0, visibleDishes).map((d, index) => (
-                    <Grid item xs={12} key={d.id}>
-                        <Fade in={index < visibleDishes} timeout={500}>
-                            <DishBox
-                                name={d.dish_name}
-                                price={d.price}
-                                description={d.description}
-                                linkAR={d.link_ar}
-                                linkTo={`/dish/${d.id}?desk_id=${deskId}`}
-                                dish_id={d.id}
-                            />
-                        </Fade>
+        <>
+          <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
+                <Grid container spacing={2} pb={2}>
+                    <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
+                        <IconText icon={<RoomService />} text={texts.labels.dishes} />
                     </Grid>
-                ))}
-            </Grid>
+                    <Grid item xs={4}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            backgroundColor: theme.background.primary,
+                            borderRadius: theme.shape.borderRadius,
+                        }}>
+                            <Typography variant="h6" sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontWeight: theme.typography.body1.fontWeight,
+                                padding: '3px',
+                            }}>
+                                {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                </Grid>
 
-            {/* Observador para cargar más platos */}
-            <div ref={observerRef} style={{ height: '2px' }} />
-        </Box>
+                {/* Mostrar los platos con animación */}
+                <Grid container spacing={2}>
+                    {dishes.slice(0, visibleDishes).map((d, index) => (
+                        <Grid item xs={12} key={d.id}>
+                            <Fade in={index < visibleDishes} timeout={500}>
+                                <DishBox
+                                    name={d.dish_name}
+                                    price={d.price}
+                                    description={d.description}
+                                    linkAR={d.link_ar}
+                                    linkTo={`/dish/${d.id}?desk_id=${deskId}`}
+                                    dish_id={d.id}
+                                />
+                            </Fade>
+                        </Grid>
+                    ))}
+                </Grid>
+
+                {/* Observador para cargar más platos */}
+                <div ref={observerRef} style={{ height: '2px' }} />
+            </Box>
+            <CartButton />  
+        </>
     );
 };
