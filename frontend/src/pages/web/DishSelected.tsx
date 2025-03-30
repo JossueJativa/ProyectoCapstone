@@ -1,4 +1,4 @@
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme, Box, Grid, Skeleton } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -8,6 +8,7 @@ import { useSocket, useLanguage } from "@/helpers";
 import { getDish, getAllergensByDish } from '@/controller';
 
 export const DishSelected = () => {
+    const navigate = useNavigate();
     const { dishId } = useParams<{ dishId: string }>();
     const { texts } = useLanguage();
     const { socket } = useSocket();
@@ -98,7 +99,11 @@ export const DishSelected = () => {
                     borderTop: '2px solid white',
                     padding: '10px',
                 }}>
-                    <ButtonType text={texts.buttons.back} typeButton="outlined" urlLink={`/menu?desk_id=${deskId}`} />
+                    <ButtonType 
+                        text={texts.buttons.back} 
+                        typeButton="outlined" 
+                        urlLink={`/menu?desk_id=${deskId || ''}`} // Use urlLink instead of navigate
+                    />
                 </Box>
             </Box>
             <CartButton />

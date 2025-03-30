@@ -18,7 +18,9 @@
         "noDesk": "No table",
         "allergens": "Allergens",
         "delete": "Delete",
-        "details": "Show details"
+        "details": "Show details",
+        "itemsCount": "Items count",
+        "totalAmount": "Total amount"
     },
     "allergens": {
         "gluten": "Gluten",

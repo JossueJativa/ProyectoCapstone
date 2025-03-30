@@ -5,10 +5,11 @@ import { FC } from 'react';
 interface ButtonTypeProps {
     text: string;
     typeButton: 'primary' | 'outlined' | 'secondary';
-    urlLink: string;
+    urlLink?: string; // Make urlLink optional
+    onClick?: () => void; // Add onClick callback
 }
 
-export const ButtonType: FC<ButtonTypeProps> = ({ text, typeButton, urlLink }) => {
+export const ButtonType: FC<ButtonTypeProps> = ({ text, typeButton, urlLink, onClick }) => {
     const theme = useTheme();
 
     // Definir estilos de botón según el tipo
@@ -36,7 +37,7 @@ export const ButtonType: FC<ButtonTypeProps> = ({ text, typeButton, urlLink }) =
         }
     };
 
-    return (
+    return urlLink ? (
         <Link to={urlLink} style={{ textDecoration: 'none' }}>
             <Button
                 fullWidth
@@ -46,5 +47,14 @@ export const ButtonType: FC<ButtonTypeProps> = ({ text, typeButton, urlLink }) =
                 {text}
             </Button>
         </Link>
+    ) : (
+        <Button
+            fullWidth
+            variant={typeButton === 'outlined' ? 'outlined' : 'contained'}
+            sx={buttonStyles[typeButton]}
+            onClick={onClick} // Use onClick if no urlLink
+        >
+            {text}
+        </Button>
     );
 };

@@ -3,13 +3,18 @@ import { ShoppingCart as ShoppingCartIcon } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/helpers";
 import { useCart } from "@/context/CartContext";
+import { useEffect } from "react";
 
 export const CartButton = () => {
     const theme = useTheme();
-    const { cartCount } = useCart();
+    const { cartCount, syncCart } = useCart();
     const navigate = useNavigate();
     const location = useLocation();
     const { texts } = useLanguage();
+
+    useEffect(() => {
+        syncCart();
+    }, [syncCart]);
 
     return (
         <Button

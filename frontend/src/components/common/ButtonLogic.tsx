@@ -58,7 +58,7 @@ export const ButtonLogic: FC<ButtonLogicProps> = ({ text, typeButton, urlLink, o
         );
     } else if (urlLink) {
         return (
-            <Link to={urlLink} style={{ textDecoration: 'none', width: '100%' }} target='_blank'>
+            <Link to={urlLink} style={{ textDecoration: 'none', width: '100%' }}>
                 <Button
                     fullWidth
                     variant={typeButton === 'outlined' ? 'outlined' : 'contained'}
@@ -73,7 +73,5 @@ export const ButtonLogic: FC<ButtonLogicProps> = ({ text, typeButton, urlLink, o
         );
     }
 
-    // Si no se proporcionó ni `onClick` ni `urlLink`, muestra un error en la consola
-    console.error("ButtonLogic: Debes proporcionar 'onClick' o 'urlLink'.");
     return null;
 };

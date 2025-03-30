@@ -37,17 +37,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             // Listen for real-time updates
             const handleCartUpdate = (orderDetails: any[]) => {
-                setCartCount(orderDetails.length);
+                const activeOrders = orderDetails.filter(order => order.update_type !== "delete"); // Exclude deleted items
+                setCartCount(activeOrders.length);
             };
 
-            // Listen to the `order:details` event for the specific desk_id
             socket.on(`order:details`, handleCartUpdate);
 
             return () => {
                 socket.off(`order:details`, handleCartUpdate);
             };
         }
-    }, [socket, window.location.search]); // Re-run effect when desk_id changes
+    }, [socket, window.location.search]);
 
     return (
         <CartContext.Provider value={{ cartCount, syncCart }}>

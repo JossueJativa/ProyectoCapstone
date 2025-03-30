@@ -1,4 +1,5 @@
 import { Box, Typography, IconButton, TextField, useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { Add, Remove } from "@mui/icons-material";
 import { useLanguage, useSocket } from "@/helpers";
 import { ButtonLogic } from "@/components";
@@ -11,16 +12,19 @@ interface CartBoxProps {
     quantity: number;
     linkAR: string;
     desk_id: string | null;
+    linkTo: string; // Link to details page
     onQuantityChange: (id: number, newQuantity: number) => void; // Callback for quantity change
+    onDelete: (id: number) => void; // Callback for delete action
 }
 
-export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, desk_id, onQuantityChange }: CartBoxProps) => {
+export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, desk_id, linkTo, onQuantityChange, onDelete }: CartBoxProps) => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { texts } = useLanguage();
     const { socket } = useSocket();
 
     const handleQuantityChange = (newQuantity: number) => {
-        if (newQuantity < 1 || !desk_id) return; // Prevent invalid quantity or missing desk_id
+        if (newQuantity < 1 || !desk_id) return;
         console.log("Emitting order:update for order_detail_id:", id, "with new quantity:", newQuantity, "and desk_id:", desk_id); // Debug log
         socket.emit("order:update", { order_detail_id: id, desk_id, update_quantity: newQuantity }, (error: any, response: any) => {
             if (error) {
@@ -28,18 +32,6 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
             } else {
                 console.log("Quantity update response:", response); // Debug log
                 onQuantityChange(id, newQuantity); // Update state in parent
-            }
-        });
-    };
-
-    const handleDelete = () => {
-        if (!desk_id) return;
-        console.log("Emitting order:delete for order_detail_id:", id, "and desk_id:", desk_id); // Debug log
-        socket.emit("order:delete", { order_detail_id: id, desk_id }, (error: any, response: any) => {
-            if (error) {
-                console.error("Error deleting item:", error);
-            } else {
-                console.log("Delete response:", response);
             }
         });
     };
@@ -111,7 +103,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                     <ButtonLogic
                         text={texts.labels.delete}
                         typeButton="secondary"
-                        onClick={handleDelete}
+                        onClick={onDelete}
                     />
                 </Box>
                 <Box width="55%" display="flex" justifyContent="center" alignItems="center">
@@ -120,9 +112,9 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                         sx={{ mx: 1 }}
                         onClick={() => {
                             if (quantity === 1) {
-                                handleDelete(); // Delete the item if quantity is 1
+                                onDelete(id);
                             } else {
-                                handleQuantityChange(quantity - 1); // Decrease quantity otherwise
+                                handleQuantityChange(quantity - 1);
                             }
                         }}
                     >
@@ -148,7 +140,9 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
             <ButtonLogic
                 text={texts.labels.details}
                 typeButton="primary"
-                onClick={() => console.log("View details")}
+                onClick={() => {
+                    navigate(linkTo);
+                }}
             />
         </Box>
     );

@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Grid, useTheme, Typography } from "@mui/material";
 import { ViewInAr, VolumeUp } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import { useLanguage, useSocket } from "@/helpers";
 import { useCart } from "@/context/CartContext";
 import { AllergensList } from "./AllergensList";
@@ -27,23 +26,6 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
     const { socket } = useSocket();
     const location = useLocation();
     const { syncCart } = useCart();
-
-    useEffect(() => {
-      const params = new URLSearchParams(location.search);
-      const desk_id = params.get("desk_id");
-
-      if (socket && desk_id) {
-        const handleDeskNotification = (notification: any) => {
-          console.log(`📢 Notification for desk_${desk_id}:`, notification);
-        };
-
-        socket.on(`desk:notification:${desk_id}`, handleDeskNotification);
-
-        return () => {
-          socket.off(`desk:notification:${desk_id}`, handleDeskNotification);
-        };
-      }
-    });
 
     const handleAddDish = async (dish_id: number) => {
       const params = new URLSearchParams(location.search);
