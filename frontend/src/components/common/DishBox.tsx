@@ -92,25 +92,16 @@ export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
 
       if (!socket || !desk_id || !dish_id) return;
 
-      socket.emit('order:create', { desk_id: desk_id }, (error: any, orderHeader: any) => {
+      socket.emit('order:create', { product_id: dish_id, quantity: 1, desk_id: desk_id }, (error: any, response: any) => {
         if (error) {
           console.error('Error creating or fetching order:', error);
           return;
         }
+        console.log('Order created successfully:', response);
 
-        console.log('OrderHeader:', orderHeader);
-
-        socket.emit('order:detail:create', {
-          order_header_id: orderHeader.id,
-          product_id: dish_id,
-          quantity: 1,
-          desk_id: desk_id,
-        }, (error: any, orderDetail: any) => {
-          if (error) {
-            console.error('Error creating order detail:', error);
-          } else {
-            console.log('Order detail created:', orderDetail);
-          }
+        // Listen for the 'order:created' event
+        socket.on('order:created', (orderDetail: any) => {
+          console.log('Order created event received:', orderDetail);
         });
       });
     };
