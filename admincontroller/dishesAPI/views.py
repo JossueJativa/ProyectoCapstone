@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Desk, Allergens, Ingredient, Dish, Order, OrderDish
-from .serializer import DeskSerializer, AllergensSerializer, IngredientSerializer, DishSerializer, OrderSerializer, OrderDishSerializer
+from .models import Desk, Allergens, Ingredient, Dish, Order, OrderDish, Category, Garrison
+from .serializer import DeskSerializer, AllergensSerializer, IngredientSerializer, DishSerializer, OrderSerializer, OrderDishSerializer, CategorySerializer, GarrisonSerializer
 
 class BaseProtectedViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
@@ -16,6 +16,10 @@ class BaseProtectedViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         return Response({'error': 'Method not allowed'}, status=405)
+
+class CategoryViewSet(BaseProtectedViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 class DeskViewSet(BaseProtectedViewSet):
     queryset = Desk.objects.all()
@@ -32,6 +36,10 @@ class IngredientViewSet(BaseProtectedViewSet):
 class DishViewSet(BaseProtectedViewSet):
     queryset = Dish.objects.all()
     serializer_class = DishSerializer
+
+class GarrisonViewSet(BaseProtectedViewSet):
+    queryset = Garrison.objects.all()
+    serializer_class = GarrisonSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
