@@ -1,12 +1,8 @@
 import { Typography } from '@mui/material';
 import { FC } from 'react';
+import { IIConTextProps } from '@/interfaces';
 
-interface IconTextProps {
-    icon: JSX.Element;
-    text: string;
-}
-
-export const IconText:FC<IconTextProps> = ({ icon, text }) => {
+export const IconText:FC<IIConTextProps> = ({ icon, text }) => {
     return (
         <Typography
             variant="body1"

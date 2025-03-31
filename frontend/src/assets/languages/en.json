@@ -9,7 +9,9 @@
         "ar": "AR",
         "read": "Read",
         "add": "Add to cart",
-        "back": "Back"
+        "back": "Back",
+        "makeOrder": "Make order",
+        "accept": "Accept"
     },
     "labels": {
         "selectedDesk": "Table selected",
@@ -20,7 +22,9 @@
         "delete": "Delete",
         "details": "Show details",
         "itemsCount": "Items count",
-        "totalAmount": "Total amount"
+        "totalAmount": "Total amount",
+        "emptyCart": "Your cart is empty",
+        "orderSuccess": "Your order has been successfully sent. We will deliver your food shortly."
     },
     "allergens": {
         "gluten": "Gluten",

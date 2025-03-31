@@ -3,21 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Add, Remove } from "@mui/icons-material";
 import { useLanguage, useSocket } from "@/helpers";
 import { ButtonLogic } from "@/components";
+import { ICartBoxProps } from "@/interfaces";
 
-interface CartBoxProps {
-    id: number;
-    dish_name: string;
-    description: string;
-    price: number;
-    quantity: number;
-    linkAR: string;
-    desk_id: string | null;
-    linkTo: string; // Link to details page
-    onQuantityChange: (id: number, newQuantity: number) => void; // Callback for quantity change
-    onDelete: (id: number) => void; // Callback for delete action
-}
-
-export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, desk_id, linkTo, onQuantityChange, onDelete }: CartBoxProps) => {
+export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, desk_id, linkTo, onQuantityChange, onDelete }: ICartBoxProps) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { texts } = useLanguage();

@@ -3,5 +3,5 @@ export {
     DishBox, CartButton, CartBox
 } from './common';
 export {
-    LabelText, IconText
+    LabelText, IconText, PopUpInformation
 } from './decorator';

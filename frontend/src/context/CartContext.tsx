@@ -1,12 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useSocket } from "@/helpers";
+import { ICartContextProps } from "@/interfaces";
 
-interface CartContextProps {
-    cartCount: number;
-    syncCart: () => void;
-}
-
-const CartContext = createContext<CartContextProps | undefined>(undefined);
+const CartContext = createContext<ICartContextProps | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [cartCount, setCartCount] = useState(0);

@@ -1,15 +1,9 @@
 import { Button, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { FC } from 'react';
+import { IButtonTypeProps } from '@/interfaces';
 
-interface ButtonTypeProps {
-    text: string;
-    typeButton: 'primary' | 'outlined' | 'secondary';
-    urlLink?: string; // Make urlLink optional
-    onClick?: () => void; // Add onClick callback
-}
-
-export const ButtonType: FC<ButtonTypeProps> = ({ text, typeButton, urlLink, onClick }) => {
+export const ButtonType: FC<IButtonTypeProps> = ({ text, typeButton, urlLink, onClick }) => {
     const theme = useTheme();
 
     // Definir estilos de botón según el tipo

@@ -2,23 +2,14 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Grid, useTheme, Typography } from "@mui/material";
 import { ViewInAr, VolumeUp } from "@mui/icons-material";
+
+import { AllergensList } from "./AllergensList";
 import { useLanguage, useSocket } from "@/helpers";
 import { useCart } from "@/context/CartContext";
-import { AllergensList } from "./AllergensList";
-
 import { ButtonLogic } from "@/components";
+import { IDishBoxProps } from "@/interfaces";
 
-interface DishBoxProps {
-  name: string;
-  price: number;
-  description: string;
-  linkAR: string;
-  linkTo: string | null;
-  allergens: number[] | null;
-  dish_id: number;
-}
-
-export const DishBox = React.forwardRef<HTMLDivElement, DishBoxProps>(
+export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
   ({ name, price, description, linkAR, linkTo, allergens, dish_id }, ref) => {
     const theme = useTheme();
     const navigate = useNavigate();

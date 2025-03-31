@@ -1,12 +1,8 @@
 import { Typography, useTheme } from '@mui/material';
 import { FC } from 'react';
+import { ILabelTextProps } from '@/interfaces';
 
-interface LabelTextProps {
-    typeText?: 'title' | 'subtitle' | 'body1' | 'body2';
-    text: string;
-}
-
-export const LabelText: FC<LabelTextProps> = ({ typeText = 'title', text }) => {
+export const LabelText: FC<ILabelTextProps> = ({ typeText = 'title', text }) => {
     const theme = useTheme();
 
     // Define a mapping of supported types to MUI typography variants

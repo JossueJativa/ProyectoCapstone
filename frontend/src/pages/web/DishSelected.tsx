@@ -1,4 +1,4 @@
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { useTheme, Box, Grid, Skeleton } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -8,7 +8,6 @@ import { useSocket, useLanguage } from "@/helpers";
 import { getDish, getAllergensByDish } from '@/controller';
 
 export const DishSelected = () => {
-    const navigate = useNavigate();
     const { dishId } = useParams<{ dishId: string }>();
     const { texts } = useLanguage();
     const { socket } = useSocket();

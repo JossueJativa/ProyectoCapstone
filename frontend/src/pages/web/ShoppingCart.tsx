@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Box, Grid, Typography, useTheme, CircularProgress } from '@mui/material';
 import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { useSocket, useLanguage } from "@/helpers";
-import { IconText, CartBox, ButtonType } from '@/components';
-import { getDish } from '@/controller';
+import { IconText, CartBox, ButtonType, PopUpInformation } from '@/components';
+import { getDish, createOrder, createOrderDish } from '@/controller';
 
 export const ShoppingCart = () => {
-    const navigate = useNavigate();
     const theme = useTheme();
     const { texts } = useLanguage();
     const { socket } = useSocket();
@@ -17,6 +16,8 @@ export const ShoppingCart = () => {
     const [cartDishes, setCartDishes] = useState<any[]>([]);
     const [fetchedDishIds, setFetchedDishIds] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState<boolean>(true);
+    const [showPopUp, setShowPopUp] = useState(false);
+    const [orderResponse, setOrderResponse] = useState<any>(null); // Add state to store the response
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -29,6 +30,9 @@ export const ShoppingCart = () => {
                     if (error) {
                         console.error("Error fetching cart details:", error);
                         return;
+                    }
+                    if (orderDetails.length === 0) {
+                        setLoading(false);
                     }
                     mergeCartDishes(orderDetails);
                 });
@@ -61,20 +65,6 @@ export const ShoppingCart = () => {
             };
         }
     }, [socket, deskId]);
-
-    const mergeCartDishes = async (newDishes: any[]) => {
-        const updatedDishes = await Promise.all(
-            newDishes.map(async (dish) => {
-                if (!dish.details) {
-                    const dishDetails = await getDish(dish.product_id);
-                    return { ...dish, details: dishDetails };
-                }
-                return dish;
-            })
-        );
-
-        setCartDishes(updatedDishes); // Replace the entire state with the new data
-    };
 
     useEffect(() => {
         const fetchDishDetails = async () => {
@@ -114,6 +104,20 @@ export const ShoppingCart = () => {
         }
     }, [cartDishes]);
 
+    const mergeCartDishes = async (newDishes: any[]) => {
+        const updatedDishes = await Promise.all(
+            newDishes.map(async (dish) => {
+                if (!dish.details) {
+                    const dishDetails = await getDish(dish.product_id);
+                    return { ...dish, details: dishDetails };
+                }
+                return dish;
+            })
+        );
+
+        setCartDishes(updatedDishes);
+    };
+
     const handleQuantityChange = (id: number, newQuantity: number) => {
         setCartDishes(prevDishes =>
             prevDishes.map(dish =>
@@ -139,6 +143,49 @@ export const ShoppingCart = () => {
         return { totalQuantity, totalPrice };
     };
 
+    const handleMakeOrder = async () => {
+        if (deskId && socket) {
+            console.log("Making order with desk_id:", deskId);
+            try {
+                // Create individual order dishes and collect their IDs
+                const orderDishIds = await Promise.all(
+                    cartDishes.map(async (dish) => {
+                        const orderDishResponse = await createOrderDish({
+                            order_dish: {
+                                dish_id: dish.details.id,
+                                quantity: dish.quantity,
+                            },
+                        });
+                        return orderDishResponse.id;
+                    })
+                );
+
+                // Set the orderDish IDs in the cartDishes state
+                setCartDishes(prevDishes =>
+                    prevDishes.map((dish, index) => ({
+                        ...dish,
+                        orderDishId: orderDishIds[index],
+                    }))
+                );
+
+                // Create the order with the array of orderDish IDs
+                const response = await createOrder({
+                    deskId: parseInt(deskId),
+                    totalPrice: cartDishes.reduce((sum, dish) => sum + dish.quantity * dish.details.price, 0),
+                    status: "Pendiente",
+                    orderDish: orderDishIds,
+                });
+
+                setOrderResponse(response);
+                console.log("Order response:", response);
+
+                setShowPopUp(true);
+            } catch (error) {
+                console.error("Error creating order:", error);
+            }
+        }
+    };
+
     const { totalQuantity, totalPrice } = calculateSummary();
 
     if (loading) {
@@ -149,107 +196,197 @@ export const ShoppingCart = () => {
         );
     }
 
-    return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
-            {/* Render cart dishes */}
-            <Grid container spacing={2} pb={2}>
-                <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconText icon={<ShoppingCartIcon />} text={texts.buttons.cart} />
-                </Grid>
-                <Grid item xs={4}>
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        backgroundColor: theme.background.primary,
-                        borderRadius: theme.shape.borderRadius,
-                    }}>
-                        <Typography variant="h6" sx={{
-                            fontSize: theme.typography.body1.fontSize,
-                            fontWeight: theme.typography.body1.fontWeight,
-                            padding: '3px',
+    if (cartDishes.length === 0) {
+        return (
+            <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
+                {/* Render cart dishes */}
+                <Grid container spacing={2} pb={2}>
+                    <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
+                        <IconText icon={<ShoppingCartIcon />} text={texts.buttons.cart} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            backgroundColor: theme.background.primary,
+                            borderRadius: theme.shape.borderRadius,
                         }}>
-                            {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
+                            <Typography variant="h6" sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontWeight: theme.typography.body1.fontWeight,
+                                padding: '3px',
+                            }}>
+                                {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                </Grid>
+
+                {/* Summary Section */}
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: `1px solid white`,
+                    borderRadius: theme.shape.borderRadius,
+                    padding: '10px',
+                    marginBottom: '20px',
+                }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            {texts.labels.itemsCount}:
+                        </Typography>
+                        <Typography variant="body1" sx={{
+                            color: theme.button.cafeMedio,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.title.fontWeight,
+                        }}>
+                            0
                         </Typography>
                     </Box>
-                </Grid>
-            </Grid>
-
-            {/* Summary Section */}
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                border: `1px solid white`,
-                borderRadius: theme.shape.borderRadius,
-                padding: '10px',
-                marginBottom: '20px',
-            }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                        {texts.labels.itemsCount}:
-                    </Typography>
-                    <Typography variant="body1" sx={{
-                        color: theme.button.cafeMedio,
-                        fontSize: theme.typography.body1.fontSize,
-                        fontWeight: theme.typography.title.fontWeight,
-                    }}>
-                        {totalQuantity}
-                    </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                        {texts.labels.totalAmount}:
-                    </Typography>
-                    <Typography variant="body1" sx={{
-                        color: theme.button.cafeMedio,
-                        fontSize: theme.typography.body1.fontSize,
-                        fontWeight: theme.typography.title.fontWeight,
-                    }}>
-                        ${totalPrice.toFixed(2)}
-                    </Typography>
-                </Box>
-            </Box>
-
-            <Box>
-                {cartDishes.map((dish, index) => (
-                    <Box key={index} sx={{ marginBottom: '10px' }}>
-                        {dish.details ? (
-                            <CartBox
-                                id={dish.id}
-                                dish_name={dish.details.dish_name}
-                                description={dish.details.description}
-                                price={dish.details.price}
-                                quantity={dish.quantity}
-                                linkAR={dish.details.link_ar}
-                                desk_id={deskId}
-                                linkTo={`/dish/${dish.details.id}?desk_id=${deskId}`}
-                                onQuantityChange={handleQuantityChange}
-                                onDelete={() => handleDelete(dish.id)}
-                            />
-                        ) : (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
-                                <CircularProgress />
-                            </Box>
-                        )}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            {texts.labels.totalAmount}:
+                        </Typography>
+                        <Typography variant="body1" sx={{
+                            color: theme.button.cafeMedio,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.title.fontWeight,
+                        }}>
+                            $0.00
+                        </Typography>
                     </Box>
-                ))}
-            </Box>
-            <Box sx={{
-                marginTop: '20px',
-                width: '100%',
-                bottom: '0',
-            }}>
-                <Box sx={{
-                    borderRadius: theme.shape.borderRadius,
-                    borderTop: '2px solid white',
-                    padding: '10px',
-                }}>
-                    <ButtonType 
-                        text={texts.buttons.back} 
-                        typeButton="outlined" 
-                        urlLink={`/menu?desk_id=${deskId || ''}`}
-                    />
+                </Box>
+
+                <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: theme.palette.text.secondary }}>
+                        {texts.labels.emptyCart}
+                    </Typography>
                 </Box>
             </Box>
-        </Box>
+        );
+    }
+
+    return (
+        <>
+            <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
+                {/* Render cart dishes */}
+                <Grid container spacing={2} pb={2}>
+                    <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
+                        <IconText icon={<ShoppingCartIcon />} text={texts.buttons.cart} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            backgroundColor: theme.background.primary,
+                            borderRadius: theme.shape.borderRadius,
+                        }}>
+                            <Typography variant="h6" sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontWeight: theme.typography.body1.fontWeight,
+                                padding: '3px',
+                            }}>
+                                {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                </Grid>
+
+                {/* Summary Section */}
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: `1px solid white`,
+                    borderRadius: theme.shape.borderRadius,
+                    padding: '10px',
+                    marginBottom: '20px',
+                }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            {texts.labels.itemsCount}:
+                        </Typography>
+                        <Typography variant="body1" sx={{
+                            color: theme.button.cafeMedio,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.title.fontWeight,
+                        }}>
+                            {totalQuantity}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                            {texts.labels.totalAmount}:
+                        </Typography>
+                        <Typography variant="body1" sx={{
+                            color: theme.button.cafeMedio,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.title.fontWeight,
+                        }}>
+                            ${totalPrice.toFixed(2)}
+                        </Typography>
+                    </Box>
+                </Box>
+
+                <Box>
+                    {cartDishes.map((dish, index) => (
+                        <Box key={index} sx={{ marginBottom: '10px' }}>
+                            {dish.details ? (
+                                <CartBox
+                                    id={dish.id}
+                                    dish_name={dish.details.dish_name}
+                                    description={dish.details.description}
+                                    price={dish.details.price}
+                                    quantity={dish.quantity}
+                                    linkAR={dish.details.link_ar}
+                                    desk_id={deskId}
+                                    linkTo={`/dish/${dish.details.id}?desk_id=${deskId}`}
+                                    onQuantityChange={handleQuantityChange}
+                                    onDelete={() => handleDelete(dish.id)}
+                                />
+                            ) : (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
+                                    <CircularProgress />
+                                </Box>
+                            )}
+                        </Box>
+                    ))}
+                </Box>
+                <Box sx={{
+                    marginTop: '20px',
+                    width: '100%',
+                    bottom: '0',
+                }}>
+                    <Box sx={{
+                        borderRadius: theme.shape.borderRadius,
+                        borderTop: '2px solid white',
+                        padding: '10px',
+                    }}>
+                        <Box sx={{ marginBottom: '10px' }}>
+                            <ButtonType
+                                text={texts.buttons.makeOrder}
+                                typeButton="primary"
+                                onClick={() => {
+                                    handleMakeOrder();
+                                }
+                                }
+                            />
+                        </Box>
+                        <Box sx={{ marginBottom: '5px' }}>
+                            <ButtonType
+                                text={texts.buttons.back}
+                                typeButton="outlined"
+                                urlLink={`/menu?desk_id=${deskId || ''}`}
+                            />
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+            <PopUpInformation
+                open={showPopUp}
+                isInformative={true}
+                message={texts.labels.orderSuccess}
+                redirect={`/invoice/`}
+            />
+        </>
     );
 };

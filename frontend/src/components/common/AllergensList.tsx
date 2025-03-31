@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { useLanguage } from "@/helpers";
 import {
     Grain, Restaurant, Egg,
     SetMeal, EmojiFoodBeverage,
@@ -9,28 +8,8 @@ import {
     FilterVintage, Pets,
     Waves, CheckCircle,
 } from "@mui/icons-material";
-
-interface AllergensListProps {
-    allergens: number[];
-    allergenTexts: {
-        gluten: string;
-        crustaceans: string;
-        eggs: string;
-        fish: string;
-        peanuts: string;
-        soy: string;
-        milk: string;
-        nuts: string;
-        celery: string;
-        mustard: string;
-        sesame: string;
-        sulphur: string;
-        lupin: string;
-        molluscs: string;
-        none: string;
-        label: string;
-    };
-}
+import { useLanguage } from "@/helpers";
+import { IAllergensListProps } from "@/interfaces";
 
 const allergenIcons: Record<number, JSX.Element> = {
     1: <Grain />, // Gluten
@@ -50,7 +29,7 @@ const allergenIcons: Record<number, JSX.Element> = {
     15: <CheckCircle />, // No tiene
 };
 
-const getAllergenNames = (allergenTexts: AllergensListProps["allergenTexts"]): Record<number, string> => ({
+const getAllergenNames = (allergenTexts: IAllergensListProps["allergenTexts"]): Record<number, string> => ({
     1: allergenTexts.gluten,
     2: allergenTexts.crustaceans,
     3: allergenTexts.eggs,
@@ -68,7 +47,7 @@ const getAllergenNames = (allergenTexts: AllergensListProps["allergenTexts"]): R
     15: allergenTexts.none,
 });
 
-export const AllergensList: React.FC<AllergensListProps> = ({
+export const AllergensList: React.FC<IAllergensListProps> = ({
     allergens,
     allergenTexts,
 }) => {

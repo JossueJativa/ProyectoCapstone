@@ -1,30 +1,13 @@
 import { API } from './api';
+import {
+    IDeskData,
+    IAllergenData,
+    IIngredientData,
+    IDishData,
+    IOrderData
+} from '@/interfaces'
 
-interface DeskData {
-    number: number;
-    capacity: number;
-}
-
-interface AllergenData {
-    name: string;
-}
-
-interface IngredientData {
-    name: string;
-    quantity: number;
-    allergens: string[];
-}
-
-interface DishData {
-    name: string;
-    description: string;
-    time_elaboration: number;
-    price: number;
-    link_ar: string;
-    ingredients: string[];
-}
-
-const createDesk = async (data: DeskData): Promise<any> => {
+const createDesk = async (data: IDeskData): Promise<any> => {
     const { number, capacity } = data;
     const api = new API();
     const response = await api.post('/desk', {
@@ -34,7 +17,7 @@ const createDesk = async (data: DeskData): Promise<any> => {
     return response?.data;
 }
 
-const createAllergen = async (data: AllergenData): Promise<any> => {
+const createAllergen = async (data: IAllergenData): Promise<any> => {
     const { name } = data;
     const api = new API();
     const response = await api.post('/allergens', {
@@ -43,7 +26,7 @@ const createAllergen = async (data: AllergenData): Promise<any> => {
     return response?.data;
 }
 
-const createIngredient = async (data: IngredientData): Promise<any> => {
+const createIngredient = async (data: IIngredientData): Promise<any> => {
     const { name, quantity, allergens } = data;
     const api = new API();
     const response = await api.post('/ingredient', {
@@ -54,7 +37,7 @@ const createIngredient = async (data: IngredientData): Promise<any> => {
     return response?.data;
 }
 
-const createDish = async (data: DishData): Promise<any> => {
+const createDish = async (data: IDishData): Promise<any> => {
     const { 
         name,
         description,
@@ -75,9 +58,47 @@ const createDish = async (data: DishData): Promise<any> => {
     return response?.data;
 }
 
+const createOrder = async (data: IOrderData): Promise<any> => {
+    const { deskId, totalPrice, status, orderDish } = data;
+    const api = new API();
+    // date YYYY-MM-DD
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    // Time HH:MM:SS
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
+    const response = await api.post('/order', {
+        desk: deskId,
+        date: formattedDate,
+        time: formattedTime,
+        total_price: totalPrice,
+        status,
+        order_dish: orderDish
+    });
+
+    return response?.data;
+}
+
+const createOrderDish = async (data: any): Promise<any> => {
+    const { dishId, quantity } = data;
+    const api = new API();
+    const response = await api.post('/orderdish', {
+        dish: dishId,
+        quantity
+    });
+    return response?.data;
+}
+
 export {
     createDesk,
     createAllergen,
     createIngredient,
-    createDish
+    createDish,
+    createOrder,
+    createOrderDish
 };

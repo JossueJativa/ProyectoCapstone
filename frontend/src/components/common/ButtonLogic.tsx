@@ -1,16 +1,9 @@
 import { Button, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { FC } from 'react';
+import { IButtonLogicProps } from '@/interfaces';
 
-interface ButtonLogicProps {
-    text: string;
-    typeButton: 'primary' | 'outlined' | 'secondary';
-    urlLink?: string;
-    onClick?: () => void;
-    icon?: JSX.Element;
-}
-
-export const ButtonLogic: FC<ButtonLogicProps> = ({ text, typeButton, urlLink, onClick, icon }) => {
+export const ButtonLogic: FC<IButtonLogicProps> = ({ text, typeButton, urlLink, onClick, icon }) => {
     const theme = useTheme();
 
     // Validación: No pueden estar ambos definidos a la vez

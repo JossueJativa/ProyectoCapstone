@@ -14,5 +14,7 @@ export {
     createDesk,
     createAllergen,
     createIngredient,
-    createDish
+    createDish,
+    createOrder,
+    createOrderDish
 } from './setInformation';
