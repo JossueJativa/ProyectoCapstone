@@ -8,7 +8,8 @@ export {
     getIngredients,
     getDishes,
     getDish,
-    getIngredient
+    getIngredient,
+    getGarrisonsByDish
 } from './getInformation';
 export {
     createDesk,

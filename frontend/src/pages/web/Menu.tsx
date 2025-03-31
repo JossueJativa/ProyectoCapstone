@@ -39,6 +39,7 @@ export const Menu = () => {
         const fetchDishes = async () => {
             const dishesList = await getDishes();
             setDishes(dishesList);
+            console.log('Dishes fetched:', dishesList);
         };
         fetchDishes();
     }, []);
@@ -101,6 +102,7 @@ export const Menu = () => {
                                     linkAR={d.link_ar}
                                     linkTo={`/dish/${d.id}?desk_id=${deskId}`}
                                     dish_id={d.id}
+                                    has_garrison={d.has_garrison}
                                 />
                             </Fade>
                         </Grid>

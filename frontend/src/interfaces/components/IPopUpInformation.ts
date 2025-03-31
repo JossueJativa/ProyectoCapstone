@@ -4,4 +4,5 @@ export interface IPopUpInformationProps {
     message: string;
     isInformative?: boolean;
     redirect: string;
+    children?: React.ReactNode;
 }

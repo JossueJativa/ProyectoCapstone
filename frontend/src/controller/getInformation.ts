@@ -59,6 +59,20 @@ const getAllergensByDish = async(dishId: string) => {
     return Array.from(allergensSet).sort((a, b) => a - b);
 };
 
+const getGarrisonsByDish = async(dishId: string) => {
+    const api = new API();
+    const response = await api.get(`/garrison`);
+
+    const garrisonDish = response?.data.filter((garrison: any) => garrison.dish.includes(dishId));
+    const garrisonReturn = garrisonDish.map((garrison: any) => {
+        return {
+            id: garrison.id,
+            name: garrison.garrison_name
+        };
+    });
+    return garrisonReturn;
+}
+
 export { 
     getDesk, 
     getAllergens, 
@@ -67,4 +81,5 @@ export {
     getDishes,
     getDish,
     getIngredient,
+    getGarrisonsByDish
 };

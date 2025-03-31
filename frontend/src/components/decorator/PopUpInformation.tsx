@@ -4,7 +4,7 @@ import { IPopUpInformationProps } from '@/interfaces';
 import { ButtonType } from '@/components';
 import { useLanguage } from '@/helpers';
 
-export const PopUpInformation = ({ open, title, message, isInformative, redirect }: IPopUpInformationProps) => {
+export const PopUpInformation = ({ open, title, message, isInformative, redirect, children }: IPopUpInformationProps) => {
     const { texts } = useLanguage();
     return (
         (
@@ -32,17 +32,8 @@ export const PopUpInformation = ({ open, title, message, isInformative, redirect
                 <Dialog open={open}>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogContent>
-                        <p>{message}</p>
+                        {children}
                     </DialogContent>
-                    <DialogActions>
-                        <Box width="100%">
-                            <ButtonType
-                                text={texts.buttons.accept}
-                                typeButton="primary"
-                                urlLink={redirect}
-                            />
-                        </Box>
-                    </DialogActions>
                 </Dialog>
             )
         )

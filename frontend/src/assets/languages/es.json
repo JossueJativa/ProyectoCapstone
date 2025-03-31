@@ -46,5 +46,8 @@
     "errors": {
         "notFoundTitle": "No encontrado",
         "notFoundMessage": "La página que estás buscando no existe."
+    },
+    "popups": {
+        "select": "Selecciona dos guarniciones"
     }
 }
