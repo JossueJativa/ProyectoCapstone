@@ -1,28 +1,5 @@
-import { API } from './api';
-
-const getDesk = async() => {
-    const api = new API();
-    const response = await api.get('/desk');
-    return response?.data;
-}
-
-const getAllergens = async() => {
-    const api = new API();
-    const response = await api.get('/allergens');
-    return response?.data;
-}
-
-const getIngredients = async() => {
-    const api = new API();
-    const response = await api.get('/ingredient');
-    return response?.data;
-}
-
-const getIngredient = async(ingredientId: string) => {
-    const api = new API();
-    const response = await api.get(`/ingredient/${ingredientId}`);
-    return response?.data;
-}
+import { API } from '../api';
+import { getIngredient } from './index';
 
 const getDishes = async() => {
     const api = new API();
@@ -73,13 +50,33 @@ const getGarrisonsByDish = async(dishId: string) => {
     return garrisonReturn;
 }
 
-export { 
-    getDesk, 
-    getAllergens, 
-    getAllergensByDish,
-    getIngredients,
-    getDishes,
-    getDish,
-    getIngredient,
-    getGarrisonsByDish
+const getOrderDishByOrderId = async(OrderID: number) => {
+    const api = new API();
+    const response = await api.get('/orderdish');
+    const orderDishReturn = await Promise.all(response?.data
+        .filter((orderD: any) => Number(orderD.order) === Number(OrderID))
+        .map(async (orderD: any) => {
+            const dishId = orderD.dish;
+            const dish = await getDish(dishId);
+            return {
+                id: orderD.id,
+                quantity: orderD.quantity,
+                order: orderD.order,
+                dish: {
+                    id: dish.id,
+                    name: dish.dish_name,
+                    price: dish.price,
+                }
+            };
+        })
+    );
+    return orderDishReturn;
 };
+
+export {
+    getDishes, 
+    getDish, 
+    getAllergensByDish,
+    getGarrisonsByDish,
+    getOrderDishByOrderId
+}

@@ -6,3 +6,4 @@ export type { IButtonTypeProps } from './IButtonType';
 export type { ICartBoxProps } from './ICartBox';
 export type { IDishBoxProps } from './IDishBox';
 export type { ILabelTextProps } from './ILabelText';
+export type { CategoriesListProps, Category } from './ICategories';

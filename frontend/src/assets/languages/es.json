@@ -11,7 +11,9 @@
         "add": "Agregar al carrito",
         "back": "Regresar",
         "makeOrder": "Realizar pedido",
-        "accept": "Aceptar"
+        "accept": "Aceptar",
+        "makeInvoice": "Realizar factura",
+        "divideAccount": "Dividir cuenta"
     },
     "labels": {
         "selectedDesk": "Mesa seleccionada",

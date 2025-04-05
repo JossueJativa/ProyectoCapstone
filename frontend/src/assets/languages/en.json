@@ -11,7 +11,9 @@
         "add": "Add to cart",
         "back": "Back",
         "makeOrder": "Make order",
-        "accept": "Accept"
+        "accept": "Accept",
+        "makeInvoice": "Make invoice",
+        "divideAccount": "Divide account"
     },
     "labels": {
         "selectedDesk": "Table selected",

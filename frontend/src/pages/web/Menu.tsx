@@ -4,8 +4,8 @@ import { RoomService } from '@mui/icons-material';
 import { Box, Grid, Typography, useTheme, Fade } from '@mui/material';
 
 import { useSocket, useLanguage } from "@/helpers";
-import { IconText, DishBox, CartButton } from '@/components';
-import { getDishes } from '@/controller';
+import { IconText, DishBox, CartButton, CategoriesList } from '@/components';
+import { getDishes, getCategories } from '@/controller';
 
 export const Menu = () => {
     const { texts } = useLanguage();
@@ -13,8 +13,10 @@ export const Menu = () => {
     const theme = useTheme();
     const location = useLocation();
     const [dishes, setDishes] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
     const [visibleDishes, setVisibleDishes] = useState<number>(10); // Número inicial de platos visibles
     const [deskId, setDeskId] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -36,12 +38,26 @@ export const Menu = () => {
     }, [socket, location.search]);
 
     useEffect(() => {
-        const fetchDishes = async () => {
-            const dishesList = await getDishes();
-            setDishes(dishesList);
-            console.log('Dishes fetched:', dishesList);
+        const fetchCategories = async () => {
+            try {
+                const categoriesList = await getCategories(); // Asegurarse de esperar la promesa
+                setCategories(categoriesList);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
         };
+
+        const fetchDishes = async () => {
+            try {
+                const dishesList = await getDishes();
+                setDishes(dishesList);
+            } catch (error) {
+                console.error("Error fetching dishes:", error);
+            }
+        };
+
         fetchDishes();
+        fetchCategories();
     }, []);
 
     useEffect(() => {
@@ -65,9 +81,31 @@ export const Menu = () => {
         };
     }, [dishes]);
 
+    const handleCategorySelect = async (categoryId: number) => {
+        console.log("Selected Category ID:", categoryId);
+        try {
+            if (selectedCategory === categoryId) {
+                // Si la categoría seleccionada ya está activa, deseleccionarla
+                const dishesList = await getDishes(); // Obtener todos los platos
+                setDishes(dishesList);
+                setVisibleDishes(10); // Reiniciar el número de platos visibles
+                setSelectedCategory(null); // Deseleccionar la categoría
+            } else {
+                const dishesList = await getDishes(); // Realizar una nueva solicitud a la API
+                const filteredDishes = dishesList.filter((dish) => dish.category === categoryId);
+                console.log("Filtered Dishes:", filteredDishes);
+                setDishes(filteredDishes); // Actualizar los platos filtrados
+                setVisibleDishes(10); // Reiniciar el número de platos visibles
+                setSelectedCategory(categoryId); // Establecer la nueva categoría seleccionada
+            }
+        } catch (error) {
+            console.error("Error fetching dishes for category:", error);
+        }
+    };
+
     return (
         <>
-          <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
                 <Grid container spacing={2} pb={2}>
                     <Grid item xs={8} sx={{ display: 'flex', alignItems: 'center' }}>
                         <IconText icon={<RoomService />} text={texts.labels.dishes} />
@@ -89,6 +127,8 @@ export const Menu = () => {
                         </Box>
                     </Grid>
                 </Grid>
+                
+                <CategoriesList categories={categories} onCategorySelect={handleCategorySelect} selectedCategory={selectedCategory} />
 
                 {/* Mostrar los platos con animación */}
                 <Grid container spacing={2}>
@@ -112,7 +152,7 @@ export const Menu = () => {
                 {/* Observador para cargar más platos */}
                 <div ref={observerRef} style={{ height: '2px' }} />
             </Box>
-            <CartButton />  
+            <CartButton />
         </>
     );
 };

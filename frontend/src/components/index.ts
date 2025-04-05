@@ -3,5 +3,6 @@ export {
     DishBox, CartButton, CartBox
 } from './common';
 export {
-    LabelText, IconText, PopUpInformation
+    LabelText, IconText, PopUpInformation,
+    CategoriesList
 } from './decorator';

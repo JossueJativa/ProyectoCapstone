@@ -59,7 +59,7 @@ const createDish = async (data: IDishData): Promise<any> => {
 }
 
 const createOrder = async (data: IOrderData): Promise<any> => {
-    const { deskId, totalPrice, status, orderDish } = data;
+    const { deskId, totalPrice, status } = data;
     const api = new API();
     // date YYYY-MM-DD
     const date = new Date();
@@ -73,23 +73,23 @@ const createOrder = async (data: IOrderData): Promise<any> => {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}:${seconds}`;
     const response = await api.post('/order', {
-        desk: deskId,
         date: formattedDate,
         time: formattedTime,
         total_price: totalPrice,
+        desk: deskId,
         status,
-        order_dish: orderDish
     });
 
     return response?.data;
 }
 
 const createOrderDish = async (data: any): Promise<any> => {
-    const { dishId, quantity } = data;
+    const { dishId, quantity, order } = data;
     const api = new API();
     const response = await api.post('/orderdish', {
         dish: dishId,
-        quantity
+        quantity,
+        order
     });
     return response?.data;
 }

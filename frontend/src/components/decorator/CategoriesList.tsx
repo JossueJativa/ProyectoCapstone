@@ -1,0 +1,57 @@
+import { useState } from 'react';
+import { CategoriesListProps } from '@/interfaces';
+import { Box, useTheme } from '@mui/material';
+
+export const CategoriesList = ({ categories, onCategorySelect }: CategoriesListProps) => {
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+    const theme = useTheme();
+
+    const handleCategoryClick = (categoryId: number) => {
+        setSelectedCategory(categoryId);
+        onCategorySelect(categoryId);
+    };
+
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                overflowX: 'auto',
+                gap: 2,
+                padding: 1,
+                '&::-webkit-scrollbar': {
+                    height: '8px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#888',
+                    borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                    backgroundColor: '#555',
+                },
+            }}
+            className="categories-slider"
+        >
+            {categories.map((category) => (
+                <Box
+                    key={category.id}
+                    onClick={() => handleCategoryClick(category.id)}
+                    sx={{
+                        minWidth: '120px',
+                        textAlign: 'center',
+                        padding: 1,
+                        backgroundColor: selectedCategory === category.id ? theme.button.verde : theme.button.transparente,
+                        borderRadius: '8px',
+                        border: `1px solid ${theme.button.verde}`,
+                        cursor: 'pointer',
+                        '&:hover': {
+                            backgroundColor: selectedCategory === category.id ? theme.button.verde : theme.button.transparente,
+                        },
+                    }}
+                    className="category-item"
+                >
+                    <h3>{category.category_name}</h3>
+                </Box>
+            ))}
+        </Box>
+    );
+};

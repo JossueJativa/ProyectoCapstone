@@ -284,12 +284,12 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
                   width: "100%",
                   textTransform: "none",
                   backgroundColor: selectedGarrisons.includes(garrison)
-                    ? theme.palette.primary.main
+                    ? theme.button.cafeMedio
                     : "transparent",
                   color: selectedGarrisons.includes(garrison)
                     ? theme.palette.common.white
                     : theme.palette.text.primary,
-                  borderColor: theme.palette.primary.main,
+                  borderColor: theme.button.cafeMedio,
                 }}
               >
                 {garrison.name}

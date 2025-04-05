@@ -5,7 +5,7 @@ import { useLanguage, useSocket } from "@/helpers";
 import { ButtonLogic } from "@/components";
 import { ICartBoxProps } from "@/interfaces";
 
-export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, desk_id, linkTo, onQuantityChange, onDelete }: ICartBoxProps) => {
+export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, desk_id, linkTo, onQuantityChange, onDelete, garrisons }: ICartBoxProps) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { texts } = useLanguage();
@@ -28,7 +28,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
         <Box
             sx={{
                 backgroundColor: "#f5f5f5",
-                borderRadius: "12px",
+                borderRadius: theme.button.border.corners,
                 padding: "16px",
                 boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
                 width: "100%",
@@ -43,7 +43,22 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                         fontSize: "1.2rem",
                         fontWeight: theme.typography.title.fontWeight,
                     }}
-                >{dish_name}</Typography>
+                >
+                    {dish_name}
+                    {garrisons && garrisons.length > 0 && (
+                        <Typography
+                            component="span"
+                            sx={{
+                                fontSize: "0.9rem",
+                                fontWeight: theme.typography.body1.fontWeight,
+                                color: theme.palette.text.secondary,
+                                marginLeft: "8px",
+                            }}
+                        >
+                            ({garrisons})
+                        </Typography>
+                    )}
+                </Typography>
                 <Typography
                     variant="h6"
                     sx={{

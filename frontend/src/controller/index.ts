@@ -2,15 +2,18 @@ export {
     LoginAuth
 } from './auth';
 export {
-    getDesk,
-    getAllergens,
-    getAllergensByDish,
-    getIngredients,
     getDishes,
     getDish,
+    getAllergensByDish,
+    getGarrisonsByDish,
+    getOrderDishByOrderId,
+    getDesk,
+    getAllergens,
+    getIngredients,
     getIngredient,
-    getGarrisonsByDish
-} from './getInformation';
+    getGarrison,
+    getCategories
+} from './getters';
 export {
     createDesk,
     createAllergen,
