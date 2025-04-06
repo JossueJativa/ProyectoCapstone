@@ -1,17 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Grid, Typography, useTheme } from '@mui/material';
-import { ShoppingCart } from '@mui/icons-material';
+import { Box, Grid, Typography, useTheme, Button, TextField } from '@mui/material';
+import { ShoppingCart, ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
 import { IconText, ButtonType } from '@/components';
+import { PopUpInformation } from '@/components/decorator/PopUpInformation';
 import { getOrderDishByOrderId } from '@/controller';
 
-export const Invoicing = () => {
+export const DivideInvoice = () => {
     const { id } = useParams<{ id: string }>();
     const theme = useTheme();
     const { texts } = useLanguage();
     const [deskId, setDeskId] = useState<string | null>(null);
     const [order, setOrder] = useState<any>(null);
+    const [openPopup, setOpenPopup] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(texts.labels.amount);
+
+    const handleOpenPopup = () => setOpenPopup(true);
+    const handleClosePopup = () => setOpenPopup(false);
+    const handleSelectOption = (option: string) => {
+        setSelectedOption(option);
+        handleClosePopup();
+    };
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -26,6 +36,12 @@ export const Invoicing = () => {
             fetchData();
         }
     }, [id, location.search]);
+
+    useEffect(() => {
+        if (selectedOption === texts.labels.amount || selectedOption === texts.labels.dish) {
+            setSelectedOption(texts.labels.amount);
+        }
+    }, [texts]);
 
     const calculateTotal = () => {
         if (!order) return { totalQuantity: 0, totalPrice: 0 };
@@ -63,7 +79,6 @@ export const Invoicing = () => {
                             </Box>
                         </Grid>
                     </Grid>
-
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -97,45 +112,93 @@ export const Invoicing = () => {
                             </Typography>
                         </Box>
                     </Box>
-
+                    {/* Divicion de cuentas por monto o plato */}
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
+                        border: `1px solid white`,
+                        borderRadius: theme.shape.borderRadius,
+                        padding: '10px',
+                        marginBottom: '20px',
                     }}>
-                        {order && order.map((dish: any, index: number) => (
-                            <Box key={index} sx={{
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', marginBottom: '10px' }}>
+                            {texts.labels.divideBy}:
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            onClick={handleOpenPopup}
+                            sx={{
+                                padding: '5px 10px',
+                                marginBottom: '10px',
+                                borderRadius: `${theme.button.border.corners}`,
+                                border: '1px solid #ccc',
+                                backgroundColor: 'white',
+                                textAlign: 'left',
+                                fontSize: '0.8rem',
                                 display: 'flex',
-                                padding: '10px',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                marginBottom: '5px',
-                                border: `1px solid white`,
-                                borderRadius: theme.shape.borderRadius,
-                                backgroundColor: theme.background.primary,
+                                height: '3rem',
+                            }}
+                        >
+                            <span style={{ flexGrow: 1, textAlign: 'left', color: 'black' }}>{selectedOption}</span>
+                            <ArrowDropDownIcon sx={{ color: 'black' }} />
+                        </Button>
+                        <PopUpInformation
+                            open={openPopup}
+                            title={`${texts.labels.divideBy}:`}
+                            message=""
+                            isInformative={false}
+                            redirect=""
+                        >
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '15rem',
+                                padding: '10px',
+                                borderRadius: theme.button.border.corners,
                             }}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold', flex: 2 }}>
-                                    {dish.dish.name}
-                                </Typography>
-                                <Typography variant="body1" sx={{
-                                    color: theme.button.cafeMedio,
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.title.fontWeight,
-                                    textAlign: 'center',
-                                    flex: 0.5
-                                }}>
-                                    {dish.quantity}
-                                </Typography>
-                                <Typography variant="body1" sx={{
-                                    color: theme.button.cafeMedio,
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.title.fontWeight,
-                                    textAlign: 'right',
-                                    flex: 1
-                                }}>
-                                    ${dish.dish.price.toFixed(2)}
-                                </Typography>
+                                <ButtonType
+                                    text={texts.labels.amount}
+                                    typeButton="outlined"
+                                    onClick={() => {
+                                        handleSelectOption(texts.labels.amount);
+                                    }}
+                                />
+                                <br />
+                                <ButtonType
+                                    text={texts.labels.dish}
+                                    typeButton="outlined"
+                                    onClick={() => {
+                                        handleSelectOption(texts.labels.dish);
+                                    }}
+                                />
                             </Box>
-                        ))}
+                        </PopUpInformation>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', marginBottom: '10px' }}>
+                            {texts.labels.howManyPeople}:
+                        </Typography>
+                        <TextField
+                            type="number"
+                            placeholder={texts.placeholders.enterPeopleCount}
+                            variant="outlined"
+                            fullWidth
+                            sx={{
+                                backgroundColor: theme.background.primary,
+                                borderRadius: theme.button.border.corners,
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: theme.button.border.color,
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: theme.button.border.color,
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: theme.button.border.color,
+                                    },
+                                },
+                            }}
+                        />
                     </Box>
                 </Box>
                 <Box sx={{
@@ -150,7 +213,7 @@ export const Invoicing = () => {
                     }}>
                         <Box sx={{ marginBottom: '10px' }}>
                             <ButtonType
-                                text={texts.buttons.makeInvoice}
+                                text={texts.buttons.continue}
                                 typeButton="primary"
                                 onClick={() => {
                                     console.log('Realizar pedido');
@@ -159,9 +222,9 @@ export const Invoicing = () => {
                         </Box>
                         <Box sx={{ marginBottom: '5px' }}>
                             <ButtonType
-                                text={texts.buttons.divideAccount}
+                                text={texts.buttons.back}
                                 typeButton="outlined"
-                                urlLink={`/divide-invoice/${id}?desk_id=${deskId || ''}`}
+                                urlLink={`/invoice/${id}?desk_id=${deskId || ''}`}
                             />
                         </Box>
                     </Box>

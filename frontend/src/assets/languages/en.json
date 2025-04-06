@@ -12,6 +12,7 @@
         "back": "Back",
         "makeOrder": "Make order",
         "accept": "Accept",
+        "continue": "Continue",
         "makeInvoice": "Make invoice",
         "divideAccount": "Divide account"
     },
@@ -26,7 +27,14 @@
         "itemsCount": "Items count",
         "totalAmount": "Total amount",
         "emptyCart": "Your cart is empty",
-        "orderSuccess": "Your order has been successfully sent. We will deliver your food shortly."
+        "orderSuccess": "Your order has been successfully sent. We will deliver your food shortly.",
+        "divideBy": "Divide by",
+        "amount": "Amount",
+        "dish": "Dish",
+        "howManyPeople": "How many people?"
+    },
+    "placeholders": {
+        "enterPeopleCount": "Enter the number of people"
     },
     "allergens": {
         "gluten": "Gluten",

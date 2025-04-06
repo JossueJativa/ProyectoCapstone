@@ -3,7 +3,10 @@ import { Fab, useTheme, Box } from '@mui/material';
 import { Help } from '@mui/icons-material';
 import { Navbar } from '@/components';
 import { Error404 } from '../errors';
-import { SelectDesk, Menu, DishSelected, ShoppingCart, Invoicing } from './index';
+import { 
+    SelectDesk, Menu, DishSelected, ShoppingCart, Invoicing,
+    DivideInvoice
+} from './index';
 import { CartProvider } from "@/context/CartContext";
 
 export const ClientRouter = () => {
@@ -22,6 +25,9 @@ export const ClientRouter = () => {
                     <Route path="/dish/:dishId" element={<DishSelected />} />
                     <Route path="/cart" element={<ShoppingCart />} />
                     <Route path="/invoice/:id" element={<Invoicing />} />
+                    <Route path="/divide-invoice/:id" element={<DivideInvoice />} />
+
+                    {/* Navegaciones permitidas */}
 
                     {/* Navegaciones no permitidas */}
                     <Route path="*" element={<Error404 />} />

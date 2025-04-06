@@ -12,6 +12,7 @@
         "back": "Regresar",
         "makeOrder": "Realizar pedido",
         "accept": "Aceptar",
+        "continue": "Continuar",
         "makeInvoice": "Realizar factura",
         "divideAccount": "Dividir cuenta"
     },
@@ -26,7 +27,14 @@
         "itemsCount": "Cantidad de artículos",
         "totalAmount": "Monto total",
         "emptyCart": "Tu carrito está vacío",
-        "orderSuccess": "Tu pedido ha sido enviado exitosamente. En breve te entregaremos tu comida."
+        "orderSuccess": "Tu pedido ha sido enviado exitosamente. En breve te entregaremos tu comida.",
+        "divideBy": "Dividir por",
+        "amount": "Monto",
+        "dish": "Plato",
+        "howManyPeople": "¿Cuántas personas?"
+    },
+    "placeholders": {
+        "enterPeopleCount": "Ingresa el número de personas"
     },
     "allergens": {
         "gluten": "Gluten",
