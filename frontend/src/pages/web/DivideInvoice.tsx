@@ -15,12 +15,17 @@ export const DivideInvoice = () => {
     const [order, setOrder] = useState<any>(null);
     const [openPopup, setOpenPopup] = useState(false);
     const [selectedOption, setSelectedOption] = useState(texts.labels.amount);
+    const [peopleCount, setPeopleCount] = useState(0);
 
     const handleOpenPopup = () => setOpenPopup(true);
     const handleClosePopup = () => setOpenPopup(false);
     const handleSelectOption = (option: string) => {
         setSelectedOption(option);
         handleClosePopup();
+    };
+
+    const handlePeopleCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPeopleCount(parseInt(event.target.value, 10) || 0);
     };
 
     useEffect(() => {
@@ -183,6 +188,8 @@ export const DivideInvoice = () => {
                             placeholder={texts.placeholders.enterPeopleCount}
                             variant="outlined"
                             fullWidth
+                            value={peopleCount}
+                            onChange={handlePeopleCountChange}
                             sx={{
                                 backgroundColor: theme.background.primary,
                                 borderRadius: theme.button.border.corners,
@@ -215,9 +222,11 @@ export const DivideInvoice = () => {
                             <ButtonType
                                 text={texts.buttons.continue}
                                 typeButton="primary"
-                                onClick={() => {
-                                    console.log('Realizar pedido');
-                                }}
+                                urlLink={
+                                    selectedOption === texts.labels.amount
+                                        ? `/invoice-by-amount/${id}?desk_id=${deskId || ''}&divide=${peopleCount}`
+                                        : `/invoice-by-dish/${id}?desk_id=${deskId || ''}&divide=${peopleCount}`
+                                }
                             />
                         </Box>
                         <Box sx={{ marginBottom: '5px' }}>

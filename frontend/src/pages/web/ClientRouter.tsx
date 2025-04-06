@@ -5,7 +5,7 @@ import { Navbar } from '@/components';
 import { Error404 } from '../errors';
 import { 
     SelectDesk, Menu, DishSelected, ShoppingCart, Invoicing,
-    DivideInvoice
+    DivideInvoice, InvoiceByMount, InvoiceByDish
 } from './index';
 import { CartProvider } from "@/context/CartContext";
 
@@ -26,6 +26,10 @@ export const ClientRouter = () => {
                     <Route path="/cart" element={<ShoppingCart />} />
                     <Route path="/invoice/:id" element={<Invoicing />} />
                     <Route path="/divide-invoice/:id" element={<DivideInvoice />} />
+                    <Route path="/invoice-by-amount/:id" element={<InvoiceByMount />} />
+                    <Route path="/invoice-by-dish/:id" element={<InvoiceByDish />} />
+
+                    {/* Navegaciones no permitidas */}
 
                     {/* Navegaciones permitidas */}
 

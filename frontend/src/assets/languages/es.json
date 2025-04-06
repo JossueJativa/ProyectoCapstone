@@ -31,7 +31,9 @@
         "divideBy": "Dividir por",
         "amount": "Monto",
         "dish": "Plato",
-        "howManyPeople": "¿Cuántas personas?"
+        "howManyPeople": "¿Cuántas personas?",
+        "invoice": "Factura",
+        "selectItem": "Selecciona los artículos para la factura"
     },
     "placeholders": {
         "enterPeopleCount": "Ingresa el número de personas"

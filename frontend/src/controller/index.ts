@@ -20,5 +20,7 @@ export {
     createIngredient,
     createDish,
     createOrder,
-    createOrderDish
-} from './setInformation';
+    createOrderDish,
+    createInvoice,
+    createInvoiceData
+} from './setters';

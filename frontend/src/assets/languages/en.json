@@ -31,7 +31,9 @@
         "divideBy": "Divide by",
         "amount": "Amount",
         "dish": "Dish",
-        "howManyPeople": "How many people?"
+        "howManyPeople": "How many people?",
+        "invoice": "Invoice",
+        "selectItem": "Select items for the invoice"
     },
     "placeholders": {
         "enterPeopleCount": "Enter the number of people"

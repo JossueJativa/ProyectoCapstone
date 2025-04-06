@@ -4,15 +4,16 @@ import { Box, Grid, Typography, useTheme } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
 import { IconText, ButtonType } from '@/components';
-import { IInvoicing, IInvoicingData } from '@/interfaces';
+import { IInvoicing, IInvoicingData } from '@/interfaces'
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
 
-export const Invoicing = () => {
+export const InvoiceByMount = () => {
     const { id } = useParams<{ id: string }>();
     const theme = useTheme();
     const { texts } = useLanguage();
     const [deskId, setDeskId] = useState<string | null>(null);
     const [order, setOrder] = useState<any>(null);
+    const [divisions, setDivisions] = useState<{ person: number; amount: string }[]>([]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -28,6 +29,23 @@ export const Invoicing = () => {
         }
     }, [id, location.search]);
 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const divide = parseInt(params.get("divide") || '0', 10);
+
+        if (divide > 0 && order) {
+            const { totalPrice } = calculateTotal();
+            const amountPerPerson = totalPrice / divide;
+
+            const divisions = Array.from({ length: divide }, (_, i) => ({
+                person: i + 1,
+                amount: amountPerPerson.toFixed(2),
+            }));
+
+            setDivisions(divisions);
+        }
+    }, [order, location.search]);
+
     const calculateTotal = () => {
         if (!order) return { totalQuantity: 0, totalPrice: 0 };
 
@@ -37,44 +55,59 @@ export const Invoicing = () => {
         return { totalQuantity, totalPrice };
     }
 
-    const handleMakeInvoice = async () => {
-        if (order && order.length > 0) {
-            const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
-            const invoiceNumber = `${invoiceNumberBase}-1`;
-
-            const { totalPrice } = calculateTotal();
-            const invoiceData: IInvoicing = {
-                invoiceId: parseInt(invoiceNumber, 10),
-                totalPrice: parseFloat(totalPrice.toFixed(2)),
-                orderId: parseInt(id, 10),
-            };
-
-            const createdInvoice = await createInvoice(invoiceData);
-
-            if (!createdInvoice || !createdInvoice.id) {
-                console.error("No se pudo crear la factura o falta el ID de la factura.", createdInvoice);
-                throw new Error("Error al crear la factura.");
-            }
-
-            const invoiceId = createdInvoice.id;
-
-            const invoiceDataList: IInvoicingData[] = order.map((dish: any) => {
-                return {
-                    quantity: dish.quantity,
-                    invoiceId,
-                    dishId: dish.dish.id,
-                };
-            });
-
-            for (const data of invoiceDataList) {
-                await createInvoiceData(data);
-            }
-        } else {
-            console.error("No hay platos para facturar.");
-        }
-    };
-
     const { totalQuantity, totalPrice } = calculateTotal();
+
+    const handleDivideByAmount = async () => {
+        const params = new URLSearchParams(location.search);
+        const peopleCount = parseInt(params.get("divide") || '0', 10);
+        if (peopleCount > 0 && order) {
+            const { totalPrice } = calculateTotal();
+            const amountPerPerson = totalPrice / peopleCount;
+            const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
+
+            let remainingDishes = [...order];
+
+            // Crear la factura para cada persona
+            for (let i = 0; i < peopleCount; i++) {
+                const invoiceNumber = `${invoiceNumberBase}-${i + 1}`;
+                const invoiceData: IInvoicing = {
+                    invoiceId: parseInt(invoiceNumber, 10),
+                    totalPrice: parseFloat(amountPerPerson.toFixed(2)),
+                    orderId: parseInt(id, 10),
+                };
+
+                const createdInvoice = await createInvoice(invoiceData);
+
+                if (!createdInvoice || !createdInvoice.id) {
+                    console.error("No se pudo crear la factura o falta el ID de la factura.", createdInvoice);
+                    throw new Error("Error al crear la factura.");
+                }
+
+                const invoiceId = createdInvoice.id;
+
+                const invoiceDataList: IInvoicingData[] = remainingDishes.map((dish: any) => {
+                    const quantity = Math.ceil(dish.quantity / peopleCount);
+
+                    if (quantity <= 0) {
+                        console.error("La cantidad calculada no es válida:", quantity);
+                        throw new Error("La cantidad calculada es inválida.");
+                    }
+
+                    return {
+                        quantity,
+                        invoiceId,
+                        dishId: dish.dish.id,
+                    };
+                });
+
+                for (const data of invoiceDataList) {
+                    await createInvoiceData(data);
+                }
+
+                remainingDishes = remainingDishes.filter((dish: any) => dish.quantity > 0);
+            }
+        }
+    }
 
     return (
         <>
@@ -101,7 +134,6 @@ export const Invoicing = () => {
                             </Box>
                         </Grid>
                     </Grid>
-
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -135,42 +167,31 @@ export const Invoicing = () => {
                             </Typography>
                         </Box>
                     </Box>
-
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
                     }}>
-                        {order && order.map((dish: any, index: number) => (
-                            <Box key={index} sx={{
-                                display: 'flex',
-                                padding: '10px',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginBottom: '5px',
-                                border: `1px solid white`,
-                                borderRadius: theme.shape.borderRadius,
-                                backgroundColor: theme.background.primary,
-                            }}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold', flex: 2 }}>
-                                    {dish.dish.name}
-                                </Typography>
-                                <Typography variant="body1" sx={{
-                                    color: theme.button.cafeMedio,
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.title.fontWeight,
-                                    textAlign: 'center',
-                                    flex: 0.5
+                        {divisions.map((division, index) => (
+                            <Box key={index}
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    padding: '10px',
+                                    marginBottom: '10px',
+                                    border: `1px solid white`,
+                                    borderRadius: theme.shape.borderRadius,
+                                    backgroundColor: theme.background.primary,
                                 }}>
-                                    {dish.quantity}
+                                <Typography variant="body1" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                    {`${texts.labels.invoice} ${division.person}`}
                                 </Typography>
-                                <Typography variant="body1" sx={{
-                                    color: theme.button.cafeMedio,
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.title.fontWeight,
-                                    textAlign: 'right',
-                                    flex: 1
-                                }}>
-                                    ${dish.dish.price.toFixed(2)}
+                                <Typography variant="body1" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    {texts.labels.totalAmount}:
+                                    <span style={{
+                                        color: theme.button.cafeMedio,
+                                        fontSize: theme.typography.body1.fontSize,
+                                        fontWeight: theme.typography.title.fontWeight,
+                                    }}>${division.amount}</span>
                                 </Typography>
                             </Box>
                         ))}
@@ -190,12 +211,21 @@ export const Invoicing = () => {
                             <ButtonType
                                 text={texts.buttons.makeInvoice}
                                 typeButton="primary"
-                                onClick={handleMakeInvoice}
+                                onClick={() => {
+                                    handleDivideByAmount()
+                                        .then(() => {
+                                            window.location.href = `/menu?desk_id=${deskId || ''}`;
+                                        })
+                                        .catch((error) => {
+                                            console.error("Error al crear la factura:", error);
+                                            alert(texts.alerts.invoiceCreationError);
+                                        });
+                                }}
                             />
                         </Box>
                         <Box sx={{ marginBottom: '5px' }}>
                             <ButtonType
-                                text={texts.buttons.divideAccount}
+                                text={texts.buttons.back}
                                 typeButton="outlined"
                                 urlLink={`/divide-invoice/${id}?desk_id=${deskId || ''}`}
                             />
