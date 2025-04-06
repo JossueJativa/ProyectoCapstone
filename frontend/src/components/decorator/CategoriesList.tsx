@@ -1,13 +1,11 @@
-import { useState } from 'react';
+import { useTheme } from '@mui/material';
 import { CategoriesListProps } from '@/interfaces';
-import { Box, useTheme } from '@mui/material';
+import { Box } from '@mui/material';
 
-export const CategoriesList = ({ categories, onCategorySelect }: CategoriesListProps) => {
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: CategoriesListProps) => {
     const theme = useTheme();
 
     const handleCategoryClick = (categoryId: number) => {
-        setSelectedCategory(categoryId);
         onCategorySelect(categoryId);
     };
 

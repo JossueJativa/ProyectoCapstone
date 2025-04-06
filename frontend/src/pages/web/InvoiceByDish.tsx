@@ -58,17 +58,34 @@ export const InvoiceByDish = () => {
         return { totalQuantity, totalPrice };
     }
 
-    const handleCheckboxChange = (dish: any) => {
-        if (selectedDishes.includes(dish)) {
-            setSelectedDishes(selectedDishes.filter((d) => d !== dish));
+    const handleCheckboxChange = (dish: any, quantity: number) => {
+        const existingDish = selectedDishes.find((d: any) => d.dish.id === dish.dish.id);
+        if (existingDish) {
+            if (quantity === 0) {
+                setSelectedDishes(selectedDishes.filter((d: any) => d.dish.id !== dish.dish.id));
+            } else {
+                setSelectedDishes(selectedDishes.map((d: any) => d.dish.id === dish.dish.id ? { ...d, quantity } : d));
+            }
         } else {
-            setSelectedDishes([...selectedDishes, dish]);
+            setSelectedDishes([...selectedDishes, { ...dish, quantity }]);
         }
     };
 
     const finalizeInvoice = () => {
         const { totalQuantity, totalPrice } = calculateTotal(selectedDishes);
         setInvoices([...invoices, { person: currentPerson, dishes: selectedDishes, totalQuantity, total: totalPrice }]);
+
+        // Adjust quantities of selected dishes in the order
+        const updatedOrder = order.map((dish: any) => {
+            const selectedDish = selectedDishes.find((d: any) => d.dish.id === dish.dish.id);
+            if (selectedDish) {
+                const remainingQuantity = dish.quantity - selectedDish.quantity;
+                return remainingQuantity > 0 ? { ...dish, quantity: remainingQuantity } : null;
+            }
+            return dish;
+        }).filter(Boolean);
+
+        setOrder(updatedOrder);
         setSelectedDishes([]);
         setCurrentPerson(currentPerson + 1);
     };
@@ -153,20 +170,24 @@ export const InvoiceByDish = () => {
                                 {texts.labels.selectItem} {currentPerson}
                             </Typography>
                             {order && order.map((dish: any, index: number) => (
-                                <Box key={index} sx={{
-                                    display: 'flex', justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    marginBottom: '10px',
-                                    padding: '10px',
-                                    borderRadius: theme.shape.borderRadius,
-                                    backgroundColor: theme.background.primary,
-                                }}>
+                                <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Checkbox
-                                            checked={selectedDishes.includes(dish)}
-                                            onChange={() => handleCheckboxChange(dish)}
+                                            checked={!!selectedDishes.find((d: any) => d.dish.id === dish.dish.id)}
+                                            onChange={(e) => handleCheckboxChange(dish, e.target.checked ? 1 : 0)}
                                         />
                                         <Typography>{dish.dish.name}</Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Typography sx={{ marginRight: '10px' }}>Cantidad:</Typography>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max={dish.quantity}
+                                            value={selectedDishes.find((d: any) => d.dish.id === dish.dish.id)?.quantity || 0}
+                                            onChange={(e) => handleCheckboxChange(dish, Math.min(parseInt(e.target.value, 10), dish.quantity))}
+                                            style={{ width: '50px', textAlign: 'center' }}
+                                        />
                                     </Box>
                                     <Typography sx={{ color: 'brown', fontWeight: 'bold' }}>${dish.dish.price.toFixed(2)}</Typography>
                                 </Box>
@@ -254,7 +275,14 @@ export const InvoiceByDish = () => {
                                 onClick={() => {
                                     if (currentPerson > divisions.length) {
                                         if (currentPerson === divisions.length + 1) {
-                                            finishInvoices();
+                                            finishInvoices()
+                                                .then(() => {
+                                                    window.location.href = `/menu?desk_id=${deskId || ''}`;
+                                                })
+                                                .catch((error) => {
+                                                    console.error("Error al crear la factura:", error);
+                                                    alert(texts.alerts.invoiceCreationError);
+                                                });
                                         } else {
                                             finalizeInvoice();
                                         }
