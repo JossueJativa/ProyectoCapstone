@@ -512,19 +512,17 @@ Para iniciar solo el servicio de WebSocket:
 ```bash
 cd websocket
 npm install
-node server.js
+npm run build
+npm run start
 ```
 
 ### Frontend (Aplicación en React)
 
-Para iniciar solo el servicio Frontend:
+Para iniciar solo el servicio de WebSocket:
 ```bash
-docker-compose up frontend
-```
-
-Para detener el servicio Frontend:
-```bash
-docker-compose stop frontend
+cd websocket
+npm install
+npm run dev
 ```
 
 ### Todos los Servicios
