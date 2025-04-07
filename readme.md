@@ -520,7 +520,7 @@ npm run start
 
 Para iniciar solo el servicio de WebSocket:
 ```bash
-cd websocket
+cd Frontend
 npm install
 npm run dev
 ```
