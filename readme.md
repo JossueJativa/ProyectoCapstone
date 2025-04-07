@@ -12,6 +12,10 @@ Este proyecto es una aplicación web desarrollada con Django y Django REST Frame
 7. [Endpoints](#endpoints)
 8. [Datos para solicitudes](#datos-para-solicitudes)
 9. [WebSockets](#websockets)
+10. [Servicio AdminController](#servicio-admincontroller)
+11. [Servicio WebSocket](#servicio-websocket)
+12. [Servicio Frontend](#servicio-frontend)
+13. [Ejecución de Servicios por Separado](#ejecución-de-servicios-por-separado)
 
 ## Requisitos
 
@@ -143,6 +147,34 @@ Las pruebas se encuentran en el directorio `admincontroller/authAPI/tests.py`, `
 - `POST /orders/` - Crea un nuevo pedido (requiere autenticación)
 - `PUT /orders/{id}/` - Actualiza la información de un pedido (requiere autenticación)
 - `DELETE /orders/{id}/` - Elimina un pedido (requiere autenticación)
+
+#### Categorías
+- `GET /category/` - Obtiene la lista de categorías
+- `GET /category/{id}/` - Obtiene los detalles de una categoría específica
+- `POST /category/` - Crea una nueva categoría
+- `PUT /category/{id}/` - Actualiza una categoría existente
+- `DELETE /category/{id}/` - Elimina una categoría
+
+#### Guarniciones
+- `GET /garrison/` - Obtiene la lista de guarniciones
+- `GET /garrison/{id}/` - Obtiene los detalles de una guarnición específica
+- `POST /garrison/` - Crea una nueva guarnición
+- `PUT /garrison/{id}/` - Actualiza una guarnición existente
+- `DELETE /garrison/{id}/` - Elimina una guarnición
+
+#### Facturas
+- `GET /invoice/` - Obtiene la lista de facturas
+- `GET /invoice/{id}/` - Obtiene los detalles de una factura específica
+- `POST /invoice/` - Crea una nueva factura
+- `PUT /invoice/{id}/` - Actualiza una factura existente
+- `DELETE /invoice/{id}/` - Elimina una factura
+
+#### Detalles de Facturas
+- `GET /invoicedish/` - Obtiene la lista de detalles de facturas
+- `GET /invoicedish/{id}/` - Obtiene los detalles de un detalle de factura específico
+- `POST /invoicedish/` - Crea un nuevo detalle de factura
+- `PUT /invoicedish/{id}/` - Actualiza un detalle de factura existente
+- `DELETE /invoicedish/{id}/` - Elimina un detalle de factura
 
 ## Datos para solicitudes
 
@@ -298,6 +330,16 @@ socket.on("respuesta", (data) => {
 });
 ```
 
+### Eventos de WebSocket
+
+- **join:desk**: Permite a un cliente unirse a una sala específica basada en el ID de la mesa. Responde con el ID de la mesa a la que se unió.
+- **order:create**: Crea un nuevo detalle de orden. Datos requeridos: `product_id`, `quantity`, `desk_id`, `garrison`. Responde con el detalle de la orden creada.
+- **order:get**: Obtiene todos los detalles de la orden para una mesa específica. Datos requeridos: `desk_id`. Responde con los detalles de la orden.
+- **order:update**: Actualiza un detalle de orden existente. Datos requeridos: `order_detail_id`, `desk_id`, `update_quantity`, `garrison`. Responde con el detalle de la orden actualizado.
+- **order:delete**: Elimina un detalle de orden específico. Datos requeridos: `order_detail_id`, `desk_id`. Responde con el ID del detalle eliminado.
+- **order:delete:all**: Elimina todos los detalles de la orden para una mesa específica. Datos requeridos: `desk_id`. Responde con el número de filas eliminadas y el ID de la mesa.
+- **disconnect**: Evento que se dispara cuando un cliente se desconecta.
+
 ## Puntos de Conexión
 
 ### Base de Datos
@@ -315,10 +357,184 @@ socket.on("respuesta", (data) => {
 - **Host**: localhost
 - **Puerto**: 3000
 
+## Servicio AdminController
+
+El servicio `admincontroller` es el núcleo de la aplicación y está configurado en el archivo `docker-compose.yml`. Este servicio utiliza Django para ejecutar el servidor de desarrollo y depende de la base de datos PostgreSQL.
+
+### Configuración del Servicio
+
+- **Contexto de construcción**: `./admincontroller`
+- **Dockerfile**: `Dockerfile`
+- **Puerto expuesto**: `8000`
+- **Volumen**: `./admincontroller:/app`
+- **Comando de inicio**: `python manage.py runserver 0.0.0.0:8000`
+- **Dependencias**: `db`
+- **Archivo de entorno**: `./admincontroller/.env`
+
+### Variables de Entorno
+
+El archivo `.env` para este servicio debe contener las siguientes variables:
+
+```env
+SECRET_KEY=<tu_secret_key>
+NAME_DB=admincontroller
+USER_DB=postgres
+PASSWORD_DB=admincontroller
+HOST_DB=db
+PORT_DB=5432
+```
+
+### Dependencias
+
+El servicio `admincontroller` depende del servicio `db` (PostgreSQL) para su funcionamiento. Asegúrate de que el servicio `db` esté configurado y ejecutándose antes de iniciar `admincontroller`.
+
+## Servicio WebSocket
+
+El servicio de WebSocket está configurado para manejar la comunicación en tiempo real entre el cliente y el servidor. Actualmente, no está integrado en Docker, pero puedes ejecutarlo manualmente siguiendo estos pasos:
+
+### Instalación y Ejecución Manual
+
+1. Navega al directorio del servicio WebSocket:
+    ```bash
+    cd websocket
+    ```
+
+2. Instala las dependencias necesarias:
+    ```bash
+    npm install
+    ```
+
+3. Construye el servidor WebSocket:
+    ```bash
+    npm run build
+    ```
+
+4. Inicia el servidor WebSocket:
+    ```bash
+    npm run start
+    ```
+
+El servidor estará disponible en el puerto `3000` por defecto.
+
 ### Eventos de WebSocket
+
 - **order:create**: Crear una nueva orden.
-- **order:get**: Obtener todos los pedido de la orden.
+- **order:get**: Obtener todos los pedidos de la orden.
 - **order:update**: Actualizar un detalle de orden.
 - **order:delete**: Eliminar un detalle de orden.
 - **order:delete:all**: Eliminar todos los detalles del pedido.
-- **order:delete**: Eliminar una orden.
+
+---
+
+## Servicio Frontend
+
+El servicio Frontend está desarrollado con React y proporciona la interfaz de usuario para interactuar con la aplicación. Está configurado en el archivo `frontend/Dockerfile`.
+
+### Configuración del Servicio
+
+- **Contexto de construcción**: `./frontend`
+- **Dockerfile**: `Dockerfile`
+- **Puerto expuesto**: `3001`
+- **Volumen**: `./frontend:/app`
+- **Comando de inicio**: `npm start`
+
+### Comandos para Ejecutar el Servicio
+
+1. Navega al directorio del servicio WebSocket:
+    ```bash
+    cd Frontend
+    ```
+
+2. Instala las dependencias necesarias:
+    ```bash
+    npm install
+    ```
+
+4. Inicia el servidor WebSocket:
+    ```bash
+    npm run dev
+    ```
+
+El servidor estará disponible en el puerto `5173` por defecto.
+
+### Acceso al Frontend
+
+Una vez iniciado, el servicio estará disponible en [http://localhost:5173](http://localhost:5173).
+
+## Ejecución de Servicios por Separado
+
+En caso de que necesites ejecutar los servicios del proyecto de forma independiente, aquí están los comandos necesarios:
+
+### Base de Datos (PostgreSQL)
+
+Para iniciar solo el servicio de la base de datos:
+```bash
+docker-compose up db
+```
+
+Para detener el servicio de la base de datos:
+```bash
+docker-compose stop db
+```
+
+### Adminer (Interfaz Gráfica para la Base de Datos)
+
+Para iniciar solo el servicio de Adminer:
+```bash
+docker-compose up adminer
+```
+
+Para detener el servicio de Adminer:
+```bash
+docker-compose stop adminer
+```
+
+### AdminController (Aplicación Django)
+
+Para iniciar solo el servicio de la aplicación Django:
+```bash
+python manage.py runserver
+```
+
+Para iniciar solo el servicio de la aplicación Django:
+```bash
+docker-compose up admincontroller
+```
+
+Para detener el servicio de la aplicación Django:
+```bash
+docker-compose stop admincontroller
+```
+
+### WebSocket (Aplicación en Node.js)
+
+Para iniciar solo el servicio de WebSocket:
+```bash
+cd websocket
+npm install
+node server.js
+```
+
+### Frontend (Aplicación en React)
+
+Para iniciar solo el servicio Frontend:
+```bash
+docker-compose up frontend
+```
+
+Para detener el servicio Frontend:
+```bash
+docker-compose stop frontend
+```
+
+### Todos los Servicios
+
+Para iniciar todos los servicios al mismo tiempo:
+```bash
+docker-compose up
+```
+
+Para detener todos los servicios:
+```bash
+docker-compose down
+```
