@@ -9,7 +9,7 @@ import { getDish, createOrder, createOrderDish, getGarrison } from '@/controller
 
 export const ShoppingCart = () => {
     const theme = useTheme();
-    const { texts } = useLanguage();
+    const { texts, language } = useLanguage();
     const { socket } = useSocket();
     const location = useLocation();
     const [deskId, setDeskId] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export const ShoppingCart = () => {
             const updatedDishes = await Promise.all(
                 newDishes.map(async (dish) => {
                     if (!dish.details) {
-                        const dishDetails = await getDish(dish.product_id);
+                        const dishDetails = await getDish(dish.product_id, language); // Pasar el idioma al método getDish
                         return {
                             ...dish,
                             details: dishDetails,
@@ -117,6 +117,28 @@ export const ShoppingCart = () => {
         }
     }, [socket, deskId]);
 
+    useEffect(() => {
+        const fetchCartDishes = async () => {
+            setLoading(true);
+            const lang = language === "en" ? "EN-GB" : "ES";
+            try {
+                const response = await fetch(`/api/dish/?lang=${lang}`);
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                setCartDishes(data);
+            } catch (error) {
+                console.error("Failed to fetch dishes:", error);
+                setCartDishes([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCartDishes();
+    }, [language]);
+
     const mergeCartDishes = async (newDishes: any[]) => {
         const updatedDishes = await Promise.all(
             newDishes.map(async (dish) => {
@@ -131,7 +153,7 @@ export const ShoppingCart = () => {
                     );
                 }
 
-                const dishDetails = await getDish(dish.product_id);
+                const dishDetails = await getDish(dish.product_id, language); // Pasar el idioma al método getDish
                 return { ...dish, details: dishDetails, garrisonDetails };
             })
         );

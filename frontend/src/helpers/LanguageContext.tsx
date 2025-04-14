@@ -30,3 +30,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
 // Hook personalizado para usar el contexto
 export const useLanguage = () => useContext(LanguageContext);
+
+export const getLanguageQueryParam = (): string => {
+    const { language } = useLanguage();
+    return language === "en" ? "EN-GB" : "ES"; // Map to DeepL-compatible language codes
+};

@@ -18,8 +18,8 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
             if (error) {
                 console.error("Error updating quantity:", error);
             } else {
-                console.log("Quantity update response:", response); // Debug log
-                onQuantityChange(id, newQuantity); // Update state in parent
+                console.log("Quantity update response:", response);
+                onQuantityChange(id, newQuantity);
             }
         });
     };

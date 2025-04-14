@@ -30,11 +30,11 @@ const getGarrison = async(id: string) => {
     return response?.data;
 }
 
-const getCategories = async() => {
+const getCategories = async(lang: string = 'ES') => {
     const api = new API();
-    const response = await api.get('/category');
+    const response = await api.get(`/category?lang=${lang.toUpperCase()}`);
     return response?.data;
-}
+};
 
 export { 
     getDesk, 

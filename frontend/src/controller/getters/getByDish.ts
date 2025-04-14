@@ -1,15 +1,15 @@
 import { API } from '../api';
 import { getIngredient } from './index';
 
-const getDishes = async() => {
+const getDishes = async(lang: string = 'ES') => {
     const api = new API();
-    const response = await api.get('/dish');
+    const response = await api.get(`/dish?lang=${lang.toUpperCase()}`);
     return response?.data;
 }
 
-const getDish = async(dishId: string) => {
+const getDish = async(dishId: string, lang: string = 'ES') => {
     const api = new API();
-    const response = await api.get(`/dish/${dishId}`);
+    const response = await api.get(`/dish/${dishId}?lang=${lang.toUpperCase()}`);
     return response?.data;
 }
 

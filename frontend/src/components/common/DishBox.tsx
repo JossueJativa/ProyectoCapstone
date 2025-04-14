@@ -37,7 +37,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         if (error) {
           return;
         }
-        syncCart(); // Sync cart after adding a dish
+        syncCart();
       });
     };
 

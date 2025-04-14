@@ -440,7 +440,7 @@ El servicio Frontend está desarrollado con React y proporciona la interfaz de u
 
 ### Comandos para Ejecutar el Servicio
 
-1. Navega al directorio del servicio WebSocket:
+1. Navega al directorio del servicio Frontend:
     ```bash
     cd Frontend
     ```
@@ -450,7 +450,7 @@ El servicio Frontend está desarrollado con React y proporciona la interfaz de u
     npm install
     ```
 
-4. Inicia el servidor WebSocket:
+4. Inicia el servidor Frontend:
     ```bash
     npm run dev
     ```
@@ -518,7 +518,7 @@ npm run start
 
 ### Frontend (Aplicación en React)
 
-Para iniciar solo el servicio de WebSocket:
+Para iniciar solo el servicio de Frontend:
 ```bash
 cd Frontend
 npm install

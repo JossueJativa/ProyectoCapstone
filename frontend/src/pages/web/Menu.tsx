@@ -8,7 +8,7 @@ import { IconText, DishBox, CartButton, CategoriesList } from '@/components';
 import { getDishes, getCategories } from '@/controller';
 
 export const Menu = () => {
-    const { texts } = useLanguage();
+    const { texts, language } = useLanguage();
     const { socket } = useSocket();
     const theme = useTheme();
     const location = useLocation();
@@ -40,16 +40,22 @@ export const Menu = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const categoriesList = await getCategories(); // Asegurarse de esperar la promesa
+                const lang = language === "en" ? "EN-GB" : "ES"; // Map language to DeepL-compatible codes
+                const categoriesList = await getCategories(lang); // Fetch categories in the selected language
                 setCategories(categoriesList);
             } catch (error) {
                 console.error("Error fetching categories:", error);
             }
         };
 
+        fetchCategories(); // Refetch categories when language changes
+    }, [language]);
+
+    useEffect(() => {
         const fetchDishes = async () => {
             try {
-                const dishesList = await getDishes();
+                const lang = language === "en" ? "EN-GB" : "ES"; // Map language to DeepL-compatible codes
+                const dishesList = await getDishes(lang); // Pass language to getDishes
                 setDishes(dishesList);
             } catch (error) {
                 console.error("Error fetching dishes:", error);
@@ -57,8 +63,7 @@ export const Menu = () => {
         };
 
         fetchDishes();
-        fetchCategories();
-    }, []);
+    }, [language]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -82,21 +87,19 @@ export const Menu = () => {
     }, [dishes]);
 
     const handleCategorySelect = async (categoryId: number) => {
-        console.log("Selected Category ID:", categoryId);
         try {
             if (selectedCategory === categoryId) {
-                // Si la categoría seleccionada ya está activa, deseleccionarla
-                const dishesList = await getDishes(); // Obtener todos los platos
+                const dishesList = await getDishes();
                 setDishes(dishesList);
-                setVisibleDishes(10); // Reiniciar el número de platos visibles
-                setSelectedCategory(null); // Deseleccionar la categoría
+                setVisibleDishes(10);
+                setSelectedCategory(null);
             } else {
-                const dishesList = await getDishes(); // Realizar una nueva solicitud a la API
+                const dishesList = await getDishes();
                 const filteredDishes = dishesList.filter((dish) => dish.category === categoryId);
                 console.log("Filtered Dishes:", filteredDishes);
-                setDishes(filteredDishes); // Actualizar los platos filtrados
-                setVisibleDishes(10); // Reiniciar el número de platos visibles
-                setSelectedCategory(categoryId); // Establecer la nueva categoría seleccionada
+                setDishes(filteredDishes);
+                setVisibleDishes(10);
+                setSelectedCategory(categoryId);
             }
         } catch (error) {
             console.error("Error fetching dishes for category:", error);
