@@ -106,7 +106,7 @@ export const ShoppingCart = () => {
     useEffect(() => {
         if (socket && deskId) {
             const handleDeleteAll = () => {
-                setCartDishes([]); // Vaciar el carrito localmente
+                setCartDishes([]);
             };
 
             socket.on("order:delete:all", handleDeleteAll);
@@ -118,25 +118,22 @@ export const ShoppingCart = () => {
     }, [socket, deskId]);
 
     useEffect(() => {
-        const fetchCartDishes = async () => {
-            setLoading(true);
-            const lang = language === "en" ? "EN-GB" : "ES";
-            try {
-                const response = await fetch(`/api/dish/?lang=${lang}`);
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status} ${response.statusText}`);
-                }
-                const data = await response.json();
-                setCartDishes(data);
-            } catch (error) {
-                console.error("Failed to fetch dishes:", error);
-                setCartDishes([]);
-            } finally {
-                setLoading(false);
+        const updateDishDetailsOnLanguageChange = async () => {
+            if (cartDishes.length > 0) {
+                const updatedDishes = await Promise.all(
+                    cartDishes.map(async (dish) => {
+                        const dishDetails = await getDish(dish.product_id, language);
+                        return {
+                            ...dish,
+                            details: dishDetails,
+                        };
+                    })
+                );
+                setCartDishes(updatedDishes);
             }
         };
 
-        fetchCartDishes();
+        updateDishDetailsOnLanguageChange();
     }, [language]);
 
     const mergeCartDishes = async (newDishes: any[]) => {
