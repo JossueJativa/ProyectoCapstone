@@ -14,7 +14,7 @@ export const Menu = () => {
     const location = useLocation();
     const [dishes, setDishes] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
-    const [visibleDishes, setVisibleDishes] = useState<number>(10); // Número inicial de platos visibles
+    const [visibleDishes, setVisibleDishes] = useState<number>(10);
     const [deskId, setDeskId] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const observerRef = useRef<HTMLDivElement | null>(null);
@@ -40,22 +40,22 @@ export const Menu = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const lang = language === "en" ? "EN-GB" : "ES"; // Map language to DeepL-compatible codes
-                const categoriesList = await getCategories(lang); // Fetch categories in the selected language
+                const lang = language === "en" ? "EN-GB" : "ES";
+                const categoriesList = await getCategories(lang);
                 setCategories(categoriesList);
             } catch (error) {
                 console.error("Error fetching categories:", error);
             }
         };
 
-        fetchCategories(); // Refetch categories when language changes
+        fetchCategories();
     }, [language]);
 
     useEffect(() => {
         const fetchDishes = async () => {
             try {
-                const lang = language === "en" ? "EN-GB" : "ES"; // Map language to DeepL-compatible codes
-                const dishesList = await getDishes(lang); // Pass language to getDishes
+                const lang = language === "en" ? "EN-GB" : "ES";
+                const dishesList = await getDishes(lang);
                 setDishes(dishesList);
             } catch (error) {
                 console.error("Error fetching dishes:", error);

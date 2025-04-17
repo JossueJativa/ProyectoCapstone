@@ -144,7 +144,8 @@ export const ShoppingCart = () => {
                 if (dish.garrison && Array.isArray(dish.garrison)) {
                     garrisonDetails = await Promise.all(
                         dish.garrison.map(async (garrisonId: number) => {
-                            const garrisonData = await getGarrison(garrisonId);
+                            const lang = language === "en" ? "EN-GB" : "ES";
+                            const garrisonData = await getGarrison(garrisonId, lang);
                             return garrisonData.garrison_name;
                         })
                     );

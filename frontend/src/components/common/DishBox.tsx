@@ -14,7 +14,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
   ({ name, price, description, linkAR, linkTo, allergens, dish_id, has_garrison }, ref) => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { texts } = useLanguage();
+    const { texts, language } = useLanguage();
     const { socket } = useSocket();
     const location = useLocation();
     const { syncCart } = useCart();
@@ -82,13 +82,14 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
     useEffect(() => {
       const fetchGarrisons = async () => {
         if (has_garrison) {
-          const garrisons = await getGarrisonsByDish(dish_id);
+          const lang = language === "en" ? "EN-GB" : "ES";
+          const garrisons = await getGarrisonsByDish(dish_id, lang);
           setGarrisons(garrisons);
         }
       };
 
       fetchGarrisons();
-    }, [has_garrison]);
+    }, [has_garrison, language]);
 
     return (
       <>

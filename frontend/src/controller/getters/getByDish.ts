@@ -36,19 +36,20 @@ const getAllergensByDish = async(dishId: string) => {
     return Array.from(allergensSet).sort((a, b) => a - b);
 };
 
-const getGarrisonsByDish = async(dishId: string) => {
+const getGarrisonsByDish = async(dishId: string, lang: string = 'ES') => {
     const api = new API();
-    const response = await api.get(`/garrison`);
+    const response = await api.get(`/garrison?lang=${lang.toUpperCase()}`);
 
     const garrisonDish = response?.data.filter((garrison: any) => garrison.dish.includes(dishId));
     const garrisonReturn = garrisonDish.map((garrison: any) => {
         return {
             id: garrison.id,
-            name: garrison.garrison_name
+            name: garrison.garrison_name,
         };
     });
+    console.log(`garrisonReturn`, garrisonReturn);
     return garrisonReturn;
-}
+};
 
 const getOrderDishByOrderId = async(OrderID: number) => {
     const api = new API();

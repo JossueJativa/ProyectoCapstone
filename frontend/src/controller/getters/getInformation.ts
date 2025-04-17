@@ -24,9 +24,9 @@ const getIngredient = async(ingredientId: string) => {
     return response?.data;
 }
 
-const getGarrison = async(id: string) => {
+const getGarrison = async(id: string, lang: string = 'ES') => {
     const api = new API();
-    const response = await api.get(`/garrison/${id}`);
+    const response = await api.get(`/garrison/${id}?lang=${lang.toUpperCase()}`);
     return response?.data;
 }
 
