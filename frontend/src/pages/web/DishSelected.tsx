@@ -9,7 +9,7 @@ import { getDish, getAllergensByDish } from '@/controller';
 
 export const DishSelected = () => {
     const { dishId } = useParams<{ dishId: string }>();
-    const { texts } = useLanguage();
+    const { texts, language } = useLanguage();
     const { socket } = useSocket();
     const theme = useTheme();
     const location = useLocation();
@@ -37,7 +37,8 @@ export const DishSelected = () => {
 
     useEffect(() => {
         const fetchDish = async () => {
-            const dish = await getDish(dishId);
+            const lang = language === "en" ? "EN-GB" : "ES";
+            const dish = await getDish(dishId, lang);
             setDish(dish);
         };
         fetchDish();
@@ -46,6 +47,7 @@ export const DishSelected = () => {
     useEffect(() => {
         const fetchAllergens = async () => {
             if (dish) {
+                const lang = language === "en" ? "EN-GB" : "ES";
                 const allergens = await getAllergensByDish(dishId);
                 setAllergens(allergens);
             }

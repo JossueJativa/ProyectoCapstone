@@ -12,20 +12,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  db-test:
-    image: postgres
-    restart: always
-    shm_size: 128mb
-    environment:
-      POSTGRES_DB: admincontroller_test
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admincontroller
-    ports:
-      - "5433:5432" # Cambiar el puerto del host para evitar conflictos
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
   adminer:
     image: adminer
     restart: always
@@ -62,35 +48,6 @@ services:
       POSTGRES_DB: admincontroller
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admincontroller
-
-  test-admincontroller:
-    build:
-      context: ./admincontroller
-      dockerfile: Dockerfile
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: admincontroller_test
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admincontroller
-    depends_on:
-      - db
-    command: python manage.py test
-
-  test-websocket:
-    build:
-      context: ./websocket
-      dockerfile: Dockerfile
-    environment:
-      POSTGRES_HOST: db-test
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: admincontroller_test
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admincontroller
-      PORT: 3001 # Use a different port for testing
-    depends_on:
-      - db-test
-    command: npm run test
 
 volumes:
   postgres_data:

@@ -1,18 +1,30 @@
 name: Build and Test
+
 on:
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      actions: write
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_PASSWORD: 'admincontroller'
+          POSTGRES_DB: 'admincontroller'
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: Checkout code
@@ -23,26 +35,21 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
       - name: Install dependencies
         run: npm install
 
-      - name: Set up PostgreSQL
-        uses: harmon758/postgresql-action@v2.0.0
-        with:
-          postgresql version: '14'
-          postgresql db: 'admincontroller_test'
-          postgresql user: 'postgres'
-          postgresql password: 'admincontroller'
-
-      - name: Run database migrations
-        run: |
-          psql -U postgres -d admincontroller_test -c "CREATE TABLE IF NOT EXISTS order_details (id SERIAL PRIMARY KEY, product_id INTEGER NOT NULL, quantity INTEGER NOT NULL, desk_id INTEGER NOT NULL, garrison TEXT);"
-
-      - name: Run tests and generate coverage
+      - name: Run tests
+        run: npm test
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           POSTGRES_DB: admincontroller_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: admincontroller
-        run: npm test -- --coverage

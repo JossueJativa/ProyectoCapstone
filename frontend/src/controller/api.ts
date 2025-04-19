@@ -73,6 +73,12 @@ class API {
                 }
             });
         }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                return error.response;
+            }
+            throw error;
+        }
     }
 
     async get(url: string): Promise<AxiosResponse | undefined> {
