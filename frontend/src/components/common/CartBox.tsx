@@ -13,12 +13,10 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
 
     const handleQuantityChange = (newQuantity: number) => {
         if (newQuantity < 1 || !desk_id) return;
-        console.log("Emitting order:update for order_detail_id:", id, "with new quantity:", newQuantity, "and desk_id:", desk_id); // Debug log
         socket.emit("order:update", { order_detail_id: id, desk_id, update_quantity: newQuantity }, (error: any, response: any) => {
             if (error) {
                 console.error("Error updating quantity:", error);
             } else {
-                console.log("Quantity update response:", response);
                 onQuantityChange(id, newQuantity);
             }
         });

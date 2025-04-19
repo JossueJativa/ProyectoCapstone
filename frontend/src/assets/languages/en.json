@@ -61,5 +61,10 @@
     },
     "popups": {
         "select": "Select two garrisons"
+    },
+    "auth": {
+        "username": "Username",
+        "password": "Password",
+        "login": "Login"
     }
 }

@@ -91,6 +91,14 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
       fetchGarrisons();
     }, [has_garrison, language]);
 
+    const speakText = (text: string) => {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language === "en" ? "en-GB" : "es-ES";
+      synth.cancel();
+      synth.speak(utterance);
+    };
+
     return (
       <>
         <Box
@@ -228,7 +236,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
               <ButtonLogic
                 text={texts.buttons.read}
                 typeButton="secondary"
-                onClick={() => console.log("Button pressed")}
+                onClick={() => speakText(`${name}. ${description}`)}
                 icon={<VolumeUp />}
               />
             </Grid>

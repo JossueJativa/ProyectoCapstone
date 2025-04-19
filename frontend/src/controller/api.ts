@@ -64,7 +64,15 @@ class API {
     }
 
     async postAuth(url: string, data: object): Promise<AxiosResponse | undefined> {
-        return this.request('post', `/user${url}`, data, false);
+        // Make a POST request without authentication
+        try {
+            return await axios.post(`${this.url}${url}/`, data, {
+                headers: {
+                    ...this.headers,
+                    Authorization: this.token
+                }
+            });
+        }
     }
 
     async get(url: string): Promise<AxiosResponse | undefined> {

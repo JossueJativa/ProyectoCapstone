@@ -61,5 +61,10 @@
     },
     "popups": {
         "select": "Selecciona dos guarniciones"
+    },
+    "auth": {
+        "username": "Usuario",
+        "password": "Contraseña",
+        "login": "Iniciar sesión"
     }
 }

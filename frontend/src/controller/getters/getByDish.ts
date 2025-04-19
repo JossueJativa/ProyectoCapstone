@@ -47,7 +47,6 @@ const getGarrisonsByDish = async(dishId: string, lang: string = 'ES') => {
             name: garrison.garrison_name,
         };
     });
-    console.log(`garrisonReturn`, garrisonReturn);
     return garrisonReturn;
 };
 
