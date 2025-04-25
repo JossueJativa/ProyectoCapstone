@@ -36,11 +36,18 @@ const getCategories = async(lang: string = 'ES') => {
     return response?.data;
 };
 
+const getOrders = async() => {
+    const api = new API();
+    const response = await api.get('/order');
+    return response?.data;
+}
+
 export { 
     getDesk, 
     getAllergens, 
     getIngredients,
     getIngredient,
     getGarrison,
-    getCategories
+    getCategories,
+    getOrders
 };

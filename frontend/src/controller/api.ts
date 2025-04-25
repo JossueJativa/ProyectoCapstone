@@ -8,7 +8,7 @@ class API {
     private headers: object;
 
     constructor() {
-        this.url = "http://localhost:8000";
+        this.url = "http://127.0.0.1:8000";
         this.url_api = `${this.url}/api`;
         this.token = `Bearer ${localStorage.getItem('access_token')}`;
         this.headers = {
@@ -66,7 +66,7 @@ class API {
     async postAuth(url: string, data: object): Promise<AxiosResponse | undefined> {
         // Make a POST request without authentication
         try {
-            return await axios.post(`${this.url}${url}/`, data, {
+            return await axios.post(`${this.url}/user${url}/`, data, {
                 headers: {
                     ...this.headers,
                     Authorization: this.token

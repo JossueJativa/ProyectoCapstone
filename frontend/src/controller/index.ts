@@ -12,7 +12,8 @@ export {
     getIngredients,
     getIngredient,
     getGarrison,
-    getCategories
+    getCategories,
+    getOrders
 } from './getters';
 export {
     createDesk,

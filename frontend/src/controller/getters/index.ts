@@ -11,5 +11,6 @@ export {
     getIngredients,
     getIngredient,
     getGarrison,
-    getCategories
+    getCategories,
+    getOrders
 } from './getInformation';

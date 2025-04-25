@@ -1,6 +1,6 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { Fab, useTheme, Box } from '@mui/material';
-import { Help } from '@mui/icons-material';
+import { useEffect } from 'react';
+import { useTheme, Box } from '@mui/material';
 import { Navbar } from '@/components';
 import { Error404 } from '../errors';
 import { 
@@ -12,8 +12,30 @@ import { CartProvider } from "@/context/CartContext";
 export const ClientRouter = () => {
     const location = useLocation();
     const isSelectDesk = location.pathname === '/';
-    const isErrorPage = location.pathname === '/404'; // Verifica si es la página de error
-    const theme = useTheme();
+    const isErrorPage = location.pathname === '/404';
+
+    useEffect(() => {
+        if (!isSelectDesk && !isErrorPage) {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
+            script.onload = () => {
+                window.voiceflow?.chat?.load({
+                    verify: { projectID: '680ac6dbe61d2476b0f2db11' },
+                    url: 'https://general-runtime.voiceflow.com',
+                    versionID: 'production',
+                    voice: {
+                        url: 'https://runtime-api.voiceflow.com',
+                    },
+                });
+            };
+            document.body.appendChild(script);
+
+            return () => {
+                document.body.removeChild(script); // Limpia el script al desmontar
+            };
+        }
+    }, [isSelectDesk, isErrorPage]);
 
     return (
         <CartProvider>
@@ -28,34 +50,8 @@ export const ClientRouter = () => {
                     <Route path="/divide-invoice/:id" element={<DivideInvoice />} />
                     <Route path="/invoice-by-amount/:id" element={<InvoiceByMount />} />
                     <Route path="/invoice-by-dish/:id" element={<InvoiceByDish />} />
-
-                    {/* Navegaciones no permitidas */}
-
-                    {/* Navegaciones permitidas */}
-
-                    {/* Navegaciones no permitidas */}
                     <Route path="*" element={<Error404 />} />
                 </Routes>
-
-                {/* Renderiza los botones flotantes solo si no es SelectDesk ni Error404 */}
-                {!isSelectDesk && !isErrorPage && (
-                    <>
-                        <Fab
-                            aria-label="help"
-                            style={{
-                                position: 'fixed',
-                                bottom: 16,
-                                right: 16,
-                                backgroundColor: theme.button.mostaza, // Color del botón
-                                color: theme.menu.black, // Color del ícono
-                                zIndex: 30
-                            }}
-                            onClick={() => { console.log("Help clicked") }}
-                        >
-                            <Help style={{ fontSize: 30 }} />
-                        </Fab>
-                    </>
-                )}
             </Box>
         </CartProvider>
     );

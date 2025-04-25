@@ -1,4 +1,4 @@
-import { Box, TextField } from '@mui/material';
+import { Box, TextField, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonLogic } from '@/components';
@@ -8,6 +8,7 @@ import { Logo } from '@/assets';
 
 export const Login = () => {
     const { texts } = useLanguage();
+    const theme = useTheme();
     const navigate = useNavigate();
     const [data, setData] = useState({
         username: "",
@@ -28,7 +29,8 @@ export const Login = () => {
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'center', 
-            height: '100vh' 
+            height: '100vh',
+            backgroundColor: theme.background.secondary,
         }}>
             <Box sx={{ 
                 width: '300px', 
