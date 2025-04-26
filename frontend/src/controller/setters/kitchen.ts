@@ -26,6 +26,15 @@ const createAllergen = async (data: IAllergenData): Promise<any> => {
     return response?.data;
 }
 
+const createCategory = async (data: any): Promise<any> => {
+    const { name } = data;
+    const api = new API();
+    const response = await api.post('/category', {
+        category_name: name
+    });
+    return response?.data;
+}
+
 const createIngredient = async (data: IIngredientData): Promise<any> => {
     const { name, quantity, allergens } = data;
     const api = new API();
@@ -33,6 +42,16 @@ const createIngredient = async (data: IIngredientData): Promise<any> => {
         ingredient_name: name,
         quantity,
         allergen: allergens
+    });
+    return response?.data;
+}
+
+const createGarrison = async (data: any): Promise<any> => {
+    const { name, dishesIds } = data;
+    const api = new API();
+    const response = await api.post('/garrison', {
+        garrison_name: name,
+        dish: dishesIds
     });
     return response?.data;
 }
@@ -100,5 +119,7 @@ export {
     createIngredient,
     createDish,
     createOrder,
-    createOrderDish
+    createOrderDish,
+    createCategory,
+    createGarrison
 };

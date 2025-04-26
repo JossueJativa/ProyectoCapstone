@@ -42,6 +42,12 @@ const getOrders = async() => {
     return response?.data;
 }
 
+const getInvoices = async() => {
+    const api = new API();
+    const response = await api.get('/invoice');
+    return response?.data;
+}
+
 export { 
     getDesk, 
     getAllergens, 
@@ -49,5 +55,6 @@ export {
     getIngredient,
     getGarrison,
     getCategories,
-    getOrders
+    getOrders,
+    getInvoices
 };

@@ -81,6 +81,23 @@ class API {
         }
     }
 
+    async getAuth(url: string, token: string): Promise<AxiosResponse | undefined> {
+        try {
+            return await axios.get(`${this.url}/user${url}/`, {
+                headers: {
+                    ...this.headers,
+                    Authorization: `Bearer ${token}`
+                }
+            });
+        }
+        catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                return error.response;
+            }
+            throw error;
+        }
+    }
+
     async get(url: string): Promise<AxiosResponse | undefined> {
         return this.request('get', url, undefined, false);
     }

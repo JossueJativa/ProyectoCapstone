@@ -1,33 +1,30 @@
-import { Box, Typography, Grid, Paper, useTheme } from '@mui/material';
-import { useState, useEffect } from 'react';
-import { getOrders } from '@/controller';
+import { Grid, Box, useTheme, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {
+    BarChart, Bar, XAxis, YAxis,
+    CartesianGrid, Tooltip,
+    ResponsiveContainer, PieChart,
+    Pie, Cell, Legend
+} from 'recharts';
+import { SideBar, BoxData } from '@/components';
+import { getOrders, getDish, getOrderDishByOrderId, getCategories } from '@/controller';
+import { IOrder } from '@/interfaces';
 
 export const Dashboard = () => {
-    const [selectedMonth, setSelectedMonth] = useState<keyof typeof monthMap>('Enero');
-    const [orders, setOrders] = useState([]);
-    const [totalPrice, setTotalPrice] = useState(0);
-    const [totalItems, setTotalItems] = useState(0);
-    const currentYear = new Date().getFullYear();
     const theme = useTheme();
-
-    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
-
-    // Map months to their respective numbers
-    const monthMap = {
-        Enero: 1,
-        Febrero: 2,
-        Marzo: 3,
-        Abril: 4,
-        Mayo: 5,
-        Junio: 6,
-    };
+    const [orders, setOrders] = useState<IOrder[]>([]);
+    const [selectedMonth, setSelectedMonth] = useState<number>(1);
+    const [dishes, setDishes] = useState<{ name: string; count: number }[]>([]);
+    const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
+    const [totalDishes, setTotalDishes] = useState(0);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [averageDishesPerTable, setAverageDishesPerTable] = useState(0);
 
     useEffect(() => {
-        // Fetch orders from the API
         const fetchOrders = async () => {
             try {
-                const orders = await getOrders();
-                setOrders(orders);
+                const response = await getOrders();
+                setOrders(response);
             } catch (error) {
                 console.error('Error fetching orders:', error);
             }
@@ -37,113 +34,173 @@ export const Dashboard = () => {
     }, []);
 
     useEffect(() => {
-        // Filter orders by the selected month and year
-        const filteredOrders = orders.filter((order) => {
-            const [year, , month] = order.date.split('-').map(Number);
-            return (
-                month === monthMap[selectedMonth] &&
-                year === currentYear
-            );
-        });
+        const fetchFilteredData = async () => {
+            try {
+                const currentYear = new Date().getFullYear();
+                const filteredOrders = orders.filter(order => {
+                    const [year, day, month] = order.date.split('-');
+                    const formattedDate = `${year}-${month}-${day}`;
+                    const orderDate = new Date(formattedDate);
 
-        // Sum all total_price values for the selected month
-        const totalPrice = filteredOrders.reduce((sum, order) => sum + order.total_price, 0);
+                    return orderDate.getFullYear() === currentYear && orderDate.getMonth() + 1 === selectedMonth;
+                });
 
-        // Count all items (order_dish) for the selected month
-        const totalItems = filteredOrders.reduce((sum, order) => sum + order.order_dish.length, 0);
+                const totalDishes = filteredOrders.reduce((sum, order) => sum + order.order_dish.length, 0);
+                const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total_price, 0);
+                const averageDishesPerTable = filteredOrders.length > 0
+                    ? (totalDishes / filteredOrders.length).toFixed(2)
+                    : 0;
 
-        setTotalPrice(totalPrice);
-        setTotalItems(totalItems);
-    }, [selectedMonth, orders]);
+                setTotalDishes(totalDishes);
+                setTotalRevenue(totalRevenue);
+                setAverageDishesPerTable(averageDishesPerTable);
+
+                const dishCounts: Record<string, number> = {};
+                for (const order of filteredOrders) {
+                    const orderDishes = await getOrderDishByOrderId(order.id);
+
+                    for (const dishId of orderDishes) {
+                        const dish = await getDish(dishId.id);
+                        const dishQuantity = dishId.quantity;
+                        const dishName = dish.dish_name;
+
+                        if (dishCounts[dishName]) {
+                            dishCounts[dishName] += dishQuantity;
+                        } else {
+                            dishCounts[dishName] = dishQuantity;
+                        }
+                    }
+                }
+                const dishArray = Object.entries(dishCounts).map(([name, count]) => ({ name, count }));
+                dishArray.sort((a, b) => b.count - a.count);
+                setDishes(dishArray);
+
+                const categoryCounts: Record<string, number> = {};
+                const categoriesData = await getCategories();
+                const categoryMap = categoriesData.reduce((map, category) => {
+                    map[category.id] = category.category_name;
+                    return map;
+                }, {} as Record<number, string>);
+
+                for (const order of filteredOrders) {
+                    const orderDishes = await getOrderDishByOrderId(order.id);
+
+                    for (const dishId of orderDishes) {
+                        const dish = await getDish(dishId.id);
+                        const categoryDish = dish.category;
+
+                        const categoryName = categoryMap[categoryDish];
+                        const dishQuantity = dishId.quantity;
+
+                        if (categoryCounts[categoryName]) {
+                            categoryCounts[categoryName] += dishQuantity;
+                        } else {
+                            categoryCounts[categoryName] = dishQuantity;
+                        }
+                    }
+                }
+
+                const categoryArray = Object.entries(categoryCounts).map(([name, count]) => ({ name, count }));
+                setCategories(categoryArray);
+            } catch (error) {
+                console.error('Error fetching filtered data:', error);
+            }
+        };
+
+        if (orders.length > 0) {
+            fetchFilteredData();
+        }
+    }, [orders, selectedMonth]);
+
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28DFF'];
 
     return (
-        <Grid container spacing={2} pb={2} minHeight={'100vh'} sx={{
-            backgroundColor: theme.background.secondary,
-            padding: '20px',
-        }}>
-            {/* Sidebar */}
-            <Grid item xs={2}>
-                <Box
-                    sx={{
-                        height: '100%',
-                        padding: '10px',
-                        borderRadius: '8px',
-                    }}
-                >
-                    <Typography variant="h6" sx={{ mb: 2 }}>
-                        {currentYear}
-                    </Typography>
-                    {months.map((month) => (
-                        <Box
-                            key={month}
-                            sx={{
-                                padding: '10px',
-                                backgroundColor: theme.button.beige,
-                                borderRadius: theme.button.border.rounded,
-                                cursor: 'pointer',
-                                textAlign: 'center',
-                                mb: 1,
-                                ...(selectedMonth === month && {
-                                    border: '2px solid black',
-                                }),
-                            }}
-                            onClick={() => setSelectedMonth(month)}
-                        >
-                            <Typography sx={{
-                                fontWeight: selectedMonth === month ? 'bold' : 'normal',
-                            }}>{month}</Typography>
-                        </Box>
-                    ))}
-                </Box>
-            </Grid>
+        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', backgroundColor: theme.background.primary, minHeight: '100vh', overflow: 'hidden' }}>
+            <Grid container sx={{ width: 'auto' }}>
+                {/* Columna derecha: SideBar */}
+                <Grid container width={'20%'}>
+                    <SideBar onMonthChange={setSelectedMonth} />
+                </Grid>
 
-            {/* Main Content */}
-            <Grid item xs={10}>
-                <Grid container spacing={2}>
-                    {/* Top Cards */}
-                    <Grid item xs={4}>
-                        <Paper sx={{ padding: '16px', textAlign: 'center' }}>
-                            <Typography variant="h6">Monto total de facturas</Typography>
-                            <Typography variant="h4">${totalPrice.toFixed(2)}</Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Paper sx={{ padding: '16px', textAlign: 'center' }}>
-                            <Typography variant="h6">Cantidad total de ítems vendidos</Typography>
-                            <Typography variant="h4">{totalItems}</Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Paper sx={{ padding: '16px', textAlign: 'center' }}>
-                            <Typography variant="h6">Total de usuarios del sistema</Typography>
-                            <Typography variant="h4">300</Typography>
-                        </Paper>
-                    </Grid>
+                {/* Columna izquierda: Contenido principal */}
+                <Grid item xs={12} md={9} sx={{ padding: '20px' }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={4}>
+                            <BoxData>
+                                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                                    <Typography variant="h6">Total Platos</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{totalDishes}</Typography>
+                                </Box>
+                            </BoxData>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <BoxData>
+                                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                                    <Typography variant="h6">Ganancias Totales</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                                        {totalRevenue}
+                                    </Typography>
+                                </Box>
+                            </BoxData>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <BoxData>
+                                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                                    <Typography variant="h6">Media de pedidos por mesa</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                                        {averageDishesPerTable}
+                                    </Typography>
+                                </Box>
+                            </BoxData>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <BoxData>
+                                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%' }}>
+                                    <Typography variant="h6" sx={{ marginBottom: '20px' }}>Platos Más Pedidos</Typography>
+                                    <ResponsiveContainer width="100%" height={200}>
+                                        <BarChart data={dishes} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="name" />
+                                            <YAxis />
+                                            <Tooltip />
+                                            <Bar dataKey="count" fill="#8884d8" />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </Box>
+                            </BoxData>
+                        </Grid>
 
-                    {/* Charts */}
-                    <Grid item xs={12}>
-                        <Paper sx={{ padding: '16px' }}>
-                            <Typography variant="h6">Platos más solicitados</Typography>
-                            {/* Aquí puedes agregar un gráfico de barras */}
-                            <Box sx={{ height: '150px', backgroundColor: '#e0e0e0' }} />
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Paper sx={{ padding: '16px' }}>
-                            <Typography variant="h6">Categorías más populares</Typography>
-                            {/* Aquí puedes agregar un gráfico de pastel */}
-                            <Box sx={{ height: '150px', backgroundColor: '#e0e0e0' }} />
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Paper sx={{ padding: '16px' }}>
-                            <Typography variant="h6">Alérgenos más comunes</Typography>
-                            {/* Aquí puedes agregar un gráfico de barras */}
-                            <Box sx={{ height: '150px', backgroundColor: '#e0e0e0' }} />
-                        </Paper>
+                        {/* Gráfico de pastel */}
+                        <Grid item xs={12}>
+                            <BoxData>
+                                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%' }}>
+                                    <Typography variant="h6" sx={{ marginBottom: '20px' }}>Categorías Más Compradas</Typography>
+                                    <ResponsiveContainer width="100%" height={200}> {/* Ajuste de altura */}
+                                        <PieChart>
+                                            <Pie
+                                                data={categories}
+                                                dataKey="count"
+                                                nameKey="name"
+                                                cx="50%" // Centrar el gráfico horizontalmente
+                                                cy="50%" // Centrar el gráfico verticalmente
+                                                outerRadius={80} // Ajuste del radio
+                                                fill="#8884d8"
+                                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} // Mostrar nombre y porcentaje
+                                            >
+                                                {categories.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Legend layout="vertical" align="left" />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </Box>
+                            </BoxData>
+                        </Grid>
+
                     </Grid>
                 </Grid>
             </Grid>
-        </Grid>
+        </Box>
     );
 };

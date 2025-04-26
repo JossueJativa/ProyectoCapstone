@@ -1,5 +1,7 @@
 export { 
-    LoginAuth
+    LoginAuth,
+    GetUserAuth,
+    LogoutAuth
 } from './auth';
 export {
     getDishes,
@@ -13,7 +15,8 @@ export {
     getIngredient,
     getGarrison,
     getCategories,
-    getOrders
+    getOrders,
+    getInvoices
 } from './getters';
 export {
     createDesk,
@@ -23,5 +26,7 @@ export {
     createOrder,
     createOrderDish,
     createInvoice,
-    createInvoiceData
+    createInvoiceData,
+    createCategory,
+    createGarrison
 } from './setters';

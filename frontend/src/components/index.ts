@@ -6,3 +6,6 @@ export {
     LabelText, IconText, PopUpInformation,
     CategoriesList
 } from './decorator';
+export {
+    SideBar, BoxData
+} from './admin';

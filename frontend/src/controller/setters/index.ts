@@ -4,7 +4,9 @@ export {
     createIngredient,
     createDish,
     createOrder,
-    createOrderDish
+    createOrderDish,
+    createCategory,
+    createGarrison
 } from './kitchen';
 export {
     createInvoice,

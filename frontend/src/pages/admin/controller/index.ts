@@ -1,2 +1,9 @@
 export { Home } from './Home';
 export { Dashboard } from './Dashboard';
+export { CreateDesk } from './CreateDesk';
+export { CreateAlergen } from './CreateAlergen';
+export { CreateCategories } from './CreateCategories';
+export { CreateGarrisons } from './CreateGarrisons';
+export { CreateIngredient } from './CreateIngredient';
+export { CreateInvoices } from './CreateInvoices';
+export { CreateOrders } from './CreateOrders';

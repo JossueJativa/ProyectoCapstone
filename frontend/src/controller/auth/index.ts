@@ -1,7 +1,8 @@
 export { 
     LoginAuth, 
     LogoutAuth, 
-    RegisterAuth
+    RegisterAuth,
+    GetUserAuth
 } from './authentication';
 export { 
     verifyToken, 
