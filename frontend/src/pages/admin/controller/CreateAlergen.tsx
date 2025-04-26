@@ -14,10 +14,19 @@ export const CreateAlergen = () => {
     const [newAllergen, setNewAllergen] = useState({ allergen_name: '' });
     const [selectedAllergen, setSelectedAllergen] = useState<any | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredAllergens = allergen.filter((a) =>
+        a.allergen_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewAllergen({ ...newAllergen, [name]: value });
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
     };
 
     const handleCreateAllergen = async () => {
@@ -132,7 +141,14 @@ export const CreateAlergen = () => {
                             gap: '10px',
                         }}
                     >
-                        {allergen.map((a: any, index: number) => (
+                        <TextField
+                            label="Buscar Alérgeno"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            fullWidth
+                            margin="normal"
+                        />
+                        {filteredAllergens.map((a: any, index: number) => (
                             <Box
                                 key={index}
                                 sx={{

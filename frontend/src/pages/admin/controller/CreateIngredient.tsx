@@ -15,6 +15,15 @@ export const CreateIngredient = () => {
     const [allergens, setAllergens] = useState<any[]>([]);
     const [selectedIngredient, setSelectedIngredient] = useState<any>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredIngredients = ingredient.filter((ing) =>
+        ing.ingredient_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+    };
 
     useEffect(() => {
         const fetchIngredient = async () => {
@@ -173,8 +182,15 @@ export const CreateIngredient = () => {
                             gap: '10px',
                         }}
                     >
-                        {ingredient && ingredient.length > 0 ? (
-                            ingredient.map((ing, index) => (
+                        <TextField
+                            label="Buscar Ingrediente"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            fullWidth
+                            margin="normal"
+                        />
+                        {filteredIngredients && filteredIngredients.length > 0 ? (
+                            filteredIngredients.map((ing, index) => (
                                 <Box
                                     key={index}
                                     sx={{

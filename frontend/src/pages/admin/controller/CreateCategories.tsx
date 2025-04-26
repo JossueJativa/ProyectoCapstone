@@ -11,6 +11,11 @@ export const CreateCategories = () => {
     const [newCategory, setNewCategory] = useState({ category_name: '' });
     const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredCategories = categories.filter((c) =>
+        c.category_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -23,6 +28,10 @@ export const CreateCategories = () => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewCategory({ ...newCategory, [name]: value });
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
     };
 
     const handleCreateCategory = async () => {
@@ -129,7 +138,14 @@ export const CreateCategories = () => {
                             gap: '10px',
                         }}
                     >
-                        {categories.map((c: any, index: number) => (
+                        <TextField
+                            label="Buscar Categoría"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            fullWidth
+                            margin="normal"
+                        />
+                        {filteredCategories.map((c: any, index: number) => (
                             <Box
                                 key={index}
                                 sx={{
