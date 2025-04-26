@@ -17,33 +17,29 @@ class API {
     }
 
     async updateToken(): Promise<void> {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+            console.error("No refresh token available");
             return;
         }
 
-        const isTokenValid = await verifyToken();
-        if (isTokenValid) {
-            return;
+        try {
+            const response = await axios.post(`${this.url}/token/refresh/`, {
+                refresh: refreshToken
+            });
+
+            const { access, refresh } = response.data;
+            localStorage.setItem('access_token', access);
+            localStorage.setItem('refresh_token', refresh);
+            this.token = `Bearer ${access}`;
+        } catch (error) {
+            console.error("Failed to refresh token", error);
         }
-
-        const response = await axios.post(`${this.url}/token/refresh/`, {
-            refresh: localStorage.getItem('refresh_token')
-        }).catch(() => null);
-
-        if (!response) {
-            return;
-        }
-
-        const { access, refresh } = response.data;
-        localStorage.setItem('access_token', access);
-        localStorage.setItem('refresh_token', refresh);
-        this.token = `Bearer ${access}`;
     }
 
     private async request(method: Method, url: string, data?: object, auth: boolean = true): Promise<AxiosResponse | undefined> {
         if (auth) {
-            await this.updateToken();
+            await this.ensureValidToken();
         }
         try {
             return await axios({
@@ -57,9 +53,23 @@ class API {
             });
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
+                // Handle 401 errors (unauthorized) and try refreshing the token
+                if (error.response.status === 401 && auth) {
+                    console.warn("Token expired, attempting to refresh...");
+                    await this.updateToken();
+                    return this.request(method, url, data, auth); // Retry the request
+                }
                 return error.response;
             }
             throw error;
+        }
+    }
+
+    private async ensureValidToken(): Promise<void> {
+        const isTokenValid = await verifyToken();
+        if (!isTokenValid) {
+            console.warn("Token is invalid or expired, refreshing...");
+            await this.updateToken();
         }
     }
 

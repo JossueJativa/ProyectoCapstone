@@ -7,6 +7,11 @@ class InvalidTokenError extends Error {
     }
 }
 
+const isValidJWT = (token: string): boolean => {
+    const parts = token.split('.');
+    return parts.length === 3;
+};
+
 const verifyToken = async (): Promise<{ success: boolean, message: string }> => {
     const refresh = localStorage.getItem('refresh_token');
     const access = localStorage.getItem('access_token');
@@ -15,8 +20,8 @@ const verifyToken = async (): Promise<{ success: boolean, message: string }> => 
     }
 
     try {
-        if (!refresh) {
-            throw new InvalidTokenError('Refresh token is null');
+        if (!refresh || !isValidJWT(refresh)) {
+            throw new InvalidTokenError('Refresh token is invalid or malformed');
         }
         const decoded = jwtDecode<JwtPayload>(refresh);
         const currentTime = Math.floor(Date.now() / 1000);
@@ -26,15 +31,15 @@ const verifyToken = async (): Promise<{ success: boolean, message: string }> => 
         return { success: true, message: 'Token is valid' };
     } catch (e) {
         if (e instanceof InvalidTokenError) {
+            console.warn(e.message);
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            window.location.href = '/admin';
             return { success: false, message: e.message };
         }
         console.error(e);
         return { success: false, message: 'An error occurred' };
     }
-}
+};
 
 const verifyResponseStatusCode = (statusCode: number, response: Response): boolean => {
     if (response.status === statusCode) {

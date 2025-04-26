@@ -51,8 +51,8 @@ export const SideBar = ({ onMonthChange }) => {
             { key: 'Mesas', icon: <DeskOutlined />, text: 'Mesas', route: '/admin/desk' },
             { key: 'Alergenos', icon: <NoMeals />, text: 'Alergenos', route: '/admin/allergen' },
             { key: 'Categorias', icon: <Category />, text: 'Categorias', route: '/admin/categories' },
-            { key: 'Guarniciones', icon: <KebabDining />, text: 'Guarniciones', route: '/admin/garrisons' },
             { key: 'Ingredientes', icon: <LocalDining />, text: 'Ingredientes', route: '/admin/ingredient' },
+            { key: 'Guarniciones', icon: <KebabDining />, text: 'Guarniciones', route: '/admin/garrisons' },
             { key: 'Facturas', icon: <HistoryEdu />, text: 'Facturas', route: '/admin/invoices' },
             { key: 'Ordenes', icon: <DinnerDining />, text: 'Ordenes', route: '/admin/orders' },
         ].map(({ key, icon, text, route }, index, array) => (

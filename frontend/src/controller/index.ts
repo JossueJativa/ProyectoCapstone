@@ -30,3 +30,15 @@ export {
     createCategory,
     createGarrison
 } from './setters';
+export {
+    updateDesk,
+    updateAllergen,
+    updateCategory,
+    updateIngredient
+} from './update';
+export {
+    deleteDesk,
+    deleteAllergen,
+    deleteCategory,
+    deleteIngredient
+} from './delete';
