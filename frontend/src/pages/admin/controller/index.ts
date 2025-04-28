@@ -7,3 +7,4 @@ export { CreateGarrisons } from './CreateGarrisons';
 export { CreateIngredient } from './CreateIngredient';
 export { CreateInvoices } from './CreateInvoices';
 export { CreateOrders } from './CreateOrders';
+export { CreateDish } from './CreateDish';

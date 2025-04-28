@@ -24,9 +24,16 @@ const deleteIngredient = async (id: number): Promise<any> => {
     return response?.data;
 }
 
+const deleteDish = async (id: number): Promise<any> => {
+    const api = new API();
+    const response = await api.delete(`/dish/${id}`);
+    return response?.data;
+}
+
 export {
     deleteDesk,
     deleteAllergen,
     deleteCategory,
-    deleteIngredient
+    deleteIngredient,
+    deleteDish,
 }

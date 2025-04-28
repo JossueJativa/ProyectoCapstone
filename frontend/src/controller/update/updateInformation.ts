@@ -3,6 +3,7 @@ import {
     IDeskData,
     IAllergenData,
     IIngredientData,
+    IDishData,
 } from '@/interfaces';
 
 const updateDesk = async (data: IDeskData): Promise<any> => {
@@ -33,7 +34,7 @@ const updateCategory = async (data: any): Promise<any> => {
     return response?.data;
 }
 
-const updateIngredient = async(data: IIngredientData): Promise<any> => {
+const updateIngredient = async (data: IIngredientData): Promise<any> => {
     const { id, name, quantity, allergens } = data;
     const api = new API();
     const response = await api.put(`/ingredient/${id}`, {
@@ -44,9 +45,37 @@ const updateIngredient = async(data: IIngredientData): Promise<any> => {
     return response?.data;
 }
 
+const updateDish = async (data: IDishData): Promise<any> => {
+    const { 
+        id, 
+        dish_name, 
+        description, 
+        time_elaboration, 
+        price, 
+        link_ar, 
+        ingredients,
+        category,
+        has_garrison,
+    } = data;
+    const api = new API();
+    const response = await api.put(`/dish/${id}`, {
+        dish_name,
+        description,
+        time_elaboration,
+        price,
+        link_ar,
+        ingredient: ingredients,
+        category,
+        has_garrison,
+    });
+    console.log(response?.data);
+    return response?.data;
+}
+
 export {
-    updateDesk, 
+    updateDesk,
     updateAllergen,
     updateCategory,
-    updateIngredient
+    updateIngredient,
+    updateDish
 }

@@ -9,7 +9,8 @@ import {
 import {
     Dashboard, NoMeals, Category,
     KebabDining, DeskOutlined, LocalDining,
-    HistoryEdu, DinnerDining, Logout, ArrowForwardIos
+    HistoryEdu, DinnerDining, Logout, 
+    ArrowForwardIos, BrunchDining
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -52,6 +53,7 @@ export const SideBar = ({ onMonthChange }) => {
             { key: 'Alergenos', icon: <NoMeals />, text: 'Alergenos', route: '/admin/allergen' },
             { key: 'Categorias', icon: <Category />, text: 'Categorias', route: '/admin/categories' },
             { key: 'Ingredientes', icon: <LocalDining />, text: 'Ingredientes', route: '/admin/ingredient' },
+            { key: 'Platos', icon: <BrunchDining />, text: 'Platos', route: '/admin/dish' },
             { key: 'Guarniciones', icon: <KebabDining />, text: 'Guarniciones', route: '/admin/garrisons' },
             { key: 'Facturas', icon: <HistoryEdu />, text: 'Facturas', route: '/admin/invoices' },
             { key: 'Ordenes', icon: <DinnerDining />, text: 'Ordenes', route: '/admin/orders' },

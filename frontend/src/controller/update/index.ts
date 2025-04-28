@@ -2,5 +2,6 @@ export {
     updateDesk,
     updateAllergen,
     updateCategory,
-    updateIngredient
+    updateIngredient,
+    updateDish
 } from './updateInformation';

@@ -15,7 +15,8 @@ export const SelectDesk = () => {
     useEffect(() => {
         const fetchDesks = async () => {
             const deskList = await getDesk();
-            setDesk(deskList);
+            const sortedDeskList = deskList.sort((a: { desk_number: number; }, b: { desk_number: number; }) => a.desk_number - b.desk_number);
+            setDesk(sortedDeskList);
         };
         fetchDesks();
     }, []);

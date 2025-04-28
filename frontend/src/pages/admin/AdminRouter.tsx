@@ -5,7 +5,7 @@ import {
     CreateDesk, CreateAlergen,
     CreateCategories, CreateGarrisons,
     CreateIngredient, CreateInvoices,
-    CreateOrders
+    CreateOrders, CreateDish
 } from './controller';
 import { ProtectedRoute } from './ProtectedRouter';
 
@@ -22,6 +22,7 @@ export const AdminRouter = () => {
             <Route path="/ingredient" element={<ProtectedRoute element={<CreateIngredient />} />} />
             <Route path="/invoices" element={<ProtectedRoute element={<CreateInvoices />} />} />
             <Route path="/orders" element={<ProtectedRoute element={<CreateOrders />} />} />
+            <Route path="/dish" element={<ProtectedRoute element={<CreateDish />} />} />
         </Routes>
     )
 }

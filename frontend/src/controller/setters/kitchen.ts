@@ -63,7 +63,9 @@ const createDish = async (data: IDishData): Promise<any> => {
         time_elaboration,
         price,
         link_ar,
-        ingredients
+        ingredients,
+        category,
+        has_garrison,
     } = data;
     const api = new API();
     const response = await api.post('/dish', {
@@ -72,7 +74,9 @@ const createDish = async (data: IDishData): Promise<any> => {
         time_elaboration,
         price,
         link_ar,
-        ingredient: ingredients
+        ingredient: ingredients,
+        category,
+        has_garrison,
     });
     return response?.data;
 }

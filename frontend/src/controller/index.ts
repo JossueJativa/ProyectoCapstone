@@ -34,11 +34,13 @@ export {
     updateDesk,
     updateAllergen,
     updateCategory,
-    updateIngredient
+    updateIngredient,
+    updateDish
 } from './update';
 export {
     deleteDesk,
     deleteAllergen,
     deleteCategory,
-    deleteIngredient
+    deleteIngredient,
+    deleteDish
 } from './delete';

@@ -2,5 +2,6 @@ export {
     deleteAllergen,
     deleteDesk,
     deleteCategory,
-    deleteIngredient
+    deleteIngredient,
+    deleteDish
 } from './deleteInformation';

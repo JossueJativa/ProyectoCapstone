@@ -34,7 +34,7 @@ export const CategoriesList = ({ categories, onCategorySelect, selectedCategory 
                     key={category.id}
                     onClick={() => handleCategoryClick(category.id)}
                     sx={{
-                        minWidth: '120px',
+                        minWidth: '150px',
                         textAlign: 'center',
                         padding: 1,
                         backgroundColor: selectedCategory === category.id ? theme.button.verde : theme.button.transparente,

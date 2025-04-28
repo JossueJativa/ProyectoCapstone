@@ -5,4 +5,6 @@ export interface IDishData {
     price: number;
     link_ar: string;
     ingredients: string[];
+    category: number;
+    has_garrison: boolean;
 }
