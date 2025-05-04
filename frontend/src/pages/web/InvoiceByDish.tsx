@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import { Box, Grid, Typography, useTheme, Checkbox } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
-import { IconText, ButtonType } from '@/components';
+import { IconText, ButtonType, PopUpInformation } from '@/components';
 import { IInvoicing, IInvoicingData } from '@/interfaces'
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
+import { calculateTotal } from '@/helpers/utils';
 
 export const InvoiceByDish = () => {
     const { id } = useParams<{ id: string }>();
@@ -17,6 +18,7 @@ export const InvoiceByDish = () => {
     const [selectedDishes, setSelectedDishes] = useState<any[]>([]);
     const [currentPerson, setCurrentPerson] = useState<number>(1);
     const [invoices, setInvoices] = useState<IInvoicing[]>([]);
+    const [popupOpen, setPopupOpen] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -37,7 +39,7 @@ export const InvoiceByDish = () => {
         const divide = parseInt(params.get("divide") || '0', 10);
 
         if (divide > 0 && order) {
-            const { totalPrice } = calculateTotal();
+            const { totalPrice } = calculateTotal(order);
             const amountPerPerson = totalPrice / divide;
 
             const divisions = Array.from({ length: divide }, (_, i) => ({
@@ -48,15 +50,6 @@ export const InvoiceByDish = () => {
             setDivisions(divisions);
         }
     }, [order, location.search]);
-
-    const calculateTotal = (dishes = order) => {
-        if (!dishes) return { totalQuantity: 0, totalPrice: 0 };
-
-        const totalQuantity = dishes.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
-        const totalPrice = dishes.reduce((acc: number, dish: any) => acc + (dish.dish.price * dish.quantity), 0);
-
-        return { totalQuantity, totalPrice };
-    }
 
     const handleCheckboxChange = (dish: any, quantity: number) => {
         const existingDish = selectedDishes.find((d: any) => d.dish.id === dish.dish.id);
@@ -132,12 +125,15 @@ export const InvoiceByDish = () => {
                     await createInvoiceData(data);
                 }
             }
+
+            // Show popup after successful invoice creation
+            setPopupOpen(true);
         } else {
             console.error("No hay facturas para procesar.");
         }
     };
 
-    const { totalQuantity, totalPrice } = calculateTotal();
+    const { totalQuantity, totalPrice } = calculateTotal(order);
 
     return (
         <>
@@ -281,7 +277,7 @@ export const InvoiceByDish = () => {
                                                 })
                                                 .catch((error) => {
                                                     console.error("Error al crear la factura:", error);
-                                                    alert(texts.alerts.invoiceCreationError);
+                                                    alert(texts.labels.invoiceCreationError);
                                                 });
                                         } else {
                                             finalizeInvoice();
@@ -302,6 +298,13 @@ export const InvoiceByDish = () => {
                     </Box>
                 </Box>
             </Box>
+            <PopUpInformation
+                open={popupOpen}
+                title={texts.labels.invoiceCreated}
+                message={texts.labels.invoiceCreatedMessage}
+                isInformative
+                redirect={`/menu?desk_id=${deskId || ''}`}
+            />
         </>
     )
 }

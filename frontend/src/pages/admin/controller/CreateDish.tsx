@@ -130,6 +130,10 @@ export const CreateDish = () => {
         setNewDish({ ...newDish, category: categoryId });
     };
 
+    const filteredDishes = dishes.filter((dish) =>
+        dish.dish_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <Box
             sx={{
@@ -306,8 +310,16 @@ export const CreateDish = () => {
                             gap: '10px',
                         }}
                     >
-                        {dishes && dishes.length > 0 ? (
-                            dishes.map((dish, index) => (
+                        <TextField
+                            label="Buscar Plato"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            fullWidth
+                            margin="normal"
+                            sx={{ marginBottom: '10px' }}
+                        />
+                        {filteredDishes && filteredDishes.length > 0 ? (
+                            filteredDishes.map((dish, index) => (
                                 <Box
                                     key={index}
                                     sx={{

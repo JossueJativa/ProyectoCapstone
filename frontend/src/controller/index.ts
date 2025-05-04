@@ -16,7 +16,9 @@ export {
     getGarrison,
     getCategories,
     getOrders,
-    getInvoices
+    getInvoices,
+    getGarrisons,
+    getInvoiceDetails
 } from './getters';
 export {
     createDesk,
@@ -35,12 +37,14 @@ export {
     updateAllergen,
     updateCategory,
     updateIngredient,
-    updateDish
+    updateDish,
+    updateGarrison
 } from './update';
 export {
     deleteDesk,
     deleteAllergen,
     deleteCategory,
     deleteIngredient,
-    deleteDish
+    deleteDish,
+    deleteGarrison
 } from './delete';

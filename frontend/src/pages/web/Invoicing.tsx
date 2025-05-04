@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import { Box, Grid, Typography, useTheme } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
-import { IconText, ButtonType } from '@/components';
+import { IconText, ButtonType, PopUpInformation } from '@/components';
 import { IInvoicing, IInvoicingData } from '@/interfaces';
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
+import { calculateTotal } from '@/helpers/utils';
 
 export const Invoicing = () => {
     const { id } = useParams<{ id: string }>();
@@ -13,6 +14,7 @@ export const Invoicing = () => {
     const { texts } = useLanguage();
     const [deskId, setDeskId] = useState<string | null>(null);
     const [order, setOrder] = useState<any>(null);
+    const [popupOpen, setPopupOpen] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -28,21 +30,12 @@ export const Invoicing = () => {
         }
     }, [id, location.search]);
 
-    const calculateTotal = () => {
-        if (!order) return { totalQuantity: 0, totalPrice: 0 };
-
-        const totalQuantity = order.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
-        const totalPrice = order.reduce((acc: number, dish: any) => acc + (dish.dish.price * dish.quantity), 0);
-
-        return { totalQuantity, totalPrice };
-    }
-
     const handleMakeInvoice = async () => {
         if (order && order.length > 0) {
             const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
             const invoiceNumber = `${invoiceNumberBase}-1`;
 
-            const { totalPrice } = calculateTotal();
+            const { totalPrice } = calculateTotal(order);
             const invoiceData: IInvoicing = {
                 invoiceId: parseInt(invoiceNumber, 10),
                 totalPrice: parseFloat(totalPrice.toFixed(2)),
@@ -69,12 +62,15 @@ export const Invoicing = () => {
             for (const data of invoiceDataList) {
                 await createInvoiceData(data);
             }
+
+            // Show popup after successful invoice creation
+            setPopupOpen(true);
         } else {
             console.error("No hay platos para facturar.");
         }
     };
 
-    const { totalQuantity, totalPrice } = calculateTotal();
+    const { totalQuantity, totalPrice } = calculateTotal(order);
 
     return (
         <>
@@ -203,6 +199,13 @@ export const Invoicing = () => {
                     </Box>
                 </Box>
             </Box>
+            <PopUpInformation
+                open={popupOpen}
+                title={texts.labels.invoiceCreated}
+                message={texts.labels.invoiceCreatedMessage}
+                isInformative
+                redirect={`/menu?desk_id=${deskId || ''}`}
+            />
         </>
     )
 }

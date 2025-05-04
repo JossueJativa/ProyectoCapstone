@@ -25,22 +25,22 @@ export const Login = () => {
     }
 
     return (
-        <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             height: '100vh',
             backgroundColor: theme.background.secondary,
         }}>
-            <Box sx={{ 
-                width: '300px', 
-                padding: '20px', 
-                borderRadius: '10px', 
+            <Box sx={{
+                width: '300px',
+                padding: '20px',
+                borderRadius: '10px',
                 backgroundColor: '#fff',
                 minWidth: '40vh'
             }}>
-                <img src={Logo} alt="Logo" style={{ 
-                    width: '100%', 
+                <img src={Logo} alt="Logo" style={{
+                    width: '100%',
                     marginBottom: '20px',
                     padding: '10px 40px'
                 }} />

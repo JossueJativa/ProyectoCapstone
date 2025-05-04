@@ -3,5 +3,6 @@ export {
     updateAllergen,
     updateCategory,
     updateIngredient,
-    updateDish
+    updateDish,
+    updateGarrison
 } from './updateInformation';

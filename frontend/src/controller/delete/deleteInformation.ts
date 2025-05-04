@@ -30,10 +30,17 @@ const deleteDish = async (id: number): Promise<any> => {
     return response?.data;
 }
 
+const deleteGarrison = async (id: number): Promise<any> => {
+    const api = new API();
+    const response = await api.delete(`/garrison/${id}`);
+    return response?.data;
+}
+
 export {
     deleteDesk,
     deleteAllergen,
     deleteCategory,
     deleteIngredient,
     deleteDish,
+    deleteGarrison,
 }

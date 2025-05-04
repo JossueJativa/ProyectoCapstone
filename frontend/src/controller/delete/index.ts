@@ -3,5 +3,6 @@ export {
     deleteDesk,
     deleteCategory,
     deleteIngredient,
-    deleteDish
+    deleteDish,
+    deleteGarrison
 } from './deleteInformation';

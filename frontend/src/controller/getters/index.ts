@@ -10,8 +10,10 @@ export {
     getAllergens,
     getIngredients,
     getIngredient,
+    getGarrisons,
     getGarrison,
     getCategories,
     getOrders,
-    getInvoices
+    getInvoices,
+    getInvoiceDetails,
 } from './getInformation';

@@ -24,6 +24,12 @@ const getIngredient = async(ingredientId: string) => {
     return response?.data;
 }
 
+const getGarrisons = async() => {
+    const api = new API();
+    const response = await api.get('/garrison');
+    return response?.data;
+}
+
 const getGarrison = async(id: string, lang: string = 'ES') => {
     const api = new API();
     const response = await api.get(`/garrison/${id}?lang=${lang.toUpperCase()}`);
@@ -48,13 +54,26 @@ const getInvoices = async() => {
     return response?.data;
 }
 
+const getInvoiceDetails = async(invoiceId: string) => {
+    const api = new API();
+    const response = await api.get(`/invoicedish`);
+    if (response?.data) {
+        const invoiceDetails = response.data.filter((detail: any) => detail.invoice === invoiceId);
+        console.log('Filtered invoice details:', invoiceDetails); // Log the filtered invoice details
+        return invoiceDetails;
+    }
+    return response?.data;
+}
+
 export { 
     getDesk, 
     getAllergens, 
     getIngredients,
     getIngredient,
+    getGarrisons,
     getGarrison,
     getCategories,
     getOrders,
-    getInvoices
+    getInvoices,
+    getInvoiceDetails
 };

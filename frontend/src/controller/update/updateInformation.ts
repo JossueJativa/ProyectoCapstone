@@ -72,10 +72,22 @@ const updateDish = async (data: IDishData): Promise<any> => {
     return response?.data;
 }
 
+const updateGarrison = async(data: any): Promise<any> => {
+    const { id, garrison_name, dish } = data;
+    const api = new API();
+
+    const response = await api.put(`/garrison/${id}`, {
+        garrison_name,
+        dish
+    });
+    return response?.data;
+}
+
 export {
     updateDesk,
     updateAllergen,
     updateCategory,
     updateIngredient,
-    updateDish
+    updateDish,
+    updateGarrison
 }

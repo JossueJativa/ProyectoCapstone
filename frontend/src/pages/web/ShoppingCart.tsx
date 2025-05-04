@@ -182,8 +182,10 @@ export const ShoppingCart = () => {
 
     const calculateSummary = () => {
         const totalQuantity = cartDishes.reduce((sum, dish) => sum + dish.quantity, 0);
-        const totalPrice = cartDishes.reduce((sum, dish) => sum + dish.quantity * dish.details.price, 0);
-        return { totalQuantity, totalPrice };
+        const subtotal = cartDishes.reduce((sum, dish) => sum + dish.quantity * dish.details.price, 0);
+        const tax = subtotal * 0.15; // 15% IVA
+        const totalPrice = subtotal + tax;
+        return { totalQuantity, subtotal, tax, totalPrice };
     };
 
     const handleMakeOrder = async () => {
@@ -208,6 +210,28 @@ export const ShoppingCart = () => {
                         return orderDishResponse.id;
                     })
                 );
+
+                console.log('Emitting order:sendToKitchen with data:', { desk_id: deskId, orderDetails: cartDishes }); // Log the data being sent
+                socket.emit("order:sendToKitchen", {
+                    desk_id: deskId,
+                    orderDetails: await Promise.all(cartDishes.map(async (dish) => {
+                        const garrisonDetails = dish.garrison && Array.isArray(dish.garrison)
+                            ? await Promise.all(dish.garrison.map(async (garrisonId: number) => {
+                                const garrisonData = await getGarrison(garrisonId, language);
+                                return garrisonData.garrison_name;
+                            }))
+                            : null;
+
+                        return {
+                            ...dish,
+                            garrisonDetails,
+                        };
+                    })),
+                }, (error: any) => {
+                    if (error) {
+                        console.error("Error sending order to kitchen:", error);
+                    }
+                });
 
                 socket.emit("order:delete:all", { desk_id: deskId }, (error: any) => {
                     if (error) {

@@ -60,7 +60,6 @@ export const Dashboard = () => {
                     const orderDishes = await getOrderDishByOrderId(order.id);
 
                     for (const dishId of orderDishes) {
-                        const dish = await getDish(dishId.id);
                         const dishQuantity = dishId.quantity;
                         const dishName = dish.dish_name;
 
@@ -86,7 +85,7 @@ export const Dashboard = () => {
                     const orderDishes = await getOrderDishByOrderId(order.id);
 
                     for (const dishId of orderDishes) {
-                        const dish = await getDish(dishId.id);
+                        const dish = await getDish(dishId.dish.id);
                         const categoryDish = dish.category;
 
                         const categoryName = categoryMap[categoryDish];

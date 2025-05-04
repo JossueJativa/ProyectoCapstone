@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import { Box, Grid, Typography, useTheme } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
-import { IconText, ButtonType } from '@/components';
+import { IconText, ButtonType, PopUpInformation } from '@/components';
 import { IInvoicing, IInvoicingData } from '@/interfaces'
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
+import { calculateTotal } from '@/helpers/utils';
 
 export const InvoiceByMount = () => {
     const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ export const InvoiceByMount = () => {
     const [deskId, setDeskId] = useState<string | null>(null);
     const [order, setOrder] = useState<any>(null);
     const [divisions, setDivisions] = useState<{ person: number; amount: string }[]>([]);
+    const [popupOpen, setPopupOpen] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -34,7 +36,7 @@ export const InvoiceByMount = () => {
         const divide = parseInt(params.get("divide") || '0', 10);
 
         if (divide > 0 && order) {
-            const { totalPrice } = calculateTotal();
+            const { totalPrice } = calculateTotal(order);
             const amountPerPerson = totalPrice / divide;
 
             const divisions = Array.from({ length: divide }, (_, i) => ({
@@ -46,28 +48,18 @@ export const InvoiceByMount = () => {
         }
     }, [order, location.search]);
 
-    const calculateTotal = () => {
-        if (!order) return { totalQuantity: 0, totalPrice: 0 };
-
-        const totalQuantity = order.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
-        const totalPrice = order.reduce((acc: number, dish: any) => acc + (dish.dish.price * dish.quantity), 0);
-
-        return { totalQuantity, totalPrice };
-    }
-
-    const { totalQuantity, totalPrice } = calculateTotal();
+    const { totalQuantity, totalPrice } = calculateTotal(order);
 
     const handleDivideByAmount = async () => {
         const params = new URLSearchParams(location.search);
         const peopleCount = parseInt(params.get("divide") || '0', 10);
         if (peopleCount > 0 && order) {
-            const { totalPrice } = calculateTotal();
+            const { totalPrice } = calculateTotal(order);
             const amountPerPerson = totalPrice / peopleCount;
             const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
 
             let remainingDishes = [...order];
 
-            // Crear la factura para cada persona
             for (let i = 0; i < peopleCount; i++) {
                 const invoiceNumber = `${invoiceNumberBase}-${i + 1}`;
                 const invoiceData: IInvoicing = {
@@ -106,6 +98,9 @@ export const InvoiceByMount = () => {
 
                 remainingDishes = remainingDishes.filter((dish: any) => dish.quantity > 0);
             }
+
+            // Show popup after successful invoice creation
+            setPopupOpen(true);
         }
     }
 
@@ -218,7 +213,7 @@ export const InvoiceByMount = () => {
                                         })
                                         .catch((error) => {
                                             console.error("Error al crear la factura:", error);
-                                            alert(texts.alerts.invoiceCreationError);
+                                            alert(texts.labels.invoiceCreationError);
                                         });
                                 }}
                             />
@@ -233,6 +228,13 @@ export const InvoiceByMount = () => {
                     </Box>
                 </Box>
             </Box>
+            <PopUpInformation
+                open={popupOpen}
+                title={texts.labels.invoiceCreated}
+                message={texts.labels.invoiceCreatedMessage}
+                isInformative
+                redirect={`/menu?desk_id=${deskId || ''}`}
+            />
         </>
     )
 }

@@ -1,6 +1,6 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useTheme, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { Navbar } from '@/components';
 import { Error404 } from '../errors';
 import { 

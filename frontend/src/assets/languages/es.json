@@ -33,7 +33,10 @@
         "dish": "Plato",
         "howManyPeople": "¿Cuántas personas?",
         "invoice": "Factura",
-        "selectItem": "Selecciona los artículos para la factura"
+        "selectItem": "Selecciona los artículos para la factura",
+        "invoiceCreated": "Factura creada",
+        "invoiceCreatedMessage": "La factura ha sido creada exitosamente.",
+        "invoiceCreationError": "Error al crear la factura"
     },
     "placeholders": {
         "enterPeopleCount": "Ingresa el número de personas"

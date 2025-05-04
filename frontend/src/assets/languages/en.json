@@ -33,7 +33,10 @@
         "dish": "Dish",
         "howManyPeople": "How many people?",
         "invoice": "Invoice",
-        "selectItem": "Select items for the invoice"
+        "selectItem": "Select items for the invoice",
+        "invoiceCreated": "Invoice created",
+        "invoiceCreatedMessage": "The invoice has been successfully created.",
+        "invoiceCreationError": "Error creating invoice"
     },
     "placeholders": {
         "enterPeopleCount": "Enter the number of people"

@@ -42,7 +42,6 @@ export const Menu = () => {
             try {
                 const lang = language === "en" ? "EN-GB" : "ES";
                 const categoriesList = await getCategories(lang);
-                console.log("Categories:", categoriesList);
                 setCategories(categoriesList);
             } catch (error) {
                 console.error("Error fetching categories:", error);
