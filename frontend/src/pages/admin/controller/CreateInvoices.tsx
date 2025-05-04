@@ -43,8 +43,9 @@ export const CreateInvoices = () => {
 
         setSelectedInvoice({
             id: invoiceId,
-            order: invoice ? invoice.order : 'N/A', // Include the order field
+            order: invoice ? invoice.order : 'N/A',
             dishes: detailedDishes,
+            totalPrice: invoice ? invoice.total_price : 0,
         });
     };
 
@@ -79,7 +80,7 @@ export const CreateInvoices = () => {
                             >
                                 <p><strong>Factura Número:</strong> {selectedInvoice.id}</p>
                                 <p><strong>Orden:</strong> {selectedInvoice.order || 'N/A'}</p>
-                                <p><strong>Total:</strong> ${selectedInvoice.dishes.reduce((sum: number, dish: any) => sum + dish.subtotal, 0).toFixed(2)}</p>
+                                <p><strong>Total:</strong> ${selectedInvoice.totalPrice.toFixed(2)}</p>
                                 <h4>Platos:</h4>
                                 <ul>
                                     {selectedInvoice.dishes.map((dish: any, index: number) => (

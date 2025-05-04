@@ -126,14 +126,28 @@ export const InvoiceByDish = () => {
                 }
             }
 
-            // Show popup after successful invoice creation
             setPopupOpen(true);
         } else {
             console.error("No hay facturas para procesar.");
         }
     };
 
-    const { totalQuantity, totalPrice } = calculateTotal(order);
+    const calculateFinalTotal = () => {
+        const totalQuantity = invoices.reduce((acc, invoice) => acc + invoice.totalQuantity, 0);
+        const totalPrice = invoices.reduce((acc, invoice) => acc + invoice.total, 0);
+        return { totalQuantity, totalPrice };
+    };
+
+    const calculateTotalWithIVA = () => {
+        if (!selectedDishes || selectedDishes.length === 0) return { totalQuantity: 0, totalPrice: 0 };
+
+        const totalQuantity = selectedDishes.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
+        const totalPrice = selectedDishes.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price * 1.15), 0); // Adding 15% IVA
+
+        return { totalQuantity, totalPrice };
+    };
+
+    const { totalQuantity, totalPrice } = currentPerson > divisions.length ? calculateFinalTotal() : calculateTotalWithIVA();
 
     return (
         <>
@@ -272,13 +286,6 @@ export const InvoiceByDish = () => {
                                     if (currentPerson > divisions.length) {
                                         if (currentPerson === divisions.length + 1) {
                                             finishInvoices()
-                                                .then(() => {
-                                                    window.location.href = `/menu?desk_id=${deskId || ''}`;
-                                                })
-                                                .catch((error) => {
-                                                    console.error("Error al crear la factura:", error);
-                                                    alert(texts.labels.invoiceCreationError);
-                                                });
                                         } else {
                                             finalizeInvoice();
                                         }

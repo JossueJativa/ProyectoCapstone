@@ -102,7 +102,12 @@ export const InvoiceByMount = () => {
             // Show popup after successful invoice creation
             setPopupOpen(true);
         }
-    }
+    };
+
+    const handlePopupClose = () => {
+        setPopupOpen(false);
+        window.location.href = `/menu?desk_id=${deskId || ''}`;
+    };
 
     return (
         <>
@@ -208,13 +213,6 @@ export const InvoiceByMount = () => {
                                 typeButton="primary"
                                 onClick={() => {
                                     handleDivideByAmount()
-                                        .then(() => {
-                                            window.location.href = `/menu?desk_id=${deskId || ''}`;
-                                        })
-                                        .catch((error) => {
-                                            console.error("Error al crear la factura:", error);
-                                            alert(texts.labels.invoiceCreationError);
-                                        });
                                 }}
                             />
                         </Box>
@@ -234,6 +232,7 @@ export const InvoiceByMount = () => {
                 message={texts.labels.invoiceCreatedMessage}
                 isInformative
                 redirect={`/menu?desk_id=${deskId || ''}`}
+                onClose={handlePopupClose}
             />
         </>
     )
