@@ -182,10 +182,8 @@ export const ShoppingCart = () => {
 
     const calculateSummary = () => {
         const totalQuantity = cartDishes.reduce((sum, dish) => sum + dish.quantity, 0);
-        const subtotal = cartDishes.reduce((sum, dish) => sum + dish.quantity * dish.details.price, 0);
-        const tax = subtotal * 0.15; // 15% IVA
-        const totalPrice = subtotal + tax;
-        return { totalQuantity, subtotal, tax, totalPrice };
+        const totalPrice = cartDishes.reduce((sum, dish) => sum + dish.quantity * dish.details.price, 0);
+        return { totalQuantity, totalPrice };
     };
 
     const handleMakeOrder = async () => {

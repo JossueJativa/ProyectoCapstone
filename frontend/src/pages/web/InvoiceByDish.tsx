@@ -6,7 +6,6 @@ import { useLanguage } from '@/helpers';
 import { IconText, ButtonType, PopUpInformation } from '@/components';
 import { IInvoicing, IInvoicingData } from '@/interfaces'
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
-import { calculateTotal } from '@/helpers/utils';
 
 export const InvoiceByDish = () => {
     const { id } = useParams<{ id: string }>();
@@ -39,7 +38,7 @@ export const InvoiceByDish = () => {
         const divide = parseInt(params.get("divide") || '0', 10);
 
         if (divide > 0 && order) {
-            const { totalPrice } = calculateTotal(order);
+            const totalPrice = order.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price), 0);
             const amountPerPerson = totalPrice / divide;
 
             const divisions = Array.from({ length: divide }, (_, i) => ({
@@ -65,7 +64,13 @@ export const InvoiceByDish = () => {
     };
 
     const finalizeInvoice = () => {
-        const { totalQuantity, totalPrice } = calculateTotal(selectedDishes);
+        if (selectedDishes.length === 0) {
+            alert("Por favor, selecciona al menos un plato.");
+            return;
+        }
+
+        const totalQuantity = selectedDishes.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
+        const totalPrice = selectedDishes.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price), 0);
         setInvoices([...invoices, { person: currentPerson, dishes: selectedDishes, totalQuantity, total: totalPrice }]);
 
         // Adjust quantities of selected dishes in the order
@@ -89,6 +94,17 @@ export const InvoiceByDish = () => {
             setInvoices([...invoices]);
             setSelectedDishes(previousInvoice?.dishes || []);
             setCurrentPerson(currentPerson - 1);
+
+            // Reset the order quantities to include the dishes from the previous invoice
+            const updatedOrder = order.map((dish: any) => {
+                const previousDish = previousInvoice?.dishes.find((d: any) => d.dish.id === dish.dish.id);
+                if (previousDish) {
+                    return { ...dish, quantity: (dish.quantity || 0) + (previousDish.quantity || 0) };
+                }
+                return dish;
+            });
+
+            setOrder(updatedOrder);
         }
     };
 
@@ -138,16 +154,16 @@ export const InvoiceByDish = () => {
         return { totalQuantity, totalPrice };
     };
 
-    const calculateTotalWithIVA = () => {
-        if (!selectedDishes || selectedDishes.length === 0) return { totalQuantity: 0, totalPrice: 0 };
+    const calculateTotal = (dishes) => {
+        if (!dishes || dishes.length === 0) return { totalQuantity: 0, totalPrice: 0 };
 
-        const totalQuantity = selectedDishes.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
-        const totalPrice = selectedDishes.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price * 1.15), 0); // Adding 15% IVA
+        const totalQuantity = dishes.reduce((acc, dish) => acc + dish.quantity, 0);
+        const totalPrice = dishes.reduce((acc, dish) => acc + (dish.quantity * dish.dish.price), 0);
 
         return { totalQuantity, totalPrice };
     };
 
-    const { totalQuantity, totalPrice } = currentPerson > divisions.length ? calculateFinalTotal() : calculateTotalWithIVA();
+    const { totalQuantity, totalPrice } = currentPerson > divisions.length ? calculateFinalTotal() : calculateTotal(selectedDishes);
 
     return (
         <>

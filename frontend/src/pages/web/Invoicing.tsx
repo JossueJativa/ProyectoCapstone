@@ -6,7 +6,6 @@ import { useLanguage } from '@/helpers';
 import { IconText, ButtonType, PopUpInformation } from '@/components';
 import { IInvoicing, IInvoicingData } from '@/interfaces';
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
-import { calculateTotal } from '@/helpers/utils';
 
 export const Invoicing = () => {
     const { id } = useParams<{ id: string }>();
@@ -35,7 +34,7 @@ export const Invoicing = () => {
             const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
             const invoiceNumber = `${invoiceNumberBase}-1`;
 
-            const { totalPrice } = calculateTotal(order);
+            const totalPrice = order.reduce((acc: number, dish: any) => acc + dish.dish.price * dish.quantity, 0);
             const invoiceData: IInvoicing = {
                 invoiceId: parseInt(invoiceNumber, 10),
                 totalPrice: parseFloat(totalPrice.toFixed(2)),
@@ -70,7 +69,8 @@ export const Invoicing = () => {
         }
     };
 
-    const { totalQuantity, totalPrice } = calculateTotal(order);
+    const totalQuantity = order ? order.reduce((acc: number, dish: any) => acc + dish.quantity, 0) : 0;
+    const totalPrice = order ? order.reduce((acc: number, dish: any) => acc + dish.dish.price * dish.quantity, 0) : 0;
 
     return (
         <>

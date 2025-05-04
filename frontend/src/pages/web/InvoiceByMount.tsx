@@ -6,7 +6,6 @@ import { useLanguage } from '@/helpers';
 import { IconText, ButtonType, PopUpInformation } from '@/components';
 import { IInvoicing, IInvoicingData } from '@/interfaces'
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
-import { calculateTotal } from '@/helpers/utils';
 
 export const InvoiceByMount = () => {
     const { id } = useParams<{ id: string }>();
@@ -16,6 +15,7 @@ export const InvoiceByMount = () => {
     const [order, setOrder] = useState<any>(null);
     const [divisions, setDivisions] = useState<{ person: number; amount: string }[]>([]);
     const [popupOpen, setPopupOpen] = useState(false);
+    const [total, setTotal] = useState({ totalQuantity: 0, totalPrice: 0 });
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -36,7 +36,8 @@ export const InvoiceByMount = () => {
         const divide = parseInt(params.get("divide") || '0', 10);
 
         if (divide > 0 && order) {
-            const { totalPrice } = calculateTotal(order);
+            const totalQuantity = order.reduce((acc, dish) => acc + (dish.quantity || 0), 0);
+            const totalPrice = order.reduce((acc, dish) => acc + ((dish.quantity || 0) * (dish.dish?.price || 0)), 0);
             const amountPerPerson = totalPrice / divide;
 
             const divisions = Array.from({ length: divide }, (_, i) => ({
@@ -45,16 +46,15 @@ export const InvoiceByMount = () => {
             }));
 
             setDivisions(divisions);
+            setTotal({ totalQuantity, totalPrice });
         }
     }, [order, location.search]);
-
-    const { totalQuantity, totalPrice } = calculateTotal(order);
 
     const handleDivideByAmount = async () => {
         const params = new URLSearchParams(location.search);
         const peopleCount = parseInt(params.get("divide") || '0', 10);
         if (peopleCount > 0 && order) {
-            const { totalPrice } = calculateTotal(order);
+            const totalPrice = order.reduce((acc: number, dish: any) => acc + dish.price * dish.quantity, 0);
             const amountPerPerson = totalPrice / peopleCount;
             const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
 
@@ -151,7 +151,7 @@ export const InvoiceByMount = () => {
                                 fontSize: theme.typography.body1.fontSize,
                                 fontWeight: theme.typography.title.fontWeight,
                             }}>
-                                {totalQuantity}
+                                {total.totalQuantity}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -163,7 +163,7 @@ export const InvoiceByMount = () => {
                                 fontSize: theme.typography.body1.fontSize,
                                 fontWeight: theme.typography.title.fontWeight,
                             }}>
-                                ${totalPrice.toFixed(2)}
+                                ${total.totalPrice.toFixed(2)}
                             </Typography>
                         </Box>
                     </Box>

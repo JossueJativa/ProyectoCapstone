@@ -6,7 +6,6 @@ import { useLanguage } from '@/helpers';
 import { IconText, ButtonType } from '@/components';
 import { PopUpInformation } from '@/components/decorator/PopUpInformation';
 import { getOrderDishByOrderId } from '@/controller';
-import { calculateTotal } from '@/helpers/utils';
 
 export const DivideInvoice = () => {
     const { id } = useParams<{ id: string }>();
@@ -49,7 +48,16 @@ export const DivideInvoice = () => {
         }
     }, [texts]);
 
-    const { totalQuantity, totalPrice } = calculateTotal(order);
+    const calculateTotal = () => {
+        if (!order) return { totalQuantity: 0, totalPrice: 0 };
+
+        const totalQuantity = order.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
+        const totalPrice = order.reduce((acc: number, dish: any) => acc + (dish.dish.price * dish.quantity), 0);
+
+        return { totalQuantity, totalPrice };
+    }
+
+    const { totalQuantity, totalPrice } = calculateTotal();
 
     return (
         <>
