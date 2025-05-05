@@ -53,53 +53,64 @@ export const InvoiceByMount = () => {
     const handleDivideByAmount = async () => {
         const params = new URLSearchParams(location.search);
         const peopleCount = parseInt(params.get("divide") || '0', 10);
+    
         if (peopleCount > 0 && order) {
-            const totalPrice = order.reduce((acc: number, dish: any) => acc + dish.price * dish.quantity, 0);
+            // Calcular el precio total correctamente
+            const totalPrice = order.reduce((acc: number, dish: any) => {
+                const dishTotal = (dish.quantity || 0) * (dish.dish?.price || 0);
+                return acc + dishTotal;
+            }, 0);
+    
+            if (totalPrice <= 0) {
+                console.error("El precio total calculado no es válido:", totalPrice);
+                throw new Error("El precio total es inválido.");
+            }
+    
             const amountPerPerson = totalPrice / peopleCount;
             const invoiceNumberBase = `${id}-${deskId}-${Date.now()}`;
-
+    
             let remainingDishes = [...order];
-
+    
             for (let i = 0; i < peopleCount; i++) {
                 const invoiceNumber = `${invoiceNumberBase}-${i + 1}`;
                 const invoiceData: IInvoicing = {
                     invoiceId: parseInt(invoiceNumber, 10),
-                    totalPrice: parseFloat(amountPerPerson.toFixed(2)),
+                    totalPrice: parseFloat(amountPerPerson.toFixed(2)), // Asegurarse de que sea un número válido
                     orderId: parseInt(id, 10),
                 };
-
+    
                 const createdInvoice = await createInvoice(invoiceData);
-
+    
                 if (!createdInvoice || !createdInvoice.id) {
                     console.error("No se pudo crear la factura o falta el ID de la factura.", createdInvoice);
                     throw new Error("Error al crear la factura.");
                 }
-
+    
                 const invoiceId = createdInvoice.id;
-
+    
                 const invoiceDataList: IInvoicingData[] = remainingDishes.map((dish: any) => {
                     const quantity = Math.ceil(dish.quantity / peopleCount);
-
+    
                     if (quantity <= 0) {
                         console.error("La cantidad calculada no es válida:", quantity);
                         throw new Error("La cantidad calculada es inválida.");
                     }
-
+    
                     return {
                         quantity,
                         invoiceId,
                         dishId: dish.dish.id,
                     };
                 });
-
+    
                 for (const data of invoiceDataList) {
                     await createInvoiceData(data);
                 }
-
+    
                 remainingDishes = remainingDishes.filter((dish: any) => dish.quantity > 0);
             }
-
-            // Show popup after successful invoice creation
+    
+            // Mostrar el popup después de crear las facturas
             setPopupOpen(true);
         }
     };
