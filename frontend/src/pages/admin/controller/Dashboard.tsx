@@ -61,7 +61,7 @@ export const Dashboard = () => {
 
                     for (const dishId of orderDishes) {
                         const dishQuantity = dishId.quantity;
-                        const dishName = dish.dish_name;
+                        const dishName = dishId.dish.name;
 
                         if (dishCounts[dishName]) {
                             dishCounts[dishName] += dishQuantity;
@@ -137,7 +137,7 @@ export const Dashboard = () => {
                                 <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
                                     <Typography variant="h6">Ganancias Totales</Typography>
                                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                        {totalRevenue}
+                                        {totalRevenue.toFixed(2)} $
                                     </Typography>
                                 </Box>
                             </BoxData>

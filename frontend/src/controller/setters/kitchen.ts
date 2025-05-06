@@ -58,7 +58,7 @@ const createGarrison = async (data: any): Promise<any> => {
 
 const createDish = async (data: IDishData): Promise<any> => {
     const { 
-        name,
+        dish_name,
         description,
         time_elaboration,
         price,
@@ -69,7 +69,7 @@ const createDish = async (data: IDishData): Promise<any> => {
     } = data;
     const api = new API();
     const response = await api.post('/dish', {
-        dish_name: name,
+        dish_name,
         description,
         time_elaboration,
         price,
@@ -78,6 +78,7 @@ const createDish = async (data: IDishData): Promise<any> => {
         category,
         has_garrison,
     });
+    console.log(response?.data);
     return response?.data;
 }
 
