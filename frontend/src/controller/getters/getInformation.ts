@@ -42,9 +42,13 @@ const getCategories = async(lang: string = 'ES') => {
     return response?.data;
 };
 
-const getOrders = async() => {
+const getOrders = async(month: number | null) => {
     const api = new API();
-    const response = await api.get('/order');
+    if (month === null) {
+        const response = await api.get('/order');
+        return response?.data;
+    }
+    const response = await api.get(`/order?month=${month}`);
     return response?.data;
 }
 

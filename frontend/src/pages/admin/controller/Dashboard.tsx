@@ -23,7 +23,8 @@ export const Dashboard = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await getOrders();
+                const currentYear = new Date().getFullYear();
+                const response = await getOrders(currentYear, selectedMonth);
                 setOrders(response);
             } catch (error) {
                 console.error('Error fetching orders:', error);
@@ -31,7 +32,7 @@ export const Dashboard = () => {
         };
 
         fetchOrders();
-    }, []);
+    }, [selectedMonth]);
 
     useEffect(() => {
         const fetchFilteredData = async () => {
