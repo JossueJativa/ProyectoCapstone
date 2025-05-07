@@ -16,4 +16,5 @@ export {
     getOrders,
     getInvoices,
     getInvoiceDetails,
+    getDashboardInformation
 } from './getInformation';

@@ -18,7 +18,8 @@ export {
     getOrders,
     getInvoices,
     getGarrisons,
-    getInvoiceDetails
+    getInvoiceDetails,
+    getDashboardInformation
 } from './getters';
 export {
     createDesk,

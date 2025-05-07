@@ -7,7 +7,7 @@ import {
     Pie, Cell, Legend
 } from 'recharts';
 import { SideBar, BoxData } from '@/components';
-import { getOrders, getDish, getOrderDishByOrderId, getCategories } from '@/controller';
+import { getDashboardInformation } from '@/controller';
 import { IOrder } from '@/interfaces';
 
 export const Dashboard = () => {
@@ -21,10 +21,37 @@ export const Dashboard = () => {
     const [averageDishesPerTable, setAverageDishesPerTable] = useState(0);
 
     useEffect(() => {
-        const fetchOrders = async () => {
+        const fetchDashboardInfo = async () => {
             try {
                 const currentYear = new Date().getFullYear();
-                const response = await getOrders(currentYear, selectedMonth);
+                const responseData = await getDashboardInformation(currentYear, selectedMonth);
+                const { dashboard_statistics } = responseData;
+
+                setTotalDishes(dashboard_statistics.total_dishes);
+                setTotalRevenue(dashboard_statistics.total_revenue);
+                setAverageDishesPerTable(dashboard_statistics.average_dishes_per_table);
+                setDishes(dashboard_statistics.dishes.map(dish => ({
+                    name: dish.dish__dish_name,
+                    count: dish.count
+                })));
+                setCategories(dashboard_statistics.categories.map(category => ({
+                    name: category.dish__category__category_name,
+                    count: category.count
+                })));
+            } catch (error) {
+                console.error('Error fetching dashboard info:', error);
+            }
+        };
+
+        fetchDashboardInfo();
+    }, [selectedMonth]);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const year = new Date().getFullYear();
+                const responseData = await getDashboardInformation( year, selectedMonth );
+                const response = await getOrders(selectedMonth);
                 setOrders(response);
             } catch (error) {
                 console.error('Error fetching orders:', error);
