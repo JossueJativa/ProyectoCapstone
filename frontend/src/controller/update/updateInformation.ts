@@ -68,7 +68,6 @@ const updateDish = async (data: IDishData): Promise<any> => {
         category,
         has_garrison,
     });
-    console.log(response?.data);
     return response?.data;
 }
 

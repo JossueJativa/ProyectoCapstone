@@ -59,7 +59,6 @@ const getInvoiceDetails = async(invoiceId: string) => {
     const response = await api.get(`/invoicedish`);
     if (response?.data) {
         const invoiceDetails = response.data.filter((detail: any) => detail.invoice === invoiceId);
-        console.log('Filtered invoice details:', invoiceDetails); // Log the filtered invoice details
         return invoiceDetails;
     }
     return response?.data;

@@ -22,13 +22,10 @@ export const CreateInvoices = () => {
     }, []);
 
     const handleInvoiceClick = async (invoiceId: string) => {
-        console.log('Fetching details for invoice ID:', invoiceId); // Log the invoice ID being fetched
         const details = await getInvoiceDetails(invoiceId);
-        console.log('Fetched invoice details:', details); // Log the fetched invoice details
 
         const detailedDishes = await Promise.all(details.map(async (invoiceDish: any) => {
             const dish = await getDish(invoiceDish.dish);
-            console.log('Fetched dish details:', dish); // Log the fetched dish details
             const subtotal = dish.price * invoiceDish.quantity;
             return {
                 id: invoiceDish.id,

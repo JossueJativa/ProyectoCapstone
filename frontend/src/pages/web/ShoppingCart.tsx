@@ -209,7 +209,6 @@ export const ShoppingCart = () => {
                     })
                 );
 
-                console.log('Emitting order:sendToKitchen with data:', { desk_id: deskId, orderDetails: cartDishes }); // Log the data being sent
                 socket.emit("order:sendToKitchen", {
                     desk_id: deskId,
                     orderDetails: await Promise.all(cartDishes.map(async (dish) => {

@@ -96,7 +96,6 @@ export const Menu = () => {
             } else {
                 const dishesList = await getDishes();
                 const filteredDishes = dishesList.filter((dish) => dish.category === categoryId);
-                console.log("Filtered Dishes:", filteredDishes);
                 setDishes(filteredDishes);
                 setVisibleDishes(10);
                 setSelectedCategory(categoryId);

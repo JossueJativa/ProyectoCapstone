@@ -48,7 +48,6 @@ export const CreateOrders = () => {
             socket.emit('join:kitchen');
 
             const handleOrderReceived = (data: any) => {
-                console.log('Data received from socket:', data); // Log the data received from the socket
                 const now = new Date();
                 const orderDate = now.toISOString().split('T')[0];
                 const orderTime = now.toLocaleTimeString();

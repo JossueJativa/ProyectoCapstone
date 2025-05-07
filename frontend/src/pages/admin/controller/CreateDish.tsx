@@ -16,15 +16,24 @@ export const CreateDish = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [selectedDish, setSelectedDish] = useState<any>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [dishSearchTerm, setDishSearchTerm] = useState('');
+    const [ingredientSearchTerm, setIngredientSearchTerm] = useState('');
 
-    const filteredIngredients = ingredients.filter((ing) =>
-        ing.ingredient_name.toLowerCase().includes(searchTerm.toLowerCase())
+    const handleDishSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDishSearchTerm(e.target.value);
+    };
+
+    const handleIngredientSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIngredientSearchTerm(e.target.value);
+    };
+
+    const filteredDishes = dishes.filter((dish) =>
+        dish.dish_name.toLowerCase().includes(dishSearchTerm.toLowerCase())
     );
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-    };
+    const filteredIngredients = ingredients.filter((ing) =>
+        ing.ingredient_name.toLowerCase().includes(ingredientSearchTerm.toLowerCase())
+    );
 
     useEffect(() => {
         const fetchDishes = async () => {
@@ -130,10 +139,6 @@ export const CreateDish = () => {
         setNewDish({ ...newDish, category: categoryId });
     };
 
-    const filteredDishes = dishes.filter((dish) =>
-        dish.dish_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <Box
             sx={{
@@ -212,8 +217,8 @@ export const CreateDish = () => {
                         <h4>Ingredientes</h4>
                         <TextField
                             label="Buscar Ingrediente"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
+                            value={ingredientSearchTerm}
+                            onChange={handleIngredientSearchChange}
                             fullWidth
                             margin="normal"
                         />
@@ -312,8 +317,8 @@ export const CreateDish = () => {
                     >
                         <TextField
                             label="Buscar Plato"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            value={dishSearchTerm}
+                            onChange={handleDishSearchChange}
                             fullWidth
                             margin="normal"
                             sx={{ marginBottom: '10px' }}
