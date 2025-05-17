@@ -22,6 +22,18 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
     const [garrisons, setGarrisons] = useState<any[]>([]);
     const [selectedGarrisons, setSelectedGarrisons] = useState<any[]>([]);
 
+    useEffect(() => {
+      const fetchGarrisons = async () => {
+        if (has_garrison) {
+          const lang = language === "en" ? "EN-GB" : "ES";
+          const garrisons = await getGarrisonsByDish(String(dish_id), lang);
+          setGarrisons(garrisons);
+        }
+      };
+
+      fetchGarrisons();
+    }, [has_garrison, language]);
+
     const handleAddDish = async (dish_id: number) => {
       const params = new URLSearchParams(location.search);
       const desk_id = params.get("desk_id");
@@ -78,18 +90,6 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         }
       );
     };
-
-    useEffect(() => {
-      const fetchGarrisons = async () => {
-        if (has_garrison) {
-          const lang = language === "en" ? "EN-GB" : "ES";
-          const garrisons = await getGarrisonsByDish(String(dish_id), lang);
-          setGarrisons(garrisons);
-        }
-      };
-
-      fetchGarrisons();
-    }, [has_garrison, language]);
 
     const speakText = (text: string) => {
       const synth = window.speechSynthesis;
@@ -270,7 +270,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
           {/* PopUpInformation */}
           <PopUpInformation
             open={popupOpen}
-            title={texts.labels.selectGarrison}
+            title={texts.labels.garrisons}
             message={texts.labels.selectGarrison}
             isInformative={false}
             redirect={""}

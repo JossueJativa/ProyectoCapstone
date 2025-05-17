@@ -36,7 +36,9 @@
         "selectItem": "Selecciona los artículos para la factura",
         "invoiceCreated": "Factura creada",
         "invoiceCreatedMessage": "La factura ha sido creada exitosamente.",
-        "invoiceCreationError": "Error al crear la factura"
+        "invoiceCreationError": "Error al crear la factura",
+        "garrisons": "Guarniciones",
+        "selectGarrison": "Selecciona dos guarniciones"
     },
     "placeholders": {
         "enterPeopleCount": "Ingresa el número de personas"

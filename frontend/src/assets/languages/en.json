@@ -36,7 +36,9 @@
         "selectItem": "Select items for the invoice",
         "invoiceCreated": "Invoice created",
         "invoiceCreatedMessage": "The invoice has been successfully created.",
-        "invoiceCreationError": "Error creating invoice"
+        "invoiceCreationError": "Error creating invoice",
+        "garrisons": "Garrisons",
+        "selectGarrison": "Select two garrisons"
     },
     "placeholders": {
         "enterPeopleCount": "Enter the number of people"

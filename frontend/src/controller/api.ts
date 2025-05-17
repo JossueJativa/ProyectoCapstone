@@ -1,5 +1,4 @@
 import axios, { AxiosResponse, Method } from "axios";
-import { verifyToken } from './auth';
 
 class API {
     private url: string;
@@ -14,31 +13,26 @@ class API {
         };
     }
 
-    async updateToken(): Promise<void> {
+    private async refreshToken(): Promise<boolean> {
         const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) {
-            console.error("No refresh token available");
-            return;
+            return false;
         }
-
         try {
-            const response = await axios.post(`${this.url}/token/refresh/`, {
-                refresh: refreshToken
-            });
-
+            const response = await axios.post(`${this.url}/token/refresh/`, { refresh: refreshToken });
             const { access, refresh } = response.data;
             localStorage.setItem('access_token', access);
-            localStorage.setItem('refresh_token', refresh);
+            if (refresh) {
+                localStorage.setItem('refresh_token', refresh);
+            }
             this.token = `Bearer ${access}`;
+            return true;
         } catch (error) {
-            console.error("Failed to refresh token", error);
+            return false;
         }
     }
 
     private async request(method: Method, url: string, data?: object, auth: boolean = true): Promise<AxiosResponse | undefined> {
-        if (auth) {
-            await this.ensureValidToken();
-        }
         try {
             return await axios({
                 method,
@@ -51,11 +45,18 @@ class API {
             });
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
-                // Handle 401 errors (unauthorized) and try refreshing the token
                 if (error.response.status === 401 && auth) {
-                    console.warn("Token expired, attempting to refresh...");
-                    await this.updateToken();
-                    return this.request(method, url, data, auth); // Retry the request
+                    // Intenta refrescar el token una vez
+                    const refreshed = await this.refreshToken();
+                    if (refreshed) {
+                        // Reintenta la petición con el nuevo token
+                        return this.request(method, url, data, auth);
+                    } else {
+                        alert("Sesión caducada, por favor vuelve a iniciar sesión");
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+                        window.location.href = '/admin';
+                    }
                 }
                 return error.response;
             }
@@ -63,16 +64,7 @@ class API {
         }
     }
 
-    private async ensureValidToken(): Promise<void> {
-        const isTokenValid = await verifyToken();
-        if (!isTokenValid) {
-            console.warn("Token is invalid or expired, refreshing...");
-            await this.updateToken();
-        }
-    }
-
     async postAuth(url: string, data: object): Promise<AxiosResponse | undefined> {
-        // Make a POST request without authentication
         try {
             return await axios.post(`${this.url}/user${url}/`, data, {
                 headers: {

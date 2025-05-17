@@ -107,7 +107,7 @@ export const CreateDish = () => {
             dish_name: newDish.name, // necesario para updateDish
             name: newDish.name,
             description: newDish.description,
-            time_elaboration: Number(newDish.time_elaboration),
+            time_elaboration: newDish.time_elaboration,
             price: Number(newDish.price),
             link_ar: newDish.link_ar,
             ingredients: newDish.ingredients,

@@ -15,15 +15,9 @@ const LoginAuth = async (username: string, password: string): Promise<boolean> =
 }
 
 const LogoutAuth = async (): Promise<boolean> => {
-    const token = localStorage.getItem('refresh_token');
-    const response = await api.postAuth('/logout', { refresh: token });
-    if (response?.status === 200) {
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('access_token');
-        return true;
-    } else {
-        return false;
-    }
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access_token');
+    return true;
 }
 
 const RegisterAuth = async (username: string, password: string): Promise<boolean> => {

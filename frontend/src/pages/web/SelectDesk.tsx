@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Container, useTheme } from '@mui/material';
+import { Box, Container, Typography, useTheme } from '@mui/material';
 import { Restaurant } from '@mui/icons-material';
 
 import { IconText, ButtonType, LabelText } from '@/components';
@@ -53,6 +53,14 @@ export const SelectDesk = () => {
                     width: '100%'
                 }}>
                     {/* Mesa a seleccionar */}
+                    <Typography variant="h6" sx={{
+                        color: theme.menu.black,
+                        fontSize: theme.typography.body1.fontSize,
+                        fontWeight: theme.typography.body1.fontWeight,
+                        marginBottom: '10px',
+                    }}>
+                        {texts.tables.select}
+                    </Typography>
                     {desk.map((d, i) => {
                         const deskColor = menuColors[i % menuColors.length];
                         const isSelected = selectedDesk === d.desk_number;
