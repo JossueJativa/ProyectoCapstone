@@ -13,10 +13,6 @@ export const CreateCategories = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-<<<<<<< HEAD
-=======
-    // Tipar correctamente el parámetro 'c'
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
     const filteredCategories = categories.filter((c: { category_name: string }) =>
         c.category_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -58,12 +54,9 @@ export const CreateCategories = () => {
             setSelectedCategory(null);
             setIsEditing(false);
             const response = await getCategories('ES');
-<<<<<<< HEAD
             if (response.length > 0) {
                 setNewCategory({ category_name: '' });
             }
-=======
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
             setCategories(response);
         }
     };

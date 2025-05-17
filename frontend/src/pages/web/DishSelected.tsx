@@ -47,13 +47,8 @@ export const DishSelected = () => {
 
     useEffect(() => {
         const fetchAllergens = async () => {
-<<<<<<< HEAD
             if (dish) {
                 const allergens = await getAllergensByDish(String(dishId));
-=======
-            if (dish && dishId) {
-                const allergens = await getAllergensByDish(dishId);
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                 setAllergens(allergens);
             }
         }
@@ -94,7 +89,6 @@ export const DishSelected = () => {
                     allergens={allergens}
                     dish_id={dish.dish_id}
                     has_garrison={dish.has_garrison}
-                    linkTo={null}
                 />
             </Box>
             <Box sx={{

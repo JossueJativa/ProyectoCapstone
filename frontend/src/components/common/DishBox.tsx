@@ -267,24 +267,6 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
             </Grid>
           </Grid>
 
-<<<<<<< HEAD
-        {/* PopUpInformation */}
-        <PopUpInformation
-          open={popupOpen}
-          title={texts.labels.selectGarrison}
-          message={texts.labels.selectGarrison}
-          isInformative={false}
-          redirect={""}
-        >
-          {/* Poner los garrisons */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-=======
           {/* PopUpInformation */}
           <PopUpInformation
             open={popupOpen}
@@ -292,7 +274,6 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
             message={texts.labels.selectGarrison}
             isInformative={false}
             redirect={""}
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
           >
             {/* Poner los garrisons */}
             <Box

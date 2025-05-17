@@ -98,11 +98,7 @@ export const DivideInvoice = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-<<<<<<< HEAD
-                                fontSize: theme.customTypography.body1.fontSize,
-=======
                                 fontSize: theme.typography.body1.fontSize,
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                                 fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 {totalQuantity}
@@ -114,11 +110,7 @@ export const DivideInvoice = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-<<<<<<< HEAD
-                                fontSize: theme.customTypography.body1.fontSize,
-=======
                                 fontSize: theme.typography.body1.fontSize,
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                                 fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 ${totalPrice.toFixed(2)}

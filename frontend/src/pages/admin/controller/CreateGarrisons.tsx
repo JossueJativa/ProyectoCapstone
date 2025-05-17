@@ -107,11 +107,7 @@ export const CreateGarrisons = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', backgroundColor: theme.background.primary, minHeight: '100vh', overflow: 'hidden' }}>
             <Grid container sx={{ width: 'auto' }}>
                 <Grid container width={'20%'}>
-<<<<<<< HEAD
                     <SideBar onMonthChange={function (): void {} } />
-=======
-                    <SideBar onMonthChange={() => {}} />
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                 </Grid>
 
                 <Grid item xs={12} md={9} sx={{ padding: '20px', display: 'flex' }}>

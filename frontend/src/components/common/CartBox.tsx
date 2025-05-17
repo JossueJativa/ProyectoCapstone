@@ -22,8 +22,6 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
         });
     };
 
-    const handleDelete = () => onDelete(id);
-
     return (
         <Box
             sx={{
@@ -106,11 +104,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                     <ButtonLogic
                         text={texts.labels.delete}
                         typeButton="secondary"
-<<<<<<< HEAD
                         onClick={() => onDelete(id)}
-=======
-                        onClick={handleDelete}
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                     />
                 </Box>
                 <Box width="55%" display="flex" justifyContent="center" alignItems="center">

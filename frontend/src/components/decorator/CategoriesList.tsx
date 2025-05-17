@@ -1,29 +1,15 @@
-<<<<<<< HEAD
-import { useTheme } from '@mui/material';
-import { CategoriesListProps, Category } from '@/interfaces';
-=======
 import { CategoriesListProps, Category } from '@/interfaces/components/ICategories';
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material';
 
 interface ExtendedCategoriesListProps extends CategoriesListProps {
     onCategorySelect: (categoryId: string) => void;
-<<<<<<< HEAD
-    selectedCategory: string | null;
-}
-
-export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: ExtendedCategoriesListProps) => {
-    const theme = useTheme();
-
-=======
     selectedCategory: string;
 }
 
 export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: ExtendedCategoriesListProps) => {
     const theme = useTheme();
 
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
     return (
         <Box
             sx={{
@@ -57,7 +43,7 @@ export const CategoriesList = ({ categories, onCategorySelect, selectedCategory 
                         cursor: 'pointer',
                     }}
                 >
-                    <h3>{category.name}</h3>
+                    <h3>{category.category_name}</h3>
                 </Box>
             ))}
         </Box>

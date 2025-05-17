@@ -42,11 +42,10 @@ const updateCategory = async (data: any): Promise<any> => {
 }
 
 const updateIngredient = async (data: UpdateIngredientData): Promise<any> => {
-    const { id, name, quantity, allergens } = data;
+    const { id, name, allergens } = data;
     const api = new API();
     const response = await api.put(`/ingredient/${id}`, {
         ingredient_name: name,
-        quantity,
         allergen: allergens
     });
     return response?.data;

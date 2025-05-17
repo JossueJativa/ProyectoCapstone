@@ -190,11 +190,7 @@ export const ShoppingCart = () => {
         if (deskId && socket) {
             try {
                 const order = await createOrder({
-<<<<<<< HEAD
                     deskId: Number(deskId),
-=======
-                    deskId: deskId ? Number(deskId) : 0,
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                     totalPrice: calculateSummary().totalPrice,
                     status: 'Pendiente',
                     orderDish: []
@@ -433,11 +429,7 @@ export const ShoppingCart = () => {
                                         price={dish.details.price}
                                         quantity={dish.quantity}
                                         linkAR={dish.details.link_ar}
-<<<<<<< HEAD
-                                        desk_id={deskId || ''}
-=======
                                         desk_id={deskId ? deskId : ''}
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                                         linkTo={`/dish/${dish.details.id}?desk_id=${deskId}`}
                                         onQuantityChange={handleQuantityChange}
                                         onDelete={() => handleDelete(dish.id)}
