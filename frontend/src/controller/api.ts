@@ -6,7 +6,7 @@ class API {
     private headers: object;
 
     constructor() {
-        this.url = "https://bistroalpasoar.com/api";
+        this.url = "http://localhost:8000/api";
         this.token = `Bearer ${localStorage.getItem('access_token')}`;
         this.headers = {
             "Content-Type": "application/json"
