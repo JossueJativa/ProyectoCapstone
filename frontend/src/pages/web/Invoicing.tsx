@@ -4,8 +4,8 @@ import { Box, Grid, Typography, useTheme } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
 import { IconText, ButtonType, PopUpInformation } from '@/components';
-import { IInvoicing, IInvoicingData } from '@/interfaces';
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
+import { IInvoicing, IInvoicingData } from '@/interfaces';
 
 export const Invoicing = () => {
     const { id } = useParams<{ id: string }>();
@@ -22,7 +22,7 @@ export const Invoicing = () => {
 
         if (id) { // Verifica que el ID de la factura exista
             const fetchData = async () => {
-                const orderDishes = await getOrderDishByOrderId(id);
+                const orderDishes = await getOrderDishByOrderId(id ? parseInt(id, 10) : 0);
                 setOrder(orderDishes);
             };
             fetchData();
@@ -38,7 +38,7 @@ export const Invoicing = () => {
             const invoiceData: IInvoicing = {
                 invoiceId: parseInt(invoiceNumber, 10),
                 totalPrice: parseFloat(totalPrice.toFixed(2)),
-                orderId: parseInt(id, 10),
+                orderId: parseInt(id || '0', 10),
             };
 
             const createdInvoice = await createInvoice(invoiceData);
@@ -112,8 +112,8 @@ export const Invoicing = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontSize: theme.customTypography.body1.fontSize,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 {totalQuantity}
                             </Typography>
@@ -124,8 +124,8 @@ export const Invoicing = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontSize: theme.customTypography.body1.fontSize,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 ${totalPrice.toFixed(2)}
                             </Typography>
@@ -152,8 +152,8 @@ export const Invoicing = () => {
                                 </Typography>
                                 <Typography variant="body1" sx={{
                                     color: theme.button.cafeMedio,
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.title.fontWeight,
+                                    fontSize: theme.customTypography.body1.fontSize,
+                                    fontWeight: theme.customTypography.title.fontWeight,
                                     textAlign: 'center',
                                     flex: 0.5
                                 }}>
@@ -161,8 +161,8 @@ export const Invoicing = () => {
                                 </Typography>
                                 <Typography variant="body1" sx={{
                                     color: theme.button.cafeMedio,
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.title.fontWeight,
+                                    fontSize: theme.customTypography.body1.fontSize,
+                                    fontWeight: theme.customTypography.title.fontWeight,
                                     textAlign: 'right',
                                     flex: 1
                                 }}>

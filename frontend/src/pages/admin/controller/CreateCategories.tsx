@@ -13,13 +13,15 @@ export const CreateCategories = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredCategories = categories.filter((c) =>
+    // Tipar correctamente el parámetro 'c'
+    const filteredCategories = categories.filter((c: { category_name: string }) =>
         c.category_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Cambiar selectedMonth por 'ES' en getCategories
     useEffect(() => {
         const fetchCategories = async () => {
-            const response = await getCategories();
+            const response = await getCategories('ES');
             setCategories(response);
         }
         fetchCategories();
@@ -38,8 +40,8 @@ export const CreateCategories = () => {
         if (newCategory.category_name) {
             await createCategory(newCategory);
             setNewCategory({ category_name: '' });
-            const response = await getCategories(selectedMonth);
-            setCategories(response.data);
+            const response = await getCategories('ES');
+            setCategories(response);
         }
     };
 
@@ -53,15 +55,15 @@ export const CreateCategories = () => {
             setNewCategory({ category_name: '' });
             setSelectedCategory(null);
             setIsEditing(false);
-            const response = await getCategories(selectedMonth);
-            setCategories(response.data);
+            const response = await getCategories('ES');
+            setCategories(response);
         }
     };
 
-    const handleDeleteCategory = async (id: number) => {
-        await deleteCategory(id);
-        const response = await getCategories(selectedMonth);
-        setCategories(response.data);
+    const handleDeleteCategory = async (id: string) => {
+        await deleteCategory(Number(id));
+        const response = await getCategories('ES');
+        setCategories(response);
     };
 
     const handleCategoryClick = (category: any) => {

@@ -17,6 +17,7 @@ export type {
     IIngredientData,
     IDishData,
     IOrderData,
+    IInvoicing,
     IInvoicingData,
     IOrder
 } from './controller';

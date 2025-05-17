@@ -10,19 +10,18 @@ import {
 export const CreateDesk = () => {
     const theme = useTheme();
     const [desk, setDesk] = useState<any[]>([]);
-    const [selectedMonth, setSelectedMonth] = useState<number>(1);
     const [newDesk, setNewDesk] = useState({ number: '', capacity: '' });
     const [selectedDesk, setSelectedDesk] = useState<any | null>(null);
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         const fetchDesk = async () => {
-            const response = await getDesk(selectedMonth);
-            const sortedDesks = response.sort((a: any, b: any) => a.desk_number - b.desk_number); // Ordenar por número de mesa
+            const deskResponse = await getDesk();
+            const sortedDesks = deskResponse.sort((a: any, b: any) => a.desk_number - b.desk_number);
             setDesk(sortedDesks);
         };
         fetchDesk();
-    }, [selectedMonth]);
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -31,10 +30,13 @@ export const CreateDesk = () => {
 
     const handleCreateDesk = async () => {
         if (newDesk.number && newDesk.capacity) {
-            await createDesk(newDesk);
+            await createDesk({
+                number: Number(newDesk.number),
+                capacity: Number(newDesk.capacity)
+            });
             setNewDesk({ number: '', capacity: '' });
-            const response = await getDesk(selectedMonth);
-            const sortedDesks = response.sort((a: any, b: any) => a.desk_number - b.desk_number); // Ordenar por número de mesa
+            const deskResponse = await getDesk();
+            const sortedDesks = deskResponse.sort((a: any, b: any) => a.desk_number - b.desk_number);
             setDesk(sortedDesks);
         }
     };
@@ -43,15 +45,15 @@ export const CreateDesk = () => {
         if (selectedDesk && newDesk.number && newDesk.capacity) {
             const data = {
                 id: selectedDesk.id,
-                number: newDesk.number,
-                capacity: newDesk.capacity
+                number: Number(newDesk.number),
+                capacity: Number(newDesk.capacity)
             };
             await updateDesk(data);
             setNewDesk({ number: '', capacity: '' });
             setSelectedDesk(null);
             setIsEditing(false);
-            const response = await getDesk(selectedMonth);
-            const sortedDesks = response.sort((a: any, b: any) => a.desk_number - b.desk_number); // Ordenar por número de mesa
+            const deskResponse = await getDesk();
+            const sortedDesks = deskResponse.sort((a: any, b: any) => a.desk_number - b.desk_number);
             setDesk(sortedDesks);
         } else {
             console.error('Error: selectedDesk or its id is undefined');
@@ -72,8 +74,8 @@ export const CreateDesk = () => {
 
     const handleDeleteDesk = async (id: number) => {
         await deleteDesk(id);
-        const response = await getDesk(selectedMonth);
-        const sortedDesks = response.sort((a: any, b: any) => a.desk_number - b.desk_number); // Ordenar por número de mesa
+        const deskResponse = await getDesk();
+        const sortedDesks = deskResponse.sort((a: any, b: any) => a.desk_number - b.desk_number);
         setDesk(sortedDesks);
     };
 
@@ -90,7 +92,7 @@ export const CreateDesk = () => {
         >
             <Grid container sx={{ width: 'auto' }}>
                 <Grid container width={'20%'}>
-                    <SideBar onMonthChange={setSelectedMonth} />
+                    <SideBar onMonthChange={() => {}} />
                 </Grid>
 
                 <Grid item xs={12} md={9} sx={{ padding: '20px', display: 'flex' }}>

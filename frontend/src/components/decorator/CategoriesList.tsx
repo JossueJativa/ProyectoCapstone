@@ -1,13 +1,14 @@
-import { useTheme } from '@mui/material';
-import { CategoriesListProps } from '@/interfaces';
+import { CategoriesListProps, Category } from '@/interfaces/components/ICategories';
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material';
 
-export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: CategoriesListProps) => {
+interface ExtendedCategoriesListProps extends CategoriesListProps {
+    onCategorySelect: (categoryId: string) => void;
+    selectedCategory: string;
+}
+
+export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: ExtendedCategoriesListProps) => {
     const theme = useTheme();
-
-    const handleCategoryClick = (categoryId: number) => {
-        onCategorySelect(categoryId);
-    };
 
     return (
         <Box
@@ -29,25 +30,20 @@ export const CategoriesList = ({ categories, onCategorySelect, selectedCategory 
             }}
             className="categories-slider"
         >
-            {categories.map((category) => (
+            {categories.map((category: Category) => (
                 <Box
                     key={category.id}
-                    onClick={() => handleCategoryClick(category.id)}
+                    onClick={() => onCategorySelect(category.id)}
                     sx={{
                         minWidth: '150px',
                         textAlign: 'center',
                         padding: 1,
                         backgroundColor: selectedCategory === category.id ? theme.button.verde : theme.button.transparente,
                         borderRadius: '8px',
-                        border: `1px solid ${theme.button.verde}`,
                         cursor: 'pointer',
-                        '&:hover': {
-                            backgroundColor: selectedCategory === category.id ? theme.button.verde : theme.button.transparente,
-                        },
                     }}
-                    className="category-item"
                 >
-                    <h3>{category.category_name}</h3>
+                    <h3>{category.name}</h3>
                 </Box>
             ))}
         </Box>

@@ -145,7 +145,7 @@ export const ShoppingCart = () => {
                     garrisonDetails = await Promise.all(
                         dish.garrison.map(async (garrisonId: number) => {
                             const lang = language === "en" ? "EN-GB" : "ES";
-                            const garrisonData = await getGarrison(garrisonId, lang);
+                            const garrisonData = await getGarrison(String(garrisonId), lang);
                             return garrisonData.garrison_name;
                         })
                     );
@@ -190,9 +190,10 @@ export const ShoppingCart = () => {
         if (deskId && socket) {
             try {
                 const order = await createOrder({
-                    deskId: deskId,
+                    deskId: deskId ? Number(deskId) : 0,
                     totalPrice: calculateSummary().totalPrice,
                     status: 'Pendiente',
+                    orderDish: []
                 })
 
                 const OrderId = order.id;
@@ -214,7 +215,7 @@ export const ShoppingCart = () => {
                     orderDetails: await Promise.all(cartDishes.map(async (dish) => {
                         const garrisonDetails = dish.garrison && Array.isArray(dish.garrison)
                             ? await Promise.all(dish.garrison.map(async (garrisonId: number) => {
-                                const garrisonData = await getGarrison(garrisonId, language);
+                                const garrisonData = await getGarrison(String(garrisonId), language);
                                 return garrisonData.garrison_name;
                             }))
                             : null;
@@ -296,7 +297,7 @@ export const ShoppingCart = () => {
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
                                 fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 0
                             </Typography>
@@ -308,7 +309,7 @@ export const ShoppingCart = () => {
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
                                 fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 $0.00
                             </Typography>
@@ -398,7 +399,7 @@ export const ShoppingCart = () => {
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
                                 fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 {totalQuantity}
                             </Typography>
@@ -410,7 +411,7 @@ export const ShoppingCart = () => {
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
                                 fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 ${totalPrice.toFixed(2)}
                             </Typography>
@@ -428,7 +429,7 @@ export const ShoppingCart = () => {
                                         price={dish.details.price}
                                         quantity={dish.quantity}
                                         linkAR={dish.details.link_ar}
-                                        desk_id={deskId}
+                                        desk_id={deskId ? deskId : ''}
                                         linkTo={`/dish/${dish.details.id}?desk_id=${deskId}`}
                                         onQuantityChange={handleQuantityChange}
                                         onDelete={() => handleDelete(dish.id)}

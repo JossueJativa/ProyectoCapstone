@@ -4,8 +4,16 @@ import { Box, Grid, Typography, useTheme, Checkbox } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useLanguage } from '@/helpers';
 import { IconText, ButtonType, PopUpInformation } from '@/components';
-import { IInvoicing, IInvoicingData } from '@/interfaces'
+import { IInvoicing, IInvoicingData } from '@/interfaces';
 import { getOrderDishByOrderId, createInvoice, createInvoiceData } from '@/controller';
+
+// Tipo local para facturas de UI
+interface UIInvoice {
+    person: number;
+    dishes: any[];
+    totalQuantity: number;
+    total: number;
+}
 
 export const InvoiceByDish = () => {
     const { id } = useParams<{ id: string }>();
@@ -16,7 +24,7 @@ export const InvoiceByDish = () => {
     const [divisions, setDivisions] = useState<{ person: number; amount: string }[]>([]);
     const [selectedDishes, setSelectedDishes] = useState<any[]>([]);
     const [currentPerson, setCurrentPerson] = useState<number>(1);
-    const [invoices, setInvoices] = useState<IInvoicing[]>([]);
+    const [invoices, setInvoices] = useState<UIInvoice[]>([]);
     const [popupOpen, setPopupOpen] = useState(false);
 
     useEffect(() => {
@@ -26,7 +34,7 @@ export const InvoiceByDish = () => {
 
         if (id) {
             const fetchData = async () => {
-                const orderDishes = await getOrderDishByOrderId(id);
+                const orderDishes = await getOrderDishByOrderId(id ? parseInt(id, 10) : 0);
                 setOrder(orderDishes);
             };
             fetchData();
@@ -70,8 +78,8 @@ export const InvoiceByDish = () => {
         }
 
         const totalQuantity = selectedDishes.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
-        const totalPrice = selectedDishes.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price), 0);
-        setInvoices([...invoices, { person: currentPerson, dishes: selectedDishes, totalQuantity, total: totalPrice }]);
+        const total = selectedDishes.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price), 0);
+        setInvoices([...invoices, { person: currentPerson, dishes: selectedDishes, totalQuantity, total }]);
 
         // Adjust quantities of selected dishes in the order
         const updatedOrder = order.map((dish: any) => {
@@ -90,8 +98,8 @@ export const InvoiceByDish = () => {
 
     const goBack = () => {
         if (currentPerson > 1) {
-            const previousInvoice = invoices.pop();
-            setInvoices([...invoices]);
+            const previousInvoice = invoices[invoices.length - 1];
+            setInvoices(invoices.slice(0, -1));
             setSelectedDishes(previousInvoice?.dishes || []);
             setCurrentPerson(currentPerson - 1);
 
@@ -118,7 +126,7 @@ export const InvoiceByDish = () => {
                 const invoiceData: IInvoicing = {
                     invoiceId: parseInt(invoiceNumber, 10),
                     totalPrice: parseFloat(invoice.total.toFixed(2)),
-                    orderId: parseInt(id, 10),
+                    orderId: parseInt(id || '0', 10),
                 };
 
                 const createdInvoice = await createInvoice(invoiceData);
@@ -148,18 +156,17 @@ export const InvoiceByDish = () => {
         }
     };
 
-    const calculateFinalTotal = () => {
-        const totalQuantity = invoices.reduce((acc, invoice) => acc + invoice.totalQuantity, 0);
-        const totalPrice = invoices.reduce((acc, invoice) => acc + invoice.total, 0);
+    const calculateFinalTotal = (): { totalQuantity: number; totalPrice: number } => {
+        const totalQuantity = invoices.reduce((acc: number, invoice: UIInvoice) => acc + invoice.totalQuantity, 0);
+        const totalPrice = invoices.reduce((acc: number, invoice: UIInvoice) => acc + invoice.total, 0);
         return { totalQuantity, totalPrice };
     };
 
-    const calculateTotal = (dishes) => {
+    const calculateTotal = (dishes: any[]): { totalQuantity: number; totalPrice: number } => {
         if (!dishes || dishes.length === 0) return { totalQuantity: 0, totalPrice: 0 };
 
-        const totalQuantity = dishes.reduce((acc, dish) => acc + dish.quantity, 0);
-        const totalPrice = dishes.reduce((acc, dish) => acc + (dish.quantity * dish.dish.price), 0);
-
+        const totalQuantity = dishes.reduce((acc: number, dish: any) => acc + dish.quantity, 0);
+        const totalPrice = dishes.reduce((acc: number, dish: any) => acc + (dish.quantity * dish.dish.price), 0);
         return { totalQuantity, totalPrice };
     };
 
@@ -181,8 +188,8 @@ export const InvoiceByDish = () => {
                                 borderRadius: theme.shape.borderRadius,
                             }}>
                                 <Typography variant="h6" sx={{
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.body1.fontWeight,
+                                    fontSize: theme.customTypography.body1.fontSize,
+                                    fontWeight: theme.customTypography.body1.fontWeight,
                                     padding: '3px',
                                 }}>
                                     {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
@@ -236,8 +243,8 @@ export const InvoiceByDish = () => {
                                     </Typography>
                                     <Typography variant="body1" sx={{
                                         color: theme.button.cafeMedio,
-                                        fontSize: theme.typography.body1.fontSize,
-                                        fontWeight: theme.typography.title.fontWeight,
+                                        fontSize: theme.customTypography.body1.fontSize,
+                                        fontWeight: theme.customTypography.title.fontWeight,
                                     }}>
                                         {totalQuantity}
                                     </Typography>
@@ -248,8 +255,8 @@ export const InvoiceByDish = () => {
                                     </Typography>
                                     <Typography variant="body1" sx={{
                                         color: theme.button.cafeMedio,
-                                        fontSize: theme.typography.body1.fontSize,
-                                        fontWeight: theme.typography.title.fontWeight,
+                                        fontSize: theme.customTypography.body1.fontSize,
+                                        fontWeight: theme.customTypography.title.fontWeight,
                                     }}>
                                         ${totalPrice.toFixed(2)}
                                     </Typography>
@@ -274,8 +281,8 @@ export const InvoiceByDish = () => {
                                             {texts.labels.totalAmount}:
                                             <span style={{
                                                 color: theme.button.cafeMedio,
-                                                fontSize: theme.typography.body1.fontSize,
-                                                fontWeight: theme.typography.title.fontWeight,
+                                                fontSize: theme.customTypography.body1.fontSize,
+                                                fontWeight: theme.customTypography.title.fontWeight,
                                             }}>${invoice.total.toFixed(2)}</span>
                                         </Typography>
                                     </Box>

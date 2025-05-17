@@ -33,7 +33,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         quantity: 1,
         desk_id: desk_id,
         garrisons: null
-      }, (error: any, response: any) => {
+      }, (error: any) => {
         if (error) {
           return;
         }
@@ -67,7 +67,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         desk_id: desk_id,
         garrison: parseIdGarrisons
       },
-        (error: any, response: any) => {
+        (error: any) => {
           if (error) {
             console.error("Error adding dish with garrisons:", error);
             return;
@@ -83,7 +83,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
       const fetchGarrisons = async () => {
         if (has_garrison) {
           const lang = language === "en" ? "EN-GB" : "ES";
-          const garrisons = await getGarrisonsByDish(dish_id, lang);
+          const garrisons = await getGarrisonsByDish(String(dish_id), lang);
           setGarrisons(garrisons);
         }
       };
@@ -125,7 +125,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
                 sx={{
                   color: theme.menu.black,
                   fontSize: "1.2rem",
-                  fontWeight: theme.typography.title.fontWeight,
+                  fontWeight: theme.customTypography.title.fontWeight,
                 }}
               >
                 {name}
@@ -144,8 +144,8 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
                 variant="h6"
                 sx={{
                   color: theme.button.cafeMedio,
-                  fontSize: theme.typography.body1.fontSize,
-                  fontWeight: theme.typography.title.fontWeight,
+                  fontSize: theme.customTypography.body1.fontSize,
+                  fontWeight: theme.customTypography.title.fontWeight,
                 }}
               >
                 $ {price.toFixed(2)}
@@ -266,53 +266,55 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
               />
             </Grid>
           </Grid>
-        </Box>
 
-        {/* PopUpInformation */}
-        <PopUpInformation
-          open={popupOpen}
-          title={texts.popups.select}
-          isInformative={false}
-        >
-          {/* Poner los garrisons */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+          {/* PopUpInformation */}
+          <PopUpInformation
+            open={popupOpen}
+            title={texts.labels.selectGarrison}
+            message={texts.labels.selectGarrison}
+            isInformative={false}
+            redirect={""}
           >
-            {garrisons.map((garrison) => (
-              <Button
-                key={garrison.id}
-                variant={selectedGarrisons.includes(garrison) ? "contained" : "outlined"}
-                onClick={() => handleGarrisonSelection(garrison)}
-                sx={{
-                  mb: 1,
-                  width: "100%",
-                  textTransform: "none",
-                  backgroundColor: selectedGarrisons.includes(garrison)
-                    ? theme.button.cafeMedio
-                    : "transparent",
-                  color: selectedGarrisons.includes(garrison)
-                    ? theme.palette.common.white
-                    : theme.palette.text.primary,
-                  borderColor: theme.button.cafeMedio,
-                }}
-              >
-                {garrison.name}
-              </Button>
-            ))}
-            {selectedGarrisons.length === 2 && (
-              <ButtonLogic
-                text={texts.buttons.add}
-                typeButton="primary"
-                onClick={handleAddDishWithGarrisons}
-              />
-            )}
-          </Box>
-        </PopUpInformation>
+            {/* Poner los garrisons */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {garrisons.map((garrison) => (
+                <Button
+                  key={garrison.id}
+                  variant={selectedGarrisons.includes(garrison) ? "contained" : "outlined"}
+                  onClick={() => handleGarrisonSelection(garrison)}
+                  sx={{
+                    mb: 1,
+                    width: "100%",
+                    textTransform: "none",
+                    backgroundColor: selectedGarrisons.includes(garrison)
+                      ? theme.button.cafeMedio
+                      : "transparent",
+                    color: selectedGarrisons.includes(garrison)
+                      ? theme.palette.common.white
+                      : theme.palette.text.primary,
+                    borderColor: theme.button.cafeMedio,
+                  }}
+                >
+                  {garrison.name}
+                </Button>
+              ))}
+              {selectedGarrisons.length === 2 && (
+                <ButtonLogic
+                  text={texts.buttons.add}
+                  typeButton="primary"
+                  onClick={handleAddDishWithGarrisons}
+                />
+              )}
+            </Box>
+          </PopUpInformation>
+        </Box>
       </>
     );
   }

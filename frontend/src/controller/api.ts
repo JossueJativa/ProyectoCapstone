@@ -8,7 +8,7 @@ class API {
     private headers: object;
 
     constructor() {
-        this.url = "http://127.0.0.1:8000";
+        this.url = "http://bistroalpasoar.com/api";
         this.url_api = `${this.url}/api`;
         this.token = `Bearer ${localStorage.getItem('access_token')}`;
         this.headers = {

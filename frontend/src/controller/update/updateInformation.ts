@@ -6,7 +6,14 @@ import {
     IDishData,
 } from '@/interfaces';
 
-const updateDesk = async (data: IDeskData): Promise<any> => {
+// Extiende los tipos para update, permitiendo id y otros campos extra
+
+type UpdateDeskData = IDeskData & { id: number };
+type UpdateAllergenData = IAllergenData & { id: number };
+type UpdateIngredientData = IIngredientData & { id: number };
+type UpdateDishData = IDishData & { id: number; dish_name: string };
+
+const updateDesk = async (data: UpdateDeskData): Promise<any> => {
     const { id, number, capacity } = data;
     const api = new API();
     const response = await api.put(`/desk/${id}`, {
@@ -16,7 +23,7 @@ const updateDesk = async (data: IDeskData): Promise<any> => {
     return response?.data;
 }
 
-const updateAllergen = async (data: IAllergenData): Promise<any> => {
+const updateAllergen = async (data: UpdateAllergenData): Promise<any> => {
     const { id, name } = data;
     const api = new API();
     const response = await api.put(`/allergens/${id}`, {
@@ -34,7 +41,7 @@ const updateCategory = async (data: any): Promise<any> => {
     return response?.data;
 }
 
-const updateIngredient = async (data: IIngredientData): Promise<any> => {
+const updateIngredient = async (data: UpdateIngredientData): Promise<any> => {
     const { id, name, quantity, allergens } = data;
     const api = new API();
     const response = await api.put(`/ingredient/${id}`, {
@@ -45,7 +52,7 @@ const updateIngredient = async (data: IIngredientData): Promise<any> => {
     return response?.data;
 }
 
-const updateDish = async (data: IDishData): Promise<any> => {
+const updateDish = async (data: UpdateDishData): Promise<any> => {
     const { 
         id, 
         dish_name, 

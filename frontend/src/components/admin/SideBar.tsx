@@ -16,7 +16,11 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { GetUserAuth, LogoutAuth } from '@/controller';
 
-export const SideBar = ({ onMonthChange }) => {
+export interface SideBarProps {
+    onMonthChange: (month: number) => void;
+}
+
+export const SideBar = ({ onMonthChange }: SideBarProps) => {
     const theme = useTheme();
     const [user, setUser] = useState<any>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -46,7 +50,10 @@ export const SideBar = ({ onMonthChange }) => {
         }
     };
 
-    const renderMenuItems = (navigate, currentPath) => (
+    const renderMenuItems = (
+        navigate: ReturnType<typeof useNavigate>,
+        currentPath: string
+    ) => (
         [
             { key: 'Dashboard', icon: <Dashboard />, text: 'Dashboard', route: '/admin/dashboard' },
             { key: 'Mesas', icon: <DeskOutlined />, text: 'Mesas', route: '/admin/desk' },

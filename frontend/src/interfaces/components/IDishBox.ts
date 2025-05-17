@@ -6,4 +6,5 @@ export interface IDishBoxProps {
   linkTo: string | null;
   allergens: number[] | null;
   dish_id: number;
+  has_garrison: boolean;
 }

@@ -7,7 +7,6 @@ import { useSocket } from '@/helpers';
 export const CreateOrders = () => {
     const theme = useTheme();
     const { socket } = useSocket();
-    const [orders, setOrders] = useState<any>([]);
     const [selectedMonth, setSelectedMonth] = useState<number>(1);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [cachedOrders, setCachedOrders] = useState<any>([]);
@@ -103,7 +102,7 @@ export const CreateOrders = () => {
             });
 
             const orderDishResults = await Promise.all(orderDishPromises);
-            setOrders(orderDishResults);
+            setCachedOrders(orderDishResults);
         };
         fetchOrders();
     }, [selectedMonth]);
