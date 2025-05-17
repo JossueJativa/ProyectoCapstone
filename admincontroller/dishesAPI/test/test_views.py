@@ -10,6 +10,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from authAPI.models import User
 from ..models import Desk, Allergens, Ingredient, Dish, Order, OrderDish, Category, Garrison, Invoice, InvoiceDish
 from ..serializer import DeskSerializer, AllergensSerializer, IngredientSerializer, DishSerializer, OrderSerializer, OrderDishSerializer, CategorySerializer
+from dishesAPI import views
+import os
 
 class BaseTestCase(TestCase):
     def setUp(self):
@@ -552,3 +554,251 @@ class UnifiedStatisticsTest(BaseTestCase):
         self.assertEqual(len(dashboard_statistics['categories']), 1)
         self.assertEqual(dashboard_statistics['categories'][0]['dish__category__category_name'], "Entradas")
         self.assertEqual(dashboard_statistics['categories'][0]['count'], 1)
+
+class TranslateFieldsTestCase(TestCase):
+    def test_translate_fields_success(self):
+        data = [{'name': 'Hola'}]
+        fields = ['name']
+        target_lang = 'EN-GB'
+
+        class FakeTranslation:
+            def __init__(self, text):
+                self.text = text
+        class FakeTranslator:
+            def __init__(self, key):
+                pass
+            def translate_text(self, texts, target_lang=None):
+                return [FakeTranslation('Hello') for _ in texts]
+
+        with self.settings(DEEPL_AUTH_KEY='fake-key'):
+            os.environ['DEEPL_AUTH_KEY'] = 'fake-key'
+            original_translator = views.deepl.Translator
+            views.deepl.Translator = FakeTranslator
+            try:
+                views.translate_fields(data, fields, target_lang)
+            finally:
+                views.deepl.Translator = original_translator
+        self.assertEqual(data[0]['name'], 'Hello')
+
+    def test_translate_fields_no_api_key(self):
+        data = [{'name': 'Hola'}]
+        fields = ['name']
+        target_lang = 'EN-GB'
+        if 'DEEPL_AUTH_KEY' in os.environ:
+            del os.environ['DEEPL_AUTH_KEY']
+        with self.assertRaises(ValueError) as exc:
+            views.translate_fields(data, fields, target_lang)
+        self.assertIn('DeepL API key is not configured', str(exc.exception))
+
+    def test_translate_fields_deepl_exception(self):
+        data = [{'name': 'Hola'}]
+        fields = ['name']
+        target_lang = 'EN-GB'
+        class FakeTranslator:
+            def __init__(self, key):
+                pass
+            def translate_text(self, texts, target_lang=None):
+                raise views.deepl.exceptions.DeepLException('DeepL error')
+        with self.settings(DEEPL_AUTH_KEY='fake-key'):
+            os.environ['DEEPL_AUTH_KEY'] = 'fake-key'
+            original_translator = views.deepl.Translator
+            views.deepl.Translator = FakeTranslator
+            try:
+                with self.assertRaises(views.deepl.exceptions.DeepLException):
+                    views.translate_fields(data, fields, target_lang)
+            finally:
+                views.deepl.Translator = original_translator
+
+    def test_translate_fields_generic_exception(self):
+        data = [{'name': 'Hola'}]
+        fields = ['name']
+        target_lang = 'EN-GB'
+        class FakeTranslator:
+            def __init__(self, key):
+                pass
+            def translate_text(self, texts, target_lang=None):
+                raise Exception('Generic error')
+        with self.settings(DEEPL_AUTH_KEY='fake-key'):
+            os.environ['DEEPL_AUTH_KEY'] = 'fake-key'
+            original_translator = views.deepl.Translator
+            views.deepl.Translator = FakeTranslator
+            try:
+                with self.assertRaises(Exception) as exc:
+                    views.translate_fields(data, fields, target_lang)
+                self.assertIn('Generic error', str(exc.exception))
+            finally:
+                views.deepl.Translator = original_translator
+
+class TranslateResponseTestCase(TestCase):
+    def test_translate_response_unsupported_language(self):
+        class DummyRequest:
+            query_params = {'lang': 'FR'}
+        data = [{'category_name': 'Hola'}]
+        view = views.CategoryViewSet()
+        with self.assertRaises(ValueError) as exc:
+            view.translate_response(data, ['category_name'], DummyRequest())
+        self.assertIn('not supported', str(exc.exception))
+
+    def test_translate_response_no_translation(self):
+        class DummyRequest:
+            query_params = {'lang': 'ES'}
+        data = [{'category_name': 'Hola'}]
+        view = views.CategoryViewSet()
+        # Patch translate_fields to fail if called
+        original_translate_fields = views.translate_fields
+        views.translate_fields = lambda *a, **k: (_ for _ in ()).throw(Exception('Should not be called'))
+        try:
+            view.translate_response(data, ['category_name'], DummyRequest())
+        finally:
+            views.translate_fields = original_translate_fields
+        self.assertEqual(data[0]['category_name'], 'Hola')
+
+class CategoryViewSetListErrorTestCase(TestCase):
+    def setUp(self):
+        self.view = views.CategoryViewSet()
+        self.factory = APIClient()
+        self.user = User.objects.create_user(username='testuser2', password='testpass')
+        self.request = self.factory.get('/api/category/?lang=FR')
+        self.request.user = self.user
+
+    def test_list_value_error(self):
+        # Forzar ValueError en translate_response
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise ValueError('Language not supported')
+        self.view.translate_response = fake_translate_response
+        self.view.request = self.request  # Fix: asignar self.request
+        self.view.format_kwarg = None  # Fix: asignar format_kwarg
+        response = self.view.list(self.request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Language not supported', str(response.data))
+        self.view.translate_response = original_translate_response
+
+    def test_list_generic_exception(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise Exception('Unexpected error')
+        self.view.translate_response = fake_translate_response
+        self.view.request = self.request  # Fix: asignar self.request
+        self.view.format_kwarg = None  # Fix: asignar format_kwarg
+        response = self.view.list(self.request)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('unexpected', str(response.data['error']).lower())
+        self.view.translate_response = original_translate_response
+
+class DishViewSetListRetrieveErrorTestCase(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(category_name="Appetizers")
+        self.ingredient = Ingredient.objects.create(ingredient_name="Flour")
+        self.dish = Dish.objects.create(
+            dish_name="Pizza",
+            description="Delicious pizza",
+            time_elaboration="00:30:00",
+            price=10,
+            link_ar="http://example.com",
+            category=self.category,
+            has_garrison=True
+        )
+        self.dish.ingredient.add(self.ingredient)
+        self.view = views.DishViewSet()
+        self.factory = APIClient()
+        self.user = User.objects.create_user(username='testuser3', password='testpass')
+        self.request = self.factory.get('/api/dish/?lang=EN')
+        self.request.user = self.user
+
+    def test_list_value_error(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise ValueError('Language not supported')
+        self.view.translate_response = fake_translate_response
+        self.view.request = self.request  # Fix: asignar self.request
+        self.view.format_kwarg = None  # Fix: asignar format_kwarg
+        response = self.view.list(self.request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Language not supported', str(response.data))
+        self.view.translate_response = original_translate_response
+
+    def test_list_generic_exception(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise Exception('Unexpected error')
+        self.view.translate_response = fake_translate_response
+        self.view.request = self.request  # Fix: asignar self.request
+        self.view.format_kwarg = None  # Fix: asignar format_kwarg
+        response = self.view.list(self.request)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('unexpected', str(response.data['error']).lower())
+        self.view.translate_response = original_translate_response
+
+    def test_retrieve_value_error(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise ValueError('Language not supported')
+        self.view.translate_response = fake_translate_response
+        # Simular get_object y get_serializer
+        self.view.get_object = lambda: self.dish
+        self.view.get_serializer = lambda instance: DishSerializer(instance)
+        request = self.factory.get(f'/api/dish/{self.dish.id}/?lang=FR')
+        request.user = self.user
+        response = self.view.retrieve(request, pk=self.dish.id)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Language not supported', str(response.data))
+        self.view.translate_response = original_translate_response
+
+    def test_retrieve_generic_exception(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise Exception('Unexpected error')
+        self.view.translate_response = fake_translate_response
+        self.view.get_object = lambda: self.dish
+        self.view.get_serializer = lambda instance: DishSerializer(instance)
+        request = self.factory.get(f'/api/dish/{self.dish.id}/?lang=FR')
+        request.user = self.user
+        response = self.view.retrieve(request, pk=self.dish.id)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('unexpected', str(response.data['error']).lower())
+        self.view.translate_response = original_translate_response
+
+class GarrisonViewSetListErrorTestCase(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(category_name="Appetizers")
+        self.dish = Dish.objects.create(
+            dish_name="Pizza",
+            description="Delicious pizza",
+            time_elaboration="00:30:00",
+            price=10,
+            link_ar="http://example.com",
+            category=self.category,
+            has_garrison=True
+        )
+        self.garrison = Garrison.objects.create(garrison_name="Fries")
+        self.garrison.dish.add(self.dish)
+        self.view = views.GarrisonViewSet()
+        self.factory = APIClient()
+        self.user = User.objects.create_user(username='testuser4', password='testpass')
+        self.request = self.factory.get('/api/garrison/?lang=FR')
+        self.request.user = self.user
+
+    def test_list_value_error(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise ValueError('Language not supported')
+        self.view.translate_response = fake_translate_response
+        self.view.request = self.request  # Fix: asignar self.request
+        self.view.format_kwarg = None  # Fix: asignar format_kwarg
+        response = self.view.list(self.request)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Language not supported', str(response.data))
+        self.view.translate_response = original_translate_response
+
+    def test_list_generic_exception(self):
+        original_translate_response = self.view.translate_response
+        def fake_translate_response(*a, **k):
+            raise Exception('Unexpected error')
+        self.view.translate_response = fake_translate_response
+        self.view.request = self.request  # Fix: asignar self.request
+        self.view.format_kwarg = None  # Fix: asignar format_kwarg
+        response = self.view.list(self.request)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('unexpected', str(response.data['error']).lower())
+        self.view.translate_response = original_translate_response
