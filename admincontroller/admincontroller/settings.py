@@ -28,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bistroalpasoar.com', 'srv830062.hstgr.cloud']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bistroalpasoar.com', 'www.bistroalpasoar.com']
 
 
 # Application definition
@@ -62,7 +62,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -148,9 +147,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-FORCE_SCRIPT_NAME = '/api'
-STATIC_URL = '/api/static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [BASE_DIR / "admincontroller" / "static"]
 
