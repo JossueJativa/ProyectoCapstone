@@ -41,6 +41,14 @@ export const SelectDesk = () => {
                 <IconText icon={<Restaurant />} text={texts.tables.welcome} />
 
                 {/* Mostrar las mesas */}
+                <Typography variant="h6" sx={{
+                    color: theme.menu.black,
+                    fontSize: theme.typography.body1.fontSize,
+                    fontWeight: theme.typography.body1.fontWeight,
+                    marginTop: '20px',
+                }}>
+                    {texts.tables.select}
+                </Typography>
                 <Container sx={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
@@ -53,14 +61,6 @@ export const SelectDesk = () => {
                     width: '100%'
                 }}>
                     {/* Mesa a seleccionar */}
-                    <Typography variant="h6" sx={{
-                        color: theme.menu.black,
-                        fontSize: theme.typography.body1.fontSize,
-                        fontWeight: theme.typography.body1.fontWeight,
-                        marginBottom: '10px',
-                    }}>
-                        {texts.tables.select}
-                    </Typography>
                     {desk.map((d, i) => {
                         const deskColor = menuColors[i % menuColors.length];
                         const isSelected = selectedDesk === d.desk_number;
