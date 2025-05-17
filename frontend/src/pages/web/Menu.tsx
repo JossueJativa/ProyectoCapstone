@@ -5,7 +5,7 @@ import { Box, Grid, Typography, useTheme, Fade } from '@mui/material';
 
 import { useSocket, useLanguage } from "@/helpers";
 import { IconText, DishBox, CartButton, CategoriesList } from '@/components';
-import { getDishes, getCategories } from '@/controller';
+import { getDishes, getCategories, getAllergensByDish } from '@/controller';
 
 export const Menu = () => {
     const { texts, language } = useLanguage();
@@ -16,7 +16,11 @@ export const Menu = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [visibleDishes, setVisibleDishes] = useState<number>(10);
     const [deskId, setDeskId] = useState<string | null>(null);
+<<<<<<< HEAD
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+=======
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -52,17 +56,23 @@ export const Menu = () => {
     }, [language]);
 
     useEffect(() => {
-        const fetchDishes = async () => {
+        const fetchDishesWithAllergens = async () => {
             try {
                 const lang = language === "en" ? "EN-GB" : "ES";
                 const dishesList = await getDishes(lang);
-                setDishes(dishesList);
+                // Obtener los alérgenos para cada plato
+                const dishesWithAllergens = await Promise.all(
+                    dishesList.map(async (d: any) => {
+                        const allergens = await getAllergensByDish(String(d.id));
+                        return { ...d, allergens };
+                    })
+                );
+                setDishes(dishesWithAllergens);
             } catch (error) {
                 console.error("Error fetching dishes:", error);
             }
         };
-
-        fetchDishes();
+        fetchDishesWithAllergens();
     }, [language]);
 
     useEffect(() => {
@@ -89,14 +99,34 @@ export const Menu = () => {
     const handleCategorySelect = async (categoryId: string) => {
         try {
             if (selectedCategory === categoryId) {
-                const dishesList = await getDishes();
-                setDishes(dishesList);
+                const lang = language === "en" ? "EN-GB" : "ES";
+                const dishesList = await getDishes(lang);
+                const dishesWithAllergens = await Promise.all(
+                    dishesList.map(async (d: any) => {
+                        const allergens = await getAllergensByDish(String(d.id));
+                        return { ...d, allergens };
+                    })
+                );
+                setDishes(dishesWithAllergens);
                 setVisibleDishes(10);
-                setSelectedCategory(null);
+                setSelectedCategory('');
             } else {
+<<<<<<< HEAD
                 const dishesList = await getDishes();
                 const filteredDishes = dishesList.filter((dish: { category: number | string; }) => String(dish.category) === categoryId);
                 setDishes(filteredDishes);
+=======
+                const lang = language === "en" ? "EN-GB" : "ES";
+                const dishesList = await getDishes(lang);
+                const filteredDishes = dishesList.filter((dish: any) => String(dish.category) === categoryId);
+                const dishesWithAllergens = await Promise.all(
+                    filteredDishes.map(async (d: any) => {
+                        const allergens = await getAllergensByDish(String(d.id));
+                        return { ...d, allergens };
+                    })
+                );
+                setDishes(dishesWithAllergens);
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                 setVisibleDishes(10);
                 setSelectedCategory(categoryId);
             }
@@ -145,7 +175,11 @@ export const Menu = () => {
                                     linkTo={`/dish/${d.id}?desk_id=${deskId}`}
                                     dish_id={d.id}
                                     has_garrison={d.has_garrison}
+<<<<<<< HEAD
                                     allergens={null}
+=======
+                                    allergens={d.allergens || []}
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                                 />
                             </Fade>
                         </Grid>

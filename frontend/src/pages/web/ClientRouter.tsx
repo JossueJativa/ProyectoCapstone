@@ -1,6 +1,13 @@
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Box } from '@mui/material';
+
+// Extend the Window interface to include 'voiceflow'
+declare global {
+    interface Window {
+        voiceflow?: any;
+    }
+}
 import { Navbar } from '@/components';
 import { Error404 } from '../errors';
 import { 

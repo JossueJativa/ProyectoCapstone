@@ -28,7 +28,7 @@ export const CreateDish = () => {
     };
 
     const filteredDishes = dishes.filter((dish) =>
-        dish.dish_name.toLowerCase().includes(dishSearchTerm.toLowerCase())
+        dish.name.toLowerCase().includes(dishSearchTerm.toLowerCase())
     );
 
     const filteredIngredients = ingredients.filter((ing) =>
@@ -78,18 +78,32 @@ export const CreateDish = () => {
             alert('Debe ingresar un nombre y seleccionar una categoría.');
             return;
         }
+<<<<<<< HEAD
         const data: IDishData = {
             dish_name: newDish.name,
             description: newDish.description,
             time_elaboration: newDish.time_elaboration,
+=======
+        const data = {
+            name: newDish.name,
+            description: newDish.description,
+            time_elaboration: Number(newDish.time_elaboration),
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
             price: Number(newDish.price),
             link_ar: newDish.link_ar,
             ingredients: newDish.ingredients,
             category: newDish.category,
+<<<<<<< HEAD
             has_garrison: newDish.has_garrison,
             id: 0
         };
         await createDish(data);
+=======
+            has_garrison: newDish.has_garrison
+        };
+        await createDish(data);
+        setNewDish({ name: '', description: '', time_elaboration: 0, price: 0, link_ar: '', ingredients: [], category: null, has_garrison: false });
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
         const response = await getDishes();
         if (response.length > 0) {
             setNewDish({ name: '', description: '', time_elaboration: 0, price: 0, link_ar: '', ingredients: [], category: null, has_garrison: false });
@@ -130,12 +144,20 @@ export const CreateDish = () => {
 
     const handleDishClick = (dish: any) => {
         setNewDish({
+<<<<<<< HEAD
             name: dish.dish_name,
+=======
+            name: dish.name,
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
             description: dish.description,
             time_elaboration: dish.time_elaboration,
             price: dish.price,
             link_ar: dish.link_ar,
+<<<<<<< HEAD
             ingredients: dish.ingredient || [], // Usar dish.ingredient para autoselección
+=======
+            ingredients: dish.ingredients || [],
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
             category: dish.category || null,
             has_garrison: dish.has_garrison || false
         });
@@ -164,7 +186,11 @@ export const CreateDish = () => {
         >
             <Grid container sx={{ width: 'auto' }}>
                 <Grid container width={'20%'}>
+<<<<<<< HEAD
                     <SideBar onMonthChange={() => { }} />
+=======
+                    <SideBar onMonthChange={() => {}} />
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                 </Grid>
 
                 <Grid item xs={12} md={9} sx={{ padding: '20px', display: 'flex' }}>
@@ -351,7 +377,7 @@ export const CreateDish = () => {
                                     }}
                                     onClick={() => handleDishClick(dish)}
                                 >
-                                    <p><strong>{dish.dish_name}</strong></p>
+                                    <p><strong>{dish.name}</strong></p>
                                     <Delete
                                         sx={{
                                             position: 'absolute',

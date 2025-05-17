@@ -10,13 +10,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     }
   },
-  server: {
-    proxy: {
-      '/deepl': {
-        target: 'https://api.deepl.com',
-        changeOrigin: true,
-        rewrite: path => path.replace(/^\/deepl/, ''), 
-      }
-    }
-  }
 })

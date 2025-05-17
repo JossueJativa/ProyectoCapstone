@@ -32,6 +32,7 @@ export const CreateDesk = () => {
         if (newDesk.number && newDesk.capacity) {
             await createDesk({
                 number: Number(newDesk.number),
+<<<<<<< HEAD
                 capacity: Number(newDesk.capacity),
                 id: 0
             });
@@ -39,6 +40,12 @@ export const CreateDesk = () => {
             if (deskResponse.length > 0) {
                 setNewDesk({ number: '', capacity: '' });
             }
+=======
+                capacity: Number(newDesk.capacity)
+            });
+            setNewDesk({ number: '', capacity: '' });
+            const deskResponse = await getDesk();
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
             const sortedDesks = deskResponse.sort((a: any, b: any) => a.desk_number - b.desk_number);
             setDesk(sortedDesks);
         }

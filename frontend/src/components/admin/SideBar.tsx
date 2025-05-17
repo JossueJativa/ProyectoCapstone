@@ -50,7 +50,14 @@ export const SideBar = ({ onMonthChange }: SideBarProps) => {
         }
     };
 
+<<<<<<< HEAD
     const renderMenuItems = (navigate: ReturnType<typeof useNavigate>, currentPath: string) => (
+=======
+    const renderMenuItems = (
+        navigate: ReturnType<typeof useNavigate>,
+        currentPath: string
+    ) => (
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
         [
             { key: 'Dashboard', icon: <Dashboard />, text: 'Dashboard', route: '/admin/dashboard' },
             { key: 'Mesas', icon: <DeskOutlined />, text: 'Mesas', route: '/admin/desk' },

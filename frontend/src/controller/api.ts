@@ -8,7 +8,11 @@ class API {
     private headers: object;
 
     constructor() {
+<<<<<<< HEAD
         this.url = "https://bistroalpasoar.com";
+=======
+        this.url = "http://bistroalpasoar.com/api";
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
         this.url_api = `${this.url}/api`;
         this.token = `Bearer ${localStorage.getItem('access_token')}`;
         this.headers = {

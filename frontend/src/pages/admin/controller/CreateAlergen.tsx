@@ -31,10 +31,14 @@ export const CreateAlergen = () => {
 
     const handleCreateAllergen = async () => {
         if (newAllergen.name) {
+<<<<<<< HEAD
             await createAllergen({
                 name: newAllergen.name,
                 id: 0
             });
+=======
+            await createAllergen(newAllergen);
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
             setNewAllergen({ name: '' });
             const response = await getAllergens();
             setAllergen(response);

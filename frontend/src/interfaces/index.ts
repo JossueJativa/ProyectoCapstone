@@ -19,6 +19,7 @@ export type {
     IIngredientData,
     IDishData,
     IOrderData,
+    IInvoicing,
     IInvoicingData,
     IOrder,
     IInvoicing

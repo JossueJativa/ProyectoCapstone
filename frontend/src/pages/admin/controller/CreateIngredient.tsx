@@ -60,6 +60,7 @@ export const CreateIngredient = () => {
             alert('Debe ingresar un nombre y seleccionar al menos un alérgeno.');
             return;
         }
+<<<<<<< HEAD
         const data: IIngredientData = {
             name: newIngredient.name,
             allergens: newIngredient.allergens.map(String),
@@ -70,6 +71,16 @@ export const CreateIngredient = () => {
         if (response.length > 0) {
             setNewIngredient({ name: '', allergens: [] });
         }
+=======
+        const data = {
+            name: newIngredient.name,
+            quantity: 0,
+            allergens: newIngredient.allergens.map(String)
+        };
+        await createIngredient(data);
+        setNewIngredient({ name: '', allergens: [] });
+        const response = await getIngredients();
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
         setIngredient(response);
     };
 
@@ -81,7 +92,12 @@ export const CreateIngredient = () => {
         const data: IIngredientData = {
             id: selectedIngredient.id,
             name: newIngredient.name,
+<<<<<<< HEAD
             allergens: newIngredient.allergens.map(String),
+=======
+            quantity: selectedIngredient.quantity || 0, // Default quantity if not provided
+            allergens: newIngredient.allergens.map(String)
+>>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
         };
         await updateIngredient(data);
         setNewIngredient({ name: '', allergens: [] });
