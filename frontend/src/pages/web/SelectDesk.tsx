@@ -47,7 +47,7 @@ export const SelectDesk = () => {
                     justifyItems: 'center',
                     gap: '10px',
                     backgroundColor: 'white',
-                    borderRadius: theme.shape.borderRadius,
+                    borderRadius: theme.button.border.corners,
                     marginTop: '20px',
                     padding: '10px',
                     width: '100%'
@@ -69,7 +69,7 @@ export const SelectDesk = () => {
                                     alignItems: 'center',
                                     padding: '10px',
                                     border: isSelected ? `3px solid black` : `none`,
-                                    borderRadius: theme.shape.borderRadius,
+                                    borderRadius: theme.button.border.corners,
                                     margin: '5px',
                                     backgroundColor: deskColor,
                                     color: 'white',
@@ -99,7 +99,7 @@ export const SelectDesk = () => {
                 {
                     selectedDesk !== null && (
                         <Box sx={{
-                            borderRadius: theme.shape.borderRadius,
+                            borderRadius: theme.button.border.corners,
                             borderTop: '2px solid white',
                             padding: '10px',
                         }}>

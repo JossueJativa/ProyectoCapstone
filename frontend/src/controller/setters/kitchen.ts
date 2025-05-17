@@ -46,11 +46,11 @@ const createIngredient = async (data: IIngredientData): Promise<any> => {
 }
 
 const createGarrison = async (data: any): Promise<any> => {
-    const { name, dishesIds } = data;
+    const { garrison_name, dish } = data;
     const api = new API();
     const response = await api.post('/garrison', {
-        garrison_name: name,
-        dish: dishesIds
+        garrison_name,
+        dish
     });
     return response?.data;
 }

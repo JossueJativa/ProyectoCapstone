@@ -64,7 +64,9 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                         fontSize: theme.customTypography.body1.fontSize,
                         fontWeight: theme.customTypography.title.fontWeight,
                     }}
-                >${price.toFixed(2)}</Typography>
+                >
+                    ${typeof price === 'number' ? price.toFixed(2) : (Number(price) ? Number(price).toFixed(2) : '0.00')}
+                </Typography>
             </Box>
 
             {/* Descripción */}
@@ -79,7 +81,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                     alignItems: "center",
                     mb: 2,
                     height: "200px",
-                    borderRadius: theme.shape.borderRadius,
+                    borderRadius: theme.button.border.corners,
                     cursor: "pointer",
                     overflow: "hidden",
                     backgroundColor: theme.background.secondary,

@@ -3,13 +3,11 @@ import { verifyToken } from './auth';
 
 class API {
     private url: string;
-    private url_api: string;
     private token: string;
     private headers: object;
 
     constructor() {
-        this.url = "http://bistroalpasoar.com/api";
-        this.url_api = `${this.url}/api`;
+        this.url = "https://bistroalpasoar.com/api";
         this.token = `Bearer ${localStorage.getItem('access_token')}`;
         this.headers = {
             "Content-Type": "application/json"
@@ -44,7 +42,7 @@ class API {
         try {
             return await axios({
                 method,
-                url: `${this.url_api}${url}/`,
+                url: `${this.url}${url}/`,
                 data,
                 headers: {
                     ...this.headers,

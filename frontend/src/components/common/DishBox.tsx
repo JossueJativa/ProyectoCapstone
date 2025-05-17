@@ -105,7 +105,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
           ref={ref}
           sx={{
             backgroundColor: theme.background.primary,
-            borderRadius: theme.shape.borderRadius,
+            borderRadius: theme.button.border.corners,
             padding: "10px",
           }}
         >
@@ -148,7 +148,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
                   fontWeight: theme.customTypography.title.fontWeight,
                 }}
               >
-                $ {price.toFixed(2)}
+                $ {typeof price === 'number' ? price.toFixed(2) : (Number(price) ? Number(price).toFixed(2) : '0.00')}
               </Typography>
             </Grid>
           </Grid>
@@ -158,7 +158,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
             {...(linkTo && { onClick: () => navigate(linkTo) })}
             sx={{
               pb: 2,
-              borderRadius: theme.shape.borderRadius,
+              borderRadius: theme.button.border.corners
             }}
           >
             <Typography
@@ -180,7 +180,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
               alignItems: "center",
               mb: 2,
               height: "200px",
-              borderRadius: theme.shape.borderRadius,
+              borderRadius: theme.button.border.corners,
               cursor: "pointer",
               overflow: "hidden",
               backgroundColor: theme.background.secondary,

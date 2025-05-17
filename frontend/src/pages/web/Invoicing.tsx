@@ -85,7 +85,7 @@ export const Invoicing = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 backgroundColor: theme.background.primary,
-                                borderRadius: theme.shape.borderRadius,
+                                borderRadius: theme.button.border.corners,
                             }}>
                                 <Typography variant="h6" sx={{
                                     fontSize: theme.typography.body1.fontSize,
@@ -102,7 +102,7 @@ export const Invoicing = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         border: `1px solid white`,
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         padding: '10px',
                         marginBottom: '20px',
                     }}>
@@ -144,7 +144,7 @@ export const Invoicing = () => {
                                 alignItems: 'center',
                                 marginBottom: '5px',
                                 border: `1px solid white`,
-                                borderRadius: theme.shape.borderRadius,
+                                borderRadius: theme.button.border.corners,
                                 backgroundColor: theme.background.primary,
                             }}>
                                 <Typography variant="body1" sx={{ fontWeight: 'bold', flex: 2 }}>
@@ -178,7 +178,7 @@ export const Invoicing = () => {
                     bottom: '0',
                 }}>
                     <Box sx={{
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         borderTop: '2px solid white',
                         padding: '10px',
                     }}>

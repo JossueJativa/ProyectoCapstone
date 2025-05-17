@@ -41,6 +41,7 @@ export const CategoriesList = ({ categories, onCategorySelect, selectedCategory 
                         backgroundColor: selectedCategory === category.id ? theme.button.verde : theme.button.transparente,
                         borderRadius: '8px',
                         cursor: 'pointer',
+                        border: `1px solid ${theme.button.verde}`,
                     }}
                 >
                     <h3>{category.category_name}</h3>

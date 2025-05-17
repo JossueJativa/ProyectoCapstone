@@ -81,10 +81,10 @@ export const DishSelected = () => {
         <>
             <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>
                 <DishBox
-                    name={dish.name}
+                    name={dish.dish_name}
                     price={dish.price}
                     description={dish.description}
-                    linkAR={dish.linkAR}
+                    linkAR={dish.link_ar}
                     linkTo={null}
                     allergens={allergens}
                     dish_id={dish.dish_id}
@@ -98,7 +98,7 @@ export const DishSelected = () => {
                 pb: '40px',
             }}>
                 <Box sx={{
-                    borderRadius: theme.shape.borderRadius,
+                    borderRadius: theme.button.border.corners,
                     borderTop: '2px solid white',
                     padding: '10px',
                 }}>

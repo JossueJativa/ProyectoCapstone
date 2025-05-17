@@ -94,7 +94,8 @@ export const Menu = () => {
 
     const handleCategorySelect = async (categoryId: string) => {
         try {
-            if (selectedCategory === categoryId) {
+            if (!categoryId || selectedCategory === categoryId) {
+                // Si no hay categoría seleccionada o se deselecciona, mostrar todos los platos
                 const lang = language === "en" ? "EN-GB" : "ES";
                 const dishesList = await getDishes(lang);
                 const dishesWithAllergens = await Promise.all(
@@ -105,11 +106,19 @@ export const Menu = () => {
                 );
                 setDishes(dishesWithAllergens);
                 setVisibleDishes(10);
-                setSelectedCategory('');
+                setSelectedCategory(null);
             } else {
-                const dishesList = await getDishes();
-                const filteredDishes = dishesList.filter((dish: { category: number | string; }) => String(dish.category) === categoryId);
-                setDishes(filteredDishes);
+                // Filtrar por categoría usando el id
+                const lang = language === "en" ? "EN-GB" : "ES";
+                const dishesList = await getDishes(lang);
+                const filteredDishes = dishesList.filter((dish: { category: string | number }) => String(dish.category) === String(categoryId));
+                const dishesWithAllergens = await Promise.all(
+                    filteredDishes.map(async (d: any) => {
+                        const allergens = await getAllergensByDish(String(d.id));
+                        return { ...d, allergens };
+                    })
+                );
+                setDishes(dishesWithAllergens);
                 setVisibleDishes(10);
                 setSelectedCategory(categoryId);
             }
@@ -130,7 +139,7 @@ export const Menu = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             backgroundColor: theme.background.primary,
-                            borderRadius: theme.shape.borderRadius,
+                            borderRadius: theme.button.border.corners
                         }}>
                             <Typography variant="h6" sx={{
                                 fontSize: theme.typography.body1.fontSize,
