@@ -17,11 +17,11 @@ class Server {
         this.port = process.env.PORT || '3000';
         this.server = http.createServer(this.app);
         this.io = new ServerSocket(this.server, {
-            path: "/ws/socket.io", // 👈 IMPORTANTE para que coincida con Nginx
+            path: "/ws/socket.io",
             cors: {
-                origin: "http://bistroalpasoar.com"
-            },
-            transports: ["websocket"]
+                origin: ["https://bistroalpasoar.com", "http://localhost:5173"], // agrega tus orígenes permitidos
+                methods: ["GET", "POST"]
+            }
         });
 
         this.middlewares();
