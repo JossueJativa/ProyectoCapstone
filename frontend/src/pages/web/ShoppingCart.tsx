@@ -268,7 +268,7 @@ export const ShoppingCart = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 backgroundColor: theme.background.primary,
-                                borderRadius: theme.shape.borderRadius,
+                                borderRadius: theme.button.border.corners,
                             }}>
                                 <Typography variant="h6" sx={{
                                     fontSize: theme.typography.body1.fontSize,
@@ -286,7 +286,7 @@ export const ShoppingCart = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         border: `1px solid white`,
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         padding: '10px',
                         marginBottom: '20px',
                     }}>
@@ -330,7 +330,7 @@ export const ShoppingCart = () => {
                     mb: '29px',
                 }}>
                     <Box sx={{
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         borderTop: '2px solid white',
                         padding: '10px',
                     }}>
@@ -370,7 +370,7 @@ export const ShoppingCart = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 backgroundColor: theme.background.primary,
-                                borderRadius: theme.shape.borderRadius,
+                                borderRadius: theme.button.border.corners,
                             }}>
                                 <Typography variant="h6" sx={{
                                     fontSize: theme.typography.body1.fontSize,
@@ -388,7 +388,7 @@ export const ShoppingCart = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         border: `1px solid white`,
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         padding: '10px',
                         marginBottom: '20px',
                     }}>
@@ -450,7 +450,7 @@ export const ShoppingCart = () => {
                     bottom: '0',
                 }}>
                     <Box sx={{
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         borderTop: '2px solid white',
                         padding: '10px',
                     }}>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Container, useTheme } from '@mui/material';
+import { Box, Container, Typography, useTheme } from '@mui/material';
 import { Restaurant } from '@mui/icons-material';
 
 import { IconText, ButtonType, LabelText } from '@/components';
@@ -41,13 +41,21 @@ export const SelectDesk = () => {
                 <IconText icon={<Restaurant />} text={texts.tables.welcome} />
 
                 {/* Mostrar las mesas */}
+                <Typography variant="h6" sx={{
+                    color: theme.menu.black,
+                    fontSize: theme.typography.body1.fontSize,
+                    fontWeight: theme.typography.body1.fontWeight,
+                    marginTop: '20px',
+                }}>
+                    {texts.tables.select}
+                </Typography>
                 <Container sx={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
                     justifyItems: 'center',
                     gap: '10px',
                     backgroundColor: 'white',
-                    borderRadius: theme.shape.borderRadius,
+                    borderRadius: theme.button.border.corners,
                     marginTop: '20px',
                     padding: '10px',
                     width: '100%'
@@ -69,7 +77,7 @@ export const SelectDesk = () => {
                                     alignItems: 'center',
                                     padding: '10px',
                                     border: isSelected ? `3px solid black` : `none`,
-                                    borderRadius: theme.shape.borderRadius,
+                                    borderRadius: theme.button.border.corners,
                                     margin: '5px',
                                     backgroundColor: deskColor,
                                     color: 'white',
@@ -99,7 +107,7 @@ export const SelectDesk = () => {
                 {
                     selectedDesk !== null && (
                         <Box sx={{
-                            borderRadius: theme.shape.borderRadius,
+                            borderRadius: theme.button.border.corners,
                             borderTop: '2px solid white',
                             padding: '10px',
                         }}>

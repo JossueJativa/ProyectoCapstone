@@ -72,7 +72,7 @@ export const DivideInvoice = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 backgroundColor: theme.background.primary,
-                                borderRadius: theme.shape.borderRadius,
+                                borderRadius: theme.button.border.corners,
                             }}>
                                 <Typography variant="h6" sx={{
                                     fontSize: theme.typography.body1.fontSize,
@@ -88,7 +88,7 @@ export const DivideInvoice = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         border: `1px solid white`,
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         padding: '10px',
                         marginBottom: '20px',
                     }}>
@@ -122,7 +122,7 @@ export const DivideInvoice = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         border: `1px solid white`,
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         padding: '10px',
                         marginBottom: '20px',
                     }}>
@@ -214,7 +214,7 @@ export const DivideInvoice = () => {
                     bottom: '0',
                 }}>
                     <Box sx={{
-                        borderRadius: theme.shape.borderRadius,
+                        borderRadius: theme.button.border.corners,
                         borderTop: '2px solid white',
                         padding: '10px',
                     }}>

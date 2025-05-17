@@ -39,8 +39,10 @@ const getAllergensByDish = async(dishId: string) => {
 const getGarrisonsByDish = async(dishId: string, lang: string = 'ES') => {
     const api = new API();
     const response = await api.get(`/garrison?lang=${lang.toUpperCase()}`);
-
-    const garrisonDish = response?.data.filter((garrison: any) => garrison.dish.includes(dishId));
+    // Filtra correctamente convirtiendo ambos a string
+    const garrisonDish = response?.data.filter((garrison: any) =>
+        garrison.dish.map(String).includes(String(dishId))
+    );
     const garrisonReturn = garrisonDish.map((garrison: any) => {
         return {
             id: garrison.id,

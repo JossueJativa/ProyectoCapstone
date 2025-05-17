@@ -5,6 +5,5 @@ export {
     GetUserAuth
 } from './authentication';
 export { 
-    verifyToken, 
     verifyResponseStatusCode
 } from './verification';

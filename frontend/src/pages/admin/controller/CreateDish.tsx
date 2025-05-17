@@ -28,7 +28,7 @@ export const CreateDish = () => {
     };
 
     const filteredDishes = dishes.filter((dish) =>
-        dish.name.toLowerCase().includes(dishSearchTerm.toLowerCase())
+        dish.dish_name.toLowerCase().includes(dishSearchTerm.toLowerCase())
     );
 
     const filteredIngredients = ingredients.filter((ing) =>
@@ -107,7 +107,7 @@ export const CreateDish = () => {
             dish_name: newDish.name, // necesario para updateDish
             name: newDish.name,
             description: newDish.description,
-            time_elaboration: Number(newDish.time_elaboration),
+            time_elaboration: newDish.time_elaboration,
             price: Number(newDish.price),
             link_ar: newDish.link_ar,
             ingredients: newDish.ingredients,
@@ -351,7 +351,7 @@ export const CreateDish = () => {
                                     }}
                                     onClick={() => handleDishClick(dish)}
                                 >
-                                    <p><strong>{dish.name}</strong></p>
+                                    <p><strong>{dish.dish_name}</strong></p>
                                     <Delete
                                         sx={{
                                             position: 'absolute',
