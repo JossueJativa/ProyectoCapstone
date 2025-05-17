@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material';
 
 interface ExtendedCategoriesListProps extends CategoriesListProps {
     onCategorySelect: (categoryId: string) => void;
-    selectedCategory: string;
+    selectedCategory: string | null;
 }
 
 export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: ExtendedCategoriesListProps) => {

@@ -16,11 +16,7 @@ export const Menu = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [visibleDishes, setVisibleDishes] = useState<number>(10);
     const [deskId, setDeskId] = useState<string | null>(null);
-<<<<<<< HEAD
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-=======
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -111,22 +107,9 @@ export const Menu = () => {
                 setVisibleDishes(10);
                 setSelectedCategory('');
             } else {
-<<<<<<< HEAD
                 const dishesList = await getDishes();
                 const filteredDishes = dishesList.filter((dish: { category: number | string; }) => String(dish.category) === categoryId);
                 setDishes(filteredDishes);
-=======
-                const lang = language === "en" ? "EN-GB" : "ES";
-                const dishesList = await getDishes(lang);
-                const filteredDishes = dishesList.filter((dish: any) => String(dish.category) === categoryId);
-                const dishesWithAllergens = await Promise.all(
-                    filteredDishes.map(async (d: any) => {
-                        const allergens = await getAllergensByDish(String(d.id));
-                        return { ...d, allergens };
-                    })
-                );
-                setDishes(dishesWithAllergens);
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                 setVisibleDishes(10);
                 setSelectedCategory(categoryId);
             }
@@ -175,11 +158,7 @@ export const Menu = () => {
                                     linkTo={`/dish/${d.id}?desk_id=${deskId}`}
                                     dish_id={d.id}
                                     has_garrison={d.has_garrison}
-<<<<<<< HEAD
                                     allergens={null}
-=======
-                                    allergens={d.allergens || []}
->>>>>>> 24a2e6b7b01bd1ed706a6b31422c051b23dea57f
                                 />
                             </Fade>
                         </Grid>
