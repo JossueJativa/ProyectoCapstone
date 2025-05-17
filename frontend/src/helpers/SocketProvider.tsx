@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     const location = useLocation();
 
     useEffect(() => {
-        const socketInstance = io("https://bistroalpasoar.com/ws", {
+        const socketInstance = io("https://bistroalpasoar.com", {
             path: "/ws/socket.io",
             transports: ["websocket"],
             reconnectionAttempts: 3,
