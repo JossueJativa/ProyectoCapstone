@@ -60,9 +60,9 @@ export const AllergensList: React.FC<IAllergensListProps> = ({
                 <Typography
                     variant="body1"
                     sx={{
-                        color: "black", // Replace with theme color if needed
-                        fontSize: "1rem", // Replace with theme typography if needed
-                        fontWeight: "bold", // Replace with theme typography if needed
+                        color: "black",
+                        fontSize: "1rem",
+                        fontWeight: "bold",
                     }}
                 >
                     {texts.labels.allergens}:

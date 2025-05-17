@@ -8,6 +8,9 @@ import {
 } from 'recharts';
 import { SideBar, BoxData } from '@/components';
 import { getDashboardInformation } from '@/controller';
+import { getOrderDishByOrderId } from '@/controller/getters/getByDish';
+import { getDish } from '@/controller/getters/getByDish';
+import { getCategories, getOrders } from '@/controller/getters/getInformation';
 import { IOrder } from '@/interfaces';
 
 export const Dashboard = () => {
@@ -29,12 +32,12 @@ export const Dashboard = () => {
 
                 setTotalDishes(dashboard_statistics.total_dishes);
                 setTotalRevenue(dashboard_statistics.total_revenue);
-                setAverageDishesPerTable(dashboard_statistics.average_dishes_per_table);
-                setDishes(dashboard_statistics.dishes.map(dish => ({
+                setAverageDishesPerTable(Number(dashboard_statistics.average_dishes_per_table));
+                setDishes(dashboard_statistics.dishes.map((dish: any) => ({
                     name: dish.dish__dish_name,
                     count: dish.count
                 })));
-                setCategories(dashboard_statistics.categories.map(category => ({
+                setCategories(dashboard_statistics.categories.map((category: any) => ({
                     name: category.dish__category__category_name,
                     count: category.count
                 })));
@@ -50,7 +53,7 @@ export const Dashboard = () => {
         const fetchOrders = async () => {
             try {
                 const year = new Date().getFullYear();
-                const responseData = await getDashboardInformation( year, selectedMonth );
+                await getDashboardInformation(year, selectedMonth);
                 const response = await getOrders(selectedMonth);
                 setOrders(response);
             } catch (error) {
@@ -81,7 +84,7 @@ export const Dashboard = () => {
 
                 setTotalDishes(totalDishes);
                 setTotalRevenue(totalRevenue);
-                setAverageDishesPerTable(averageDishesPerTable);
+                setAverageDishesPerTable(Number(averageDishesPerTable));
 
                 const dishCounts: Record<string, number> = {};
                 for (const order of filteredOrders) {
@@ -104,7 +107,7 @@ export const Dashboard = () => {
 
                 const categoryCounts: Record<string, number> = {};
                 const categoriesData = await getCategories();
-                const categoryMap = categoriesData.reduce((map, category) => {
+                const categoryMap = categoriesData.reduce((map: Record<number, string>, category: any) => {
                     map[category.id] = category.category_name;
                     return map;
                 }, {} as Record<number, string>);
@@ -202,25 +205,25 @@ export const Dashboard = () => {
                             <BoxData>
                                 <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%' }}>
                                     <Typography variant="h6" sx={{ marginBottom: '20px' }}>Categorías Más Compradas</Typography>
-                                    <ResponsiveContainer width="100%" height={200}> {/* Ajuste de altura */}
+                                    <ResponsiveContainer width="100%" height={200}>
                                         <PieChart>
                                             <Pie
                                                 data={categories}
                                                 dataKey="count"
                                                 nameKey="name"
-                                                cx="50%" // Centrar el gráfico horizontalmente
-                                                cy="50%" // Centrar el gráfico verticalmente
-                                                outerRadius={80} // Ajuste del radio
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius={80}
                                                 fill="#8884d8"
-                                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} // Mostrar nombre y porcentaje
+                                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                                             >
-                                                {categories.map((entry, index) => (
+                                                {categories.map((_entry: any, index: number) => (
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Legend layout="vertical" align="left" />
                                         </PieChart>
                                     </ResponsiveContainer>
+                                    <Legend layout="vertical" align="left" />
                                 </Box>
                             </BoxData>
                         </Grid>

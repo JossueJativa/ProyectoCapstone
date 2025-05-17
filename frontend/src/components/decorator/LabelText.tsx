@@ -5,24 +5,24 @@ import { ILabelTextProps } from '@/interfaces';
 export const LabelText: FC<ILabelTextProps> = ({ typeText = 'title', text }) => {
     const theme = useTheme();
 
-    // Define a mapping of supported types to MUI typography variants
-    const variantMapping = {
+    const variantMapping: Record<'title' | 'subtitle' | 'body1' | 'body2', 'h4' | 'h6' | 'body1' | 'body2'> = {
         title: 'h4',
         subtitle: 'h6',
         body1: 'body1',
         body2: 'body2',
     };
 
-    // Get the corresponding variant or default to 'h4'
-    const variant = variantMapping[typeText] || 'h4';
+    const variant: 'h4' | 'h6' | 'body1' | 'body2' = variantMapping[typeText] || 'h4';
+
+    const customTypographyKey = typeText as keyof typeof theme.customTypography;
 
     return (
         <Typography
             variant={variant}
             sx={{
                 color: 'black',
-                fontWeight: theme.typography[variant]?.fontWeight,
-                fontSize: theme.typography[variant]?.fontSize,
+                fontWeight: theme.customTypography[customTypographyKey]?.fontWeight,
+                fontSize: theme.customTypography[customTypographyKey]?.fontSize,
                 textAlign: 'center',
             }}
         >

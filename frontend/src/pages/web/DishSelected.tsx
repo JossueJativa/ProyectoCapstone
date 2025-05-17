@@ -38,7 +38,7 @@ export const DishSelected = () => {
     useEffect(() => {
         const fetchDish = async () => {
             const lang = language === "en" ? "EN-GB" : "ES";
-            const dish = await getDish(dishId, lang);
+            const dish = await getDish(String(dishId), lang);
             setDish(dish);
         };
         fetchDish();
@@ -47,8 +47,7 @@ export const DishSelected = () => {
     useEffect(() => {
         const fetchAllergens = async () => {
             if (dish) {
-                const lang = language === "en" ? "EN-GB" : "ES";
-                const allergens = await getAllergensByDish(dishId);
+                const allergens = await getAllergensByDish(String(dishId));
                 setAllergens(allergens);
             }
         }
@@ -88,6 +87,7 @@ export const DishSelected = () => {
                     allergens={allergens}
                     dish_id={dish.id}
                     has_garrison={dish.has_garrison}
+                    linkTo={null}
                 />
             </Box>
             <Box sx={{
@@ -101,9 +101,9 @@ export const DishSelected = () => {
                     borderTop: '2px solid white',
                     padding: '10px',
                 }}>
-                    <ButtonType 
-                        text={texts.buttons.back} 
-                        typeButton="outlined" 
+                    <ButtonType
+                        text={texts.buttons.back}
+                        typeButton="outlined"
                         urlLink={`/menu?desk_id=${deskId || ''}`} // Use urlLink instead of navigate
                     />
                 </Box>

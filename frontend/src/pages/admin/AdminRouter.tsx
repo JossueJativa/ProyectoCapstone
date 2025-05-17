@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { Login } from './auth';
 import { 
-    Home, Dashboard, 
+    Dashboard, 
     CreateDesk, CreateAlergen,
     CreateCategories, CreateGarrisons,
     CreateIngredient, CreateInvoices,
@@ -13,7 +13,6 @@ export const AdminRouter = () => {
     return (
         <Routes>
             <Route path="" element={<Login />} />
-            <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
             <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
             <Route path="/desk" element={<ProtectedRoute element={<CreateDesk />} />} />
             <Route path="/allergen" element={<ProtectedRoute element={<CreateAlergen />} />} />

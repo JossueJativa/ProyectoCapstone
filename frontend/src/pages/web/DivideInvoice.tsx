@@ -35,7 +35,7 @@ export const DivideInvoice = () => {
 
         if (id) { // Verifica que el ID de la factura exista
             const fetchData = async () => {
-                const orderDishes = await getOrderDishByOrderId(id);
+                const orderDishes = await getOrderDishByOrderId(Number(id));
                 setOrder(orderDishes);
             };
             fetchData();
@@ -98,8 +98,8 @@ export const DivideInvoice = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontSize: theme.customTypography.body1.fontSize,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 {totalQuantity}
                             </Typography>
@@ -110,8 +110,8 @@ export const DivideInvoice = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontSize: theme.customTypography.body1.fontSize,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 ${totalPrice.toFixed(2)}
                             </Typography>
@@ -195,13 +195,13 @@ export const DivideInvoice = () => {
                                 borderRadius: theme.button.border.corners,
                                 '& .MuiOutlinedInput-root': {
                                     '& fieldset': {
-                                        borderColor: theme.button.border.color,
+                                        borderColor: theme.button.cafeMedio,
                                     },
                                     '&:hover fieldset': {
-                                        borderColor: theme.button.border.color,
+                                        borderColor: theme.button.cafeMedio,
                                     },
                                     '&.Mui-focused fieldset': {
-                                        borderColor: theme.button.border.color,
+                                        borderColor: theme.button.cafeMedio,
                                     },
                                 },
                             }}

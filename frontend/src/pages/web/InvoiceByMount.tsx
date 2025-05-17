@@ -24,7 +24,7 @@ export const InvoiceByMount = () => {
 
         if (id) { // Verifica que el ID de la factura exista
             const fetchData = async () => {
-                const orderDishes = await getOrderDishByOrderId(id);
+                const orderDishes = await getOrderDishByOrderId(id ? parseInt(id, 10) : 0);
                 setOrder(orderDishes);
             };
             fetchData();
@@ -36,8 +36,8 @@ export const InvoiceByMount = () => {
         const divide = parseInt(params.get("divide") || '0', 10);
 
         if (divide > 0 && order) {
-            const totalQuantity = order.reduce((acc, dish) => acc + (dish.quantity || 0), 0);
-            const totalPrice = order.reduce((acc, dish) => acc + ((dish.quantity || 0) * (dish.dish?.price || 0)), 0);
+            const totalQuantity = order.reduce((acc: number, dish: any) => acc + (dish.quantity || 0), 0);
+            const totalPrice = order.reduce((acc: number, dish: any) => acc + ((dish.quantity || 0) * (dish.dish?.price || 0)), 0);
             const amountPerPerson = totalPrice / divide;
 
             const divisions = Array.from({ length: divide }, (_, i) => ({
@@ -75,8 +75,8 @@ export const InvoiceByMount = () => {
                 const invoiceNumber = `${invoiceNumberBase}-${i + 1}`;
                 const invoiceData: IInvoicing = {
                     invoiceId: parseInt(invoiceNumber, 10),
-                    totalPrice: parseFloat(amountPerPerson.toFixed(2)), // Asegurarse de que sea un número válido
-                    orderId: parseInt(id, 10),
+                    totalPrice: parseFloat(amountPerPerson.toFixed(2)),
+                    orderId: parseInt(id || '0', 10),
                 };
     
                 const createdInvoice = await createInvoice(invoiceData);
@@ -115,11 +115,6 @@ export const InvoiceByMount = () => {
         }
     };
 
-    const handlePopupClose = () => {
-        setPopupOpen(false);
-        window.location.href = `/menu?desk_id=${deskId || ''}`;
-    };
-
     return (
         <>
             <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '90vh' }}>
@@ -136,8 +131,8 @@ export const InvoiceByMount = () => {
                                 borderRadius: theme.shape.borderRadius,
                             }}>
                                 <Typography variant="h6" sx={{
-                                    fontSize: theme.typography.body1.fontSize,
-                                    fontWeight: theme.typography.body1.fontWeight,
+                                    fontSize: theme.customTypography.body1.fontSize,
+                                    fontWeight: theme.customTypography.body1.fontWeight,
                                     padding: '3px',
                                 }}>
                                     {deskId ? `${texts.labels.desk}: ${deskId}` : `${texts.labels.noDesk}`}
@@ -159,8 +154,8 @@ export const InvoiceByMount = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontSize: theme.customTypography.body1.fontSize,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 {total.totalQuantity}
                             </Typography>
@@ -171,8 +166,8 @@ export const InvoiceByMount = () => {
                             </Typography>
                             <Typography variant="body1" sx={{
                                 color: theme.button.cafeMedio,
-                                fontSize: theme.typography.body1.fontSize,
-                                fontWeight: theme.typography.title.fontWeight,
+                                fontSize: theme.customTypography.body1.fontSize,
+                                fontWeight: theme.customTypography.title.fontWeight,
                             }}>
                                 ${total.totalPrice.toFixed(2)}
                             </Typography>
@@ -200,8 +195,8 @@ export const InvoiceByMount = () => {
                                     {texts.labels.totalAmount}:
                                     <span style={{
                                         color: theme.button.cafeMedio,
-                                        fontSize: theme.typography.body1.fontSize,
-                                        fontWeight: theme.typography.title.fontWeight,
+                                        fontSize: theme.customTypography.body1.fontSize,
+                                        fontWeight: theme.customTypography.title.fontWeight,
                                     }}>${division.amount}</span>
                                 </Typography>
                             </Box>
@@ -243,7 +238,6 @@ export const InvoiceByMount = () => {
                 message={texts.labels.invoiceCreatedMessage}
                 isInformative
                 redirect={`/menu?desk_id=${deskId || ''}`}
-                onClose={handlePopupClose}
             />
         </>
     )

@@ -33,7 +33,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         quantity: 1,
         desk_id: desk_id,
         garrisons: null
-      }, (error: any, response: any) => {
+      }, (error: any) => {
         if (error) {
           return;
         }
@@ -67,7 +67,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         desk_id: desk_id,
         garrison: parseIdGarrisons
       },
-        (error: any, response: any) => {
+        (error: any) => {
           if (error) {
             console.error("Error adding dish with garrisons:", error);
             return;
@@ -83,7 +83,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
       const fetchGarrisons = async () => {
         if (has_garrison) {
           const lang = language === "en" ? "EN-GB" : "ES";
-          const garrisons = await getGarrisonsByDish(dish_id, lang);
+          const garrisons = await getGarrisonsByDish(String(dish_id), lang);
           setGarrisons(garrisons);
         }
       };
@@ -125,7 +125,7 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
                 sx={{
                   color: theme.menu.black,
                   fontSize: "1.2rem",
-                  fontWeight: theme.typography.title.fontWeight,
+                  fontWeight: theme.customTypography.title.fontWeight,
                 }}
               >
                 {name}
@@ -144,8 +144,8 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
                 variant="h6"
                 sx={{
                   color: theme.button.cafeMedio,
-                  fontSize: theme.typography.body1.fontSize,
-                  fontWeight: theme.typography.title.fontWeight,
+                  fontSize: theme.customTypography.body1.fontSize,
+                  fontWeight: theme.customTypography.title.fontWeight,
                 }}
               >
                 $ {price.toFixed(2)}
@@ -165,8 +165,8 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
               variant="body1"
               sx={{
                 color: theme.menu.black,
-                fontSize: theme.typography.body1.fontSize,
-                fontWeight: theme.typography.body1.fontWeight,
+                fontSize: theme.customTypography.body1.fontSize,
+                fontWeight: theme.customTypography.body1.fontWeight,
               }}
             >
               {description}
@@ -271,8 +271,10 @@ export const DishBox = React.forwardRef<HTMLDivElement, IDishBoxProps>(
         {/* PopUpInformation */}
         <PopUpInformation
           open={popupOpen}
-          title={texts.popups.select}
+          title={texts.labels.selectGarrison}
+          message={texts.labels.selectGarrison}
           isInformative={false}
+          redirect={""}
         >
           {/* Poner los garrisons */}
           <Box

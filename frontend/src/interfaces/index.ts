@@ -6,7 +6,9 @@ export type {
     IButtonTypeProps,
     ICartBoxProps,
     IDishBoxProps,
-    ILabelTextProps
+    ILabelTextProps,
+    CategoriesListProps,
+    Category
 } from './components';
 export type { 
     ICartContextProps 
@@ -18,5 +20,6 @@ export type {
     IDishData,
     IOrderData,
     IInvoicingData,
-    IOrder
+    IOrder,
+    IInvoicing
 } from './controller';

@@ -11,7 +11,7 @@ export const CreateAlergen = () => {
     const theme = useTheme();
     const [allergen, setAllergen] = useState<any[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<number>(1);
-    const [newAllergen, setNewAllergen] = useState({ allergen_name: '' });
+    const [newAllergen, setNewAllergen] = useState<{ name: string }>({ name: '' });
     const [selectedAllergen, setSelectedAllergen] = useState<any | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,8 +21,8 @@ export const CreateAlergen = () => {
     );
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNewAllergen({ ...newAllergen, [name]: value });
+        const { value } = e.target;
+        setNewAllergen({ name: value });
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,51 +30,54 @@ export const CreateAlergen = () => {
     };
 
     const handleCreateAllergen = async () => {
-        if (newAllergen.allergen_name) {
-            await createAllergen(newAllergen);
+        if (newAllergen.name) {
+            await createAllergen({
+                name: newAllergen.name,
+                id: 0
+            });
             setNewAllergen({ name: '' });
-            const response = await getAllergens(selectedMonth);
-            setAllergen(response.data);
+            const response = await getAllergens();
+            setAllergen(response);
         }
     };
 
     const handleUpdateAllergen = async () => {
-        if (selectedAllergen && newAllergen.allergen_name) {
+        if (selectedAllergen && newAllergen.name) {
             const data = {
                 id: selectedAllergen.id,
-                name: newAllergen.allergen_name
+                name: newAllergen.name
             };
             await updateAllergen(data);
-            setNewAllergen({ allergen_name: '' });
+            setNewAllergen({ name: '' });
             setSelectedAllergen(null);
             setIsEditing(false);
-            const response = await getAllergens(selectedMonth);
-            setAllergen(response || []);
+            const response = await getAllergens();
+            setAllergen(response);
         }
     };
 
     const handleDeleteAllergen = async (id: number) => {
         await deleteAllergen(id);
-        const response = await getAllergens(selectedMonth);
-        setAllergen(response || []);
+        const response = await getAllergens();
+        setAllergen(response);
     };
 
     const handleAllergenClick = (allergen: any) => {
-        setNewAllergen({ allergen_name: allergen.allergen_name });
+        setNewAllergen({ name: allergen.allergen_name });
         setSelectedAllergen(allergen);
         setIsEditing(true);
     };
 
     const handleCancelEdit = () => {
-        setNewAllergen({ allergen_name: '' });
+        setNewAllergen({ name: '' });
         setSelectedAllergen(null);
         setIsEditing(false);
     };
 
     useEffect(() => {
         const fetchAllergen = async () => {
-            const response = await getAllergens(selectedMonth);
-            setAllergen(response || []);
+            const response = await getAllergens();
+            setAllergen(response);
         };
         fetchAllergen();
     }, [selectedMonth]);
@@ -101,8 +104,8 @@ export const CreateAlergen = () => {
                         <h3>{isEditing ? 'Editar Alérgeno' : 'Crear Alérgeno'}</h3>
                         <TextField
                             label="Nombre del Alérgeno"
-                            name="allergen_name"
-                            value={newAllergen.allergen_name}
+                            name="name"
+                            value={newAllergen.name}
                             onChange={handleInputChange}
                             fullWidth
                             margin="normal"

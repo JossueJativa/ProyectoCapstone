@@ -1,9 +1,8 @@
-import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { useLanguage } from '@/helpers'; // Importa el hook de idioma
+import { useLanguage } from '@/helpers';
 
 export const Error404 = () => {
-    const { texts } = useLanguage(); // Obtén los textos traducidos
+    const { texts } = useLanguage();
 
     return (
         <Box

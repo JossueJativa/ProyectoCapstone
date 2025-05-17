@@ -1,4 +1,4 @@
-import { Grid, Box, useTheme, TextField, Button, Checkbox, FormControlLabel, FormGroup, Radio, RadioGroup } from '@mui/material';
+import { Grid, Box, useTheme, TextField, Button, Checkbox, FormControlLabel, FormGroup, Radio } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { SideBar } from '@/components';
@@ -6,12 +6,12 @@ import {
     createDish, getDishes, getIngredients, getCategories,
     deleteDish, updateDish
 } from '@/controller';
+import { IDishData } from '@/interfaces';
 
 export const CreateDish = () => {
     const theme = useTheme();
     const [dishes, setDishes] = useState<any[]>([]);
-    const [selectedMonth, setSelectedMonth] = useState<number>(1);
-    const [newDish, setNewDish] = useState<{ dish_name: string; ingredients: number[]; category: number | null; hasSideDishes: boolean, price: number, time_elaboration: string, description: string, link_ar: string }>({ dish_name: '', ingredients: [], category: null, hasSideDishes: false, price: 0, time_elaboration: '', description: '', link_ar: '' });
+    const [newDish, setNewDish] = useState<{ name: string; description: string; time_elaboration: number; price: number; link_ar: string; ingredients: string[]; category: number | null; has_garrison: boolean }>({ name: '', description: '', time_elaboration: 0, price: 0, link_ar: '', ingredients: [], category: null, has_garrison: false });
     const [ingredients, setIngredients] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [selectedDish, setSelectedDish] = useState<any>(null);
@@ -64,7 +64,7 @@ export const CreateDish = () => {
         setNewDish({ ...newDish, [name]: value });
     };
 
-    const handleIngredientChange = (id: number) => {
+    const handleIngredientChange = (id: string) => {
         setNewDish((prev) => {
             const ingredients = prev.ingredients.includes(id)
                 ? prev.ingredients.filter((ingredientId) => ingredientId !== id)
@@ -74,34 +74,48 @@ export const CreateDish = () => {
     };
 
     const handleCreateDish = async () => {
-        if (!newDish.dish_name || !newDish.category) {
+        if (!newDish.name || !newDish.category) {
             alert('Debe ingresar un nombre y seleccionar una categoría.');
             return;
         }
-        await createDish(newDish);
-        setNewDish({ dish_name: '', ingredients: [], category: null, hasSideDishes: false, price: 0, time_elaboration: '', description: '', link_ar: '' });
+        const data: IDishData = {
+            dish_name: newDish.name,
+            description: newDish.description,
+            time_elaboration: newDish.time_elaboration,
+            price: Number(newDish.price),
+            link_ar: newDish.link_ar,
+            ingredients: newDish.ingredients,
+            category: newDish.category,
+            has_garrison: newDish.has_garrison,
+            id: 0
+        };
+        await createDish(data);
         const response = await getDishes();
+        if (response.length > 0) {
+            setNewDish({ name: '', description: '', time_elaboration: 0, price: 0, link_ar: '', ingredients: [], category: null, has_garrison: false });
+        }
         setDishes(response);
     };
 
     const handleUpdateDish = async () => {
-        if (!newDish.dish_name || !newDish.category) {
+        if (!newDish.name || !newDish.category) {
             alert('Debe ingresar un nombre y seleccionar una categoría.');
             return;
         }
         const data = {
             id: selectedDish.id,
-            dish_name: newDish.dish_name, // Asegurar que se envíe como dish_name
+            dish_name: newDish.name, // necesario para updateDish
+            name: newDish.name,
+            description: newDish.description,
+            time_elaboration: Number(newDish.time_elaboration),
+            price: Number(newDish.price),
+            link_ar: newDish.link_ar,
             ingredients: newDish.ingredients,
             category: newDish.category,
-            has_garrison: newDish.hasSideDishes, // Cambiar a has_garrison para coincidir con el backend
-            price: newDish.price,
-            time_elaboration: newDish.time_elaboration,
-            description: newDish.description,
-            link_ar: newDish.link_ar
+            has_garrison: newDish.has_garrison
         };
         await updateDish(data);
-        setNewDish({ dish_name: '', ingredients: [], category: null, hasSideDishes: false, price: 0, time_elaboration: '', description: '', link_ar: '' });
+        setNewDish({ name: '', description: '', time_elaboration: 0, price: 0, link_ar: '', ingredients: [], category: null, has_garrison: false });
         setSelectedDish(null);
         setIsEditing(false);
         const response = await getDishes();
@@ -116,21 +130,21 @@ export const CreateDish = () => {
 
     const handleDishClick = (dish: any) => {
         setNewDish({
-            dish_name: dish.dish_name,
-            ingredients: dish.ingredient || [],
+            name: dish.dish_name,
+            description: dish.description,
+            time_elaboration: dish.time_elaboration,
+            price: dish.price,
+            link_ar: dish.link_ar,
+            ingredients: dish.ingredient || [], // Usar dish.ingredient para autoselección
             category: dish.category || null,
-            hasSideDishes: dish.has_garrison || false,
-            price: dish.price || 0,
-            time_elaboration: dish.time_elaboration || '',
-            description: dish.description || '',
-            link_ar: dish.link_ar || ''
+            has_garrison: dish.has_garrison || false
         });
         setSelectedDish(dish);
-        setIsEditing(true); // Activar modo edición
+        setIsEditing(true);
     };
 
     const handleCancelEdit = () => {
-        setNewDish({ dish_name: '', ingredients: [], category: null, hasSideDishes: false, price: 0, time_elaboration: '', description: '', link_ar: '' });
+        setNewDish({ name: '', description: '', time_elaboration: 0, price: 0, link_ar: '', ingredients: [], category: null, has_garrison: false });
         setSelectedDish(null);
         setIsEditing(false);
     };
@@ -150,7 +164,7 @@ export const CreateDish = () => {
         >
             <Grid container sx={{ width: 'auto' }}>
                 <Grid container width={'20%'}>
-                    <SideBar onMonthChange={setSelectedMonth} />
+                    <SideBar onMonthChange={() => { }} />
                 </Grid>
 
                 <Grid item xs={12} md={9} sx={{ padding: '20px', display: 'flex' }}>
@@ -162,17 +176,17 @@ export const CreateDish = () => {
                         <h3>{selectedDish ? 'Editar Plato' : 'Crear Plato'}</h3>
                         <TextField
                             label="Nombre del Plato"
-                            name="dish_name" // Cambiar el nombre del campo a 'dish_name'
-                            value={newDish.dish_name}
+                            name="name"
+                            value={newDish.name}
                             onChange={handleInputChange}
                             fullWidth
                             margin="normal"
-                            variant="outlined" // Asegurar que el variant sea 'outlined'
+                            variant="outlined"
                         />
                         <Box
                             sx={{
                                 display: 'grid',
-                                gridTemplateColumns: '1fr 1fr', // Crear un grid de 2 columnas
+                                gridTemplateColumns: '1fr 1fr',
                                 gap: '10px',
                                 marginBottom: '10px',
                             }}
@@ -204,7 +218,7 @@ export const CreateDish = () => {
                             fullWidth
                             margin="normal"
                             multiline
-                            rows={3} // Limitar a un máximo de 2 filas
+                            rows={3}
                         />
                         <TextField
                             label="Link AR"
@@ -275,8 +289,8 @@ export const CreateDish = () => {
                         <FormControlLabel
                             control={
                                 <Checkbox
-                                    checked={newDish.hasSideDishes}
-                                    onChange={(e) => setNewDish({ ...newDish, hasSideDishes: e.target.checked })}
+                                    checked={newDish.has_garrison}
+                                    onChange={(e) => setNewDish({ ...newDish, has_garrison: e.target.checked })}
                                 />
                             }
                             label="Tiene guarniciones"

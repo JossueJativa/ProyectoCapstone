@@ -36,11 +36,10 @@ const createCategory = async (data: any): Promise<any> => {
 }
 
 const createIngredient = async (data: IIngredientData): Promise<any> => {
-    const { name, quantity, allergens } = data;
+    const { name, allergens } = data;
     const api = new API();
     const response = await api.post('/ingredient', {
         ingredient_name: name,
-        quantity,
         allergen: allergens
     });
     return response?.data;

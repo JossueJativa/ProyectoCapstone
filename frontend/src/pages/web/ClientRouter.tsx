@@ -9,6 +9,12 @@ import {
 } from './index';
 import { CartProvider } from "@/context/CartContext";
 
+declare global {
+    interface Window {
+        voiceflow?: any;
+    }
+}
+
 export const ClientRouter = () => {
     const location = useLocation();
     const isSelectDesk = location.pathname === '/';

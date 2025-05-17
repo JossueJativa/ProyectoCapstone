@@ -1,5 +1,6 @@
 export interface IDishData {
-    name: string;
+    id: number;
+    dish_name: string;
     description: string;
     time_elaboration: number;
     price: number;

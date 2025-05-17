@@ -16,7 +16,7 @@ export const Menu = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [visibleDishes, setVisibleDishes] = useState<number>(10);
     const [deskId, setDeskId] = useState<string | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -86,7 +86,7 @@ export const Menu = () => {
         };
     }, [dishes]);
 
-    const handleCategorySelect = async (categoryId: number) => {
+    const handleCategorySelect = async (categoryId: string) => {
         try {
             if (selectedCategory === categoryId) {
                 const dishesList = await getDishes();
@@ -95,7 +95,7 @@ export const Menu = () => {
                 setSelectedCategory(null);
             } else {
                 const dishesList = await getDishes();
-                const filteredDishes = dishesList.filter((dish) => dish.category === categoryId);
+                const filteredDishes = dishesList.filter((dish: { category: number | string; }) => String(dish.category) === categoryId);
                 setDishes(filteredDishes);
                 setVisibleDishes(10);
                 setSelectedCategory(categoryId);
@@ -129,7 +129,7 @@ export const Menu = () => {
                         </Box>
                     </Grid>
                 </Grid>
-                
+
                 <CategoriesList categories={categories} onCategorySelect={handleCategorySelect} selectedCategory={selectedCategory} />
 
                 {/* Mostrar los platos con animación */}
@@ -145,6 +145,7 @@ export const Menu = () => {
                                     linkTo={`/dish/${d.id}?desk_id=${deskId}`}
                                     dish_id={d.id}
                                     has_garrison={d.has_garrison}
+                                    allergens={null}
                                 />
                             </Fade>
                         </Grid>

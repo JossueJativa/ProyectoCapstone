@@ -6,11 +6,11 @@ import {
     getIngredients, getAllergens, createIngredient, 
     updateIngredient, deleteIngredient 
 } from '@/controller';
+import { IIngredientData } from '@/interfaces';
 
 export const CreateIngredient = () => {
     const theme = useTheme();
     const [ingredient, setIngredient] = useState<any[]>([]); // Inicializar como un array vacío
-    const [selectedMonth, setSelectedMonth] = useState<number>(1);
     const [newIngredient, setNewIngredient] = useState<{ name: string; allergens: number[] }>({ name: '', allergens: [] });
     const [allergens, setAllergens] = useState<any[]>([]);
     const [selectedIngredient, setSelectedIngredient] = useState<any>(null);
@@ -60,9 +60,16 @@ export const CreateIngredient = () => {
             alert('Debe ingresar un nombre y seleccionar al menos un alérgeno.');
             return;
         }
-        await createIngredient(newIngredient);
-        setNewIngredient({ name: '', allergens: [] });
-        const response = await getIngredients(selectedMonth);
+        const data: IIngredientData = {
+            name: newIngredient.name,
+            allergens: newIngredient.allergens.map(String),
+            id: 0
+        };
+        await createIngredient(data);
+        const response = await getIngredients();
+        if (response.length > 0) {
+            setNewIngredient({ name: '', allergens: [] });
+        }
         setIngredient(response);
     };
 
@@ -71,17 +78,16 @@ export const CreateIngredient = () => {
             alert('Debe ingresar un nombre y seleccionar al menos un alérgeno.');
             return;
         }
-        const data = {
+        const data: IIngredientData = {
             id: selectedIngredient.id,
             name: newIngredient.name,
-            quantity: selectedIngredient.quantity || 0, // Default quantity if not provided
-            allergens: newIngredient.allergens
+            allergens: newIngredient.allergens.map(String),
         };
         await updateIngredient(data);
         setNewIngredient({ name: '', allergens: [] });
         setSelectedIngredient(null);
         setIsEditing(false); // Desactivar modo edición
-        const response = await getIngredients(selectedMonth);
+        const response = await getIngredients();
         setIngredient(response || []); // Asegurarse de que sea un array
     };
 
@@ -110,7 +116,7 @@ export const CreateIngredient = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', backgroundColor: theme.background.primary, minHeight: '100vh', overflow: 'hidden' }}>
             <Grid container sx={{ width: 'auto' }}>
                 <Grid container width={'20%'}>
-                    <SideBar onMonthChange={setSelectedMonth} />
+                    <SideBar onMonthChange={() => {}} />
                 </Grid>
 
                 <Grid item xs={12} md={9} sx={{ padding: '20px', display: 'flex' }}>

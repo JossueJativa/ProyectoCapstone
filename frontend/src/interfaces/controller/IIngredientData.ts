@@ -1,5 +1,5 @@
 export interface IIngredientData {
+    id: number;
     name: string;
-    quantity: number;
     allergens: string[];
 }

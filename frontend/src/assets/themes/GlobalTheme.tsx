@@ -1,7 +1,61 @@
-import { ThemeProvider, createTheme, Theme } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
-const theme: Theme = createTheme({
+// Extensión de tipos para el tema personalizado
+import '@mui/material/styles';
+declare module '@mui/material/styles' {
+    interface Theme {
+        button: {
+            cafeMedio: string;
+            transparente: string;
+            beige: string;
+            mostaza: string;
+            verde: string;
+            border: {
+                rounded: string;
+                corners: string;
+            };
+        };
+        background: {
+            primary: string;
+            secondary: string;
+        };
+        menu: {
+            mostaza: string;
+            ladrillo: string;
+            azul: string;
+            verde: string;
+            selected: string;
+            black: string;
+        };
+        customTypography: {
+            title: {
+                fontWeight: string;
+                fontSize: string;
+            };
+            subtitle: {
+                fontWeight: string;
+                fontSize: string;
+            };
+            body1: {
+                fontWeight: string;
+                fontSize: string;
+            };
+            body2: {
+                fontWeight: string;
+                fontSize: string;
+            };
+        };
+    }
+    interface ThemeOptions {
+        button?: Theme['button'];
+        background?: Theme['background'];
+        menu?: Theme['menu'];
+        customTypography?: Theme['customTypography'];
+    }
+}
+
+const theme = createTheme({
     button: {
         cafeMedio: '#B15C39',
         transparente: 'transparent',
@@ -25,7 +79,7 @@ const theme: Theme = createTheme({
         selected: '#B15C39',
         black: '#000000',
     },
-    typography: {
+    customTypography: {
         title: {
             fontWeight: 'bold',
             fontSize: '2rem',
@@ -44,7 +98,7 @@ const theme: Theme = createTheme({
         },
     },
     shape: {
-        borderRadius: '10px',
+        borderRadius: 10,
     }
 });
 

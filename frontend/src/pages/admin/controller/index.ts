@@ -1,4 +1,3 @@
-export { Home } from './Home';
 export { Dashboard } from './Dashboard';
 export { CreateDesk } from './CreateDesk';
 export { CreateAlergen } from './CreateAlergen';

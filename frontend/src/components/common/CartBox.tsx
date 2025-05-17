@@ -12,8 +12,8 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
     const { socket } = useSocket();
 
     const handleQuantityChange = (newQuantity: number) => {
-        if (newQuantity < 1 || !desk_id) return;
-        socket.emit("order:update", { order_detail_id: id, desk_id, update_quantity: newQuantity }, (error: any, response: any) => {
+        if (newQuantity < 1 || !desk_id || !socket) return;
+        socket.emit("order:update", { order_detail_id: id, desk_id, update_quantity: newQuantity }, (error: any) => {
             if (error) {
                 console.error("Error updating quantity:", error);
             } else {
@@ -39,7 +39,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                     sx={{
                         color: theme.menu.black,
                         fontSize: "1.2rem",
-                        fontWeight: theme.typography.title.fontWeight,
+                        fontWeight: theme.customTypography.title.fontWeight,
                     }}
                 >
                     {dish_name}
@@ -48,7 +48,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                             component="span"
                             sx={{
                                 fontSize: "0.9rem",
-                                fontWeight: theme.typography.body1.fontWeight,
+                                fontWeight: theme.customTypography.body1.fontWeight,
                                 color: theme.palette.text.secondary,
                                 marginLeft: "8px",
                             }}
@@ -61,8 +61,8 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                     variant="h6"
                     sx={{
                         color: theme.button.cafeMedio,
-                        fontSize: theme.typography.body1.fontSize,
-                        fontWeight: theme.typography.title.fontWeight,
+                        fontSize: theme.customTypography.body1.fontSize,
+                        fontWeight: theme.customTypography.title.fontWeight,
                     }}
                 >${price.toFixed(2)}</Typography>
             </Box>
@@ -104,7 +104,7 @@ export const CartBox = ({ id, dish_name, description, price, quantity, linkAR, d
                     <ButtonLogic
                         text={texts.labels.delete}
                         typeButton="secondary"
-                        onClick={onDelete}
+                        onClick={() => onDelete(id)}
                     />
                 </Box>
                 <Box width="55%" display="flex" justifyContent="center" alignItems="center">

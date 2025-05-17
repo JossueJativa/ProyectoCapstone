@@ -1,13 +1,14 @@
 import { useTheme } from '@mui/material';
-import { CategoriesListProps } from '@/interfaces';
+import { CategoriesListProps, Category } from '@/interfaces';
 import { Box } from '@mui/material';
 
-export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: CategoriesListProps) => {
-    const theme = useTheme();
+interface ExtendedCategoriesListProps extends CategoriesListProps {
+    onCategorySelect: (categoryId: string) => void;
+    selectedCategory: string | null;
+}
 
-    const handleCategoryClick = (categoryId: number) => {
-        onCategorySelect(categoryId);
-    };
+export const CategoriesList = ({ categories, onCategorySelect, selectedCategory }: ExtendedCategoriesListProps) => {
+    const theme = useTheme();
 
     return (
         <Box
@@ -29,10 +30,10 @@ export const CategoriesList = ({ categories, onCategorySelect, selectedCategory 
             }}
             className="categories-slider"
         >
-            {categories.map((category) => (
+            {categories.map((category: Category) => (
                 <Box
                     key={category.id}
-                    onClick={() => handleCategoryClick(category.id)}
+                    onClick={() => onCategorySelect(category.id)}
                     sx={{
                         minWidth: '150px',
                         textAlign: 'center',
