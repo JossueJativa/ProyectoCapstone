@@ -8,7 +8,7 @@ const deleteDesk = async (id: number): Promise<any> => {
 
 const deleteAllergen = async (id: number): Promise<any> => {
     const api = new API();
-    const response = await api.delete(`/allergen/${id}`);
+    const response = await api.delete(`/allergens/${id}`);
     return response?.data;
 }
 

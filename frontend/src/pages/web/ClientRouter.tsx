@@ -15,6 +15,7 @@ import {
     DivideInvoice, InvoiceByMount, InvoiceByDish
 } from './index';
 import { CartProvider } from "@/context/CartContext";
+import { useLanguage } from '@/helpers';
 
 declare global {
     interface Window {
@@ -24,6 +25,7 @@ declare global {
 
 export const ClientRouter = () => {
     const location = useLocation();
+    const { language } = useLanguage();
     const isSelectDesk = location.pathname === '/';
     const isErrorPage = location.pathname === '/404';
 
@@ -33,14 +35,25 @@ export const ClientRouter = () => {
             script.type = 'text/javascript';
             script.src = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
             script.onload = () => {
-                window.voiceflow?.chat?.load({
-                    verify: { projectID: '680ac6dbe61d2476b0f2db11' },
-                    url: 'https://general-runtime.voiceflow.com',
-                    versionID: 'production',
-                    voice: {
-                        url: 'https://runtime-api.voiceflow.com',
-                    },
-                });
+                if (language === 'en') {
+                    window.voiceflow?.chat?.load({
+                        verify: { projectID: '6829084e09bde9328a60279c' },
+                        url: 'https://general-runtime.voiceflow.com',
+                        versionID: 'production',
+                        voice: {
+                            url: 'https://runtime-api.voiceflow.com',
+                        },
+                    });
+                } else {
+                    window.voiceflow?.chat?.load({
+                        verify: { projectID: '680ac6dbe61d2476b0f2db11' },
+                        url: 'https://general-runtime.voiceflow.com',
+                        versionID: 'production',
+                        voice: {
+                            url: 'https://runtime-api.voiceflow.com',
+                        },
+                    });
+                }
             };
             document.body.appendChild(script);
 
@@ -48,7 +61,7 @@ export const ClientRouter = () => {
                 document.body.removeChild(script); // Limpia el script al desmontar
             };
         }
-    }, [isSelectDesk, isErrorPage]);
+    }, [isSelectDesk, isErrorPage, language]);
 
     return (
         <CartProvider>

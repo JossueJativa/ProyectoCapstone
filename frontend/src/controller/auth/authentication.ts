@@ -3,10 +3,9 @@ import { API } from '../api';
 const api = new API();
 
 const LoginAuth = async (username: string, password: string): Promise<boolean> => {
-    const response = await api.postAuth('/login', { username: username, password: password });
+    const response = await api.post('/user/login', { username: username, password: password });
     if (response?.status === 200) {
-        const { access, refresh } = response.data;
-        localStorage.setItem('refresh_token', refresh);
+        const { access } = response.data;
         localStorage.setItem('access_token', access);
         return true;
     } else {
@@ -15,18 +14,8 @@ const LoginAuth = async (username: string, password: string): Promise<boolean> =
 }
 
 const LogoutAuth = async (): Promise<boolean> => {
-    localStorage.removeItem('refresh_token');
     localStorage.removeItem('access_token');
     return true;
-}
-
-const RegisterAuth = async (username: string, password: string): Promise<boolean> => {
-    const response = await api.postAuth('/register', { username: username, password: password });
-    if (response?.status === 201) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 const GetUserAuth = async (): Promise<any> => {
@@ -38,7 +27,7 @@ const GetUserAuth = async (): Promise<any> => {
     if (!userId) {
         return null;
     }
-    const response = await api.getAuth(`/${userId}`, token || '');
+    const response = await api.get(`/user/${userId}`);
     if (response?.status === 200) {
         return response.data;
     } else {
@@ -46,4 +35,4 @@ const GetUserAuth = async (): Promise<any> => {
     }
 }
 
-export { LoginAuth, LogoutAuth, RegisterAuth, GetUserAuth };
+export { LoginAuth, LogoutAuth, GetUserAuth };

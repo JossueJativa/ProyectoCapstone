@@ -5,11 +5,14 @@ import re
 import logging
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import action
 from dotenv import load_dotenv
 from django.db.models import Sum, Count
-from rest_framework.decorators import action
+import jwt
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
 load_dotenv()
 
@@ -58,12 +61,35 @@ def translate_fields(data, fields, target_lang):
         raise
 
 class BaseProtectedViewSet(viewsets.ModelViewSet):
-    authentication_classes = [JWTAuthentication]
+    def get_jwt_user(self, request):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            raise AuthenticationFailed('No JWT token provided')
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Token expired')
+        except jwt.InvalidTokenError:
+            raise AuthenticationFailed('Invalid token')
+        User = get_user_model()
+        try:
+            user = User.objects.get(id=payload['user_id'])
+        except User.DoesNotExist:
+            raise AuthenticationFailed('User not found')
+        if not user.is_active:
+            raise PermissionDenied('User inactive')
+        return user
 
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    def dispatch(self, request, *args, **kwargs):
+        action = getattr(self, "action", None)
+        if action in ['create', 'update', 'partial_update', 'destroy']:
+            user = self.get_jwt_user(request)
+            request.user = user
+        return super().dispatch(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        return super().perform_destroy(instance)
 
     def partial_update(self, request, *args, **kwargs):
         return Response({'error': 'Method not allowed'}, status=405)
@@ -74,13 +100,34 @@ class BaseProtectedViewSet(viewsets.ModelViewSet):
         target_lang = LANGUAGE_MAPPING.get(target_lang, target_lang)
 
         if target_lang not in SUPPORTED_LANGUAGES:
-            logger.error("Unsupported language: %s", target_lang)
             raise ValueError(f"Language '{target_lang}' not supported.")
 
         if target_lang != 'ES':
             translate_fields(data, fields, target_lang)
 
-class CategoryViewSet(BaseProtectedViewSet):
+class ManualJWTProtectedActionsMixin:
+    def create(self, request, *args, **kwargs):
+        try:
+            self.get_jwt_user(request)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=401)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        try:
+            self.get_jwt_user(request)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=401)
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            self.get_jwt_user(request)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=401)
+        return super().destroy(request, *args, **kwargs)
+
+class CategoryViewSet(ManualJWTProtectedActionsMixin, BaseProtectedViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -98,49 +145,54 @@ class CategoryViewSet(BaseProtectedViewSet):
 
         return Response(data)
 
-class DeskViewSet(BaseProtectedViewSet):
+class DeskViewSet(ManualJWTProtectedActionsMixin, BaseProtectedViewSet):
     queryset = Desk.objects.all()
     serializer_class = DeskSerializer
 
-class AllergensViewSet(BaseProtectedViewSet):
+    @action(detail=False, methods=['get'], url_path='by-number/(?P<desk_number>\\d+)')
+    def by_number(self, request, desk_number=None):
+        try:
+            desk = Desk.objects.get(desk_number=desk_number)
+            serializer = self.get_serializer(desk)
+            return Response(serializer.data)
+        except Desk.DoesNotExist:
+            return Response({'error': f'Desk with number {desk_number} does not exist.'}, status=404)
+
+class AllergensViewSet(ManualJWTProtectedActionsMixin, BaseProtectedViewSet):
     queryset = Allergens.objects.all()
     serializer_class = AllergensSerializer
 
-class IngredientViewSet(BaseProtectedViewSet):
+class IngredientViewSet(ManualJWTProtectedActionsMixin, BaseProtectedViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
 
-class DishViewSet(BaseProtectedViewSet):
+class DishViewSet(ManualJWTProtectedActionsMixin, BaseProtectedViewSet):
     queryset = Dish.objects.all()
     serializer_class = DishSerializer
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        data = serializer.data
-
-        try:
-            self.translate_response([data], ['dish_name', 'description'], request)
-        except ValueError as e:
-            return Response({"error": str(e)}, status=400)
-        except Exception as e:
-            return Response({"error": "An unexpected error occurred."}, status=500)
-
-        return Response(data)
-
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        data = serializer.data
-
         try:
-            self.translate_response(data, ['dish_name', 'description'], request)
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = self.get_serializer(queryset, many=True)
+            data = serializer.data
+            self.translate_response(data, ['dish_name'], request)
+            return Response(data)
         except ValueError as e:
-            return Response({"error": str(e)}, status=400)
+            return Response({'error': str(e)}, status=400)
         except Exception as e:
-            return Response({"error": "An unexpected error occurred."}, status=500)
+            return Response({'error': 'An unexpected error occurred.'}, status=500)
 
-        return Response(data)
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            data = serializer.data
+            self.translate_response([data], ['dish_name'], request)
+            return Response(data)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=400)
+        except Exception as e:
+            return Response({'error': 'An unexpected error occurred.'}, status=500)
 
 class GarrisonViewSet(BaseProtectedViewSet):
     queryset = Garrison.objects.all()
@@ -167,7 +219,6 @@ class GarrisonViewSet(BaseProtectedViewSet):
 
         try:
             self.translate_response(data, ['garrison_name'], request)
-            print('Garrison data:', data)
         except ValueError as e:
             return Response({"error": str(e)}, status=400)
         except Exception as e:
@@ -179,6 +230,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []  # Permitir acceso sin autenticación
 
     @action(detail=False, methods=['get'])
     def unified_statistics(self, request):
@@ -233,13 +285,16 @@ class OrderDishViewSet(viewsets.ModelViewSet):
     queryset = OrderDish.objects.all()
     serializer_class = OrderDishSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []
 
 class InvoiceViewSet(viewsets.ModelViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []
 
 class InvoiceDishViewSet(viewsets.ModelViewSet):
     queryset = InvoiceDish.objects.all()
     serializer_class = InvoiceDishSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []
