@@ -77,6 +77,7 @@ const createDish = async (data: IDishData): Promise<any> => {
         category,
         has_garrison,
     });
+    console.log(response);
     return response?.data;
 }
 
@@ -94,11 +95,20 @@ const createOrder = async (data: IOrderData): Promise<any> => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+    // Validar que el desk existe antes de crear el order
+    const deskResponse = await api.get(`/desk/by-number/${deskId}`);
+    if (!deskResponse || deskResponse.status !== 200) {
+        alert(`No existe una mesa (desk) con id ${deskId}. Por favor selecciona una válida.`);
+        return null;
+    }
+    const desk_id = deskResponse.data.id;
+
     const response = await api.post('/order', {
         date: formattedDate,
         time: formattedTime,
         total_price: totalPrice,
-        desk: deskId,
+        desk: desk_id,
         status,
     });
 
