@@ -27,10 +27,10 @@ const createAllergen = async (data: IAllergenData): Promise<any> => {
 }
 
 const createCategory = async (data: any): Promise<any> => {
-    const { name } = data;
+    const { category_name } = data;
     const api = new API();
     const response = await api.post('/category', {
-        category_name: name
+        category_name
     });
     return response?.data;
 }
@@ -77,7 +77,6 @@ const createDish = async (data: IDishData): Promise<any> => {
         category,
         has_garrison,
     });
-    console.log(response);
     return response?.data;
 }
 

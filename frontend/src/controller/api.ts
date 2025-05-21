@@ -31,15 +31,13 @@ class API {
             return await axios({ method, url: `${this.url}${url}/`, data, headers });
         } catch (error) {
             if (axios.isAxiosError(error) && error.response && error.response.status === 403) {
-                // Imprime el detalle del error 403
-                console.error("[API 403 FORBIDDEN]", error.response.data);
+                alert("No tienes permisos para realizar esta acción");
             }
             if (axios.isAxiosError(error) && error.response && error.response.status === 401 && token) {
                 const refreshed = await this.refreshToken();
                 if (refreshed) {
                     const newToken = this.getToken();
                     if (newToken) headers["Authorization"] = newToken;
-                    console.log("[API RETRY REQUEST]", { method, url: `${this.url}${url}/`, data, headers });
                     return await axios({ method, url: `${this.url}${url}/`, data, headers });
                 } else {
                     alert("Sesión caducada, por favor vuelve a iniciar sesión");

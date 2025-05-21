@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Api rest
+    'rest_framework',
     'django_extensions',
 
     # Custom apps
