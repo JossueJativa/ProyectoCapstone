@@ -37,7 +37,7 @@ export const ClientRouter = () => {
             script.onload = () => {
                 if (language === 'en') {
                     window.voiceflow?.chat?.load({
-                        verify: { projectID: '6829084e09bde9328a60279c' },
+                        verify: { projectID: '682beb072932dfdc88e975a5' },
                         url: 'https://general-runtime.voiceflow.com',
                         versionID: 'production',
                         voice: {
@@ -46,7 +46,7 @@ export const ClientRouter = () => {
                     });
                 } else {
                     window.voiceflow?.chat?.load({
-                        verify: { projectID: '680ac6dbe61d2476b0f2db11' },
+                        verify: { projectID: '682be9f89b2c86fa4db2994d' },
                         url: 'https://general-runtime.voiceflow.com',
                         versionID: 'production',
                         voice: {

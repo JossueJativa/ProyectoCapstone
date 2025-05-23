@@ -5,8 +5,9 @@ const api = new API();
 const LoginAuth = async (username: string, password: string): Promise<boolean> => {
     const response = await api.post('/user/login', { username: username, password: password });
     if (response?.status === 200) {
-        const { access } = response.data;
+        const { access, refresh } = response.data;
         localStorage.setItem('access_token', access);
+        if (refresh) localStorage.setItem('refresh_token', refresh);
         return true;
     } else {
         return false;

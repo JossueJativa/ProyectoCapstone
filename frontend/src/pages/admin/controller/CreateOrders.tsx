@@ -1,13 +1,12 @@
 import { Grid, Box, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { SideBar } from '@/components';
-import { getOrders, getOrderDishByOrderId } from '@/controller';
 import { useSocket } from '@/helpers';
 
 export const CreateOrders = () => {
     const theme = useTheme();
     const { socket } = useSocket();
-    const [selectedMonth, setSelectedMonth] = useState<number>(1);
+    const [,setSelectedMonth] = useState<number>(1);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [cachedOrders, setCachedOrders] = useState<any>([]);
     const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -94,24 +93,24 @@ export const CreateOrders = () => {
     };
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            const response = await getOrders(selectedMonth);
-            const orderDishPromises = response.map(async (order: any) => {
-                const orderDishes = await getOrderDishByOrderId(order.id);
-                return { ...order, dishes: orderDishes };
-            });
+        const interval = setInterval(() => {
+            const today = new Date().toISOString().split('T')[0];
+            if (currentDate !== today) {
+                localStorage.removeItem('cachedOrders');
+                localStorage.setItem('currentDate', today);
+                setCachedOrders([]);
+                setCurrentDate(today);
+            }
+        }, 60 * 1000); // cada minuto
 
-            const orderDishResults = await Promise.all(orderDishPromises);
-            setCachedOrders(orderDishResults);
-        };
-        fetchOrders();
-    }, [selectedMonth]);
+        return () => clearInterval(interval);
+    }, [currentDate]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', backgroundColor: theme.background.primary, minHeight: '100vh', overflow: 'hidden' }}>
             <Grid container sx={{ width: 'auto' }}>
                 <Grid container width={'20%'}>
-                    <SideBar onMonthChange={setSelectedMonth} />
+                    <SideBar onMonthChange={(setMonth: number) => setSelectedMonth(setMonth)} />
                 </Grid>
 
                 <Grid item xs={12} md={9} sx={{ padding: '20px', display: 'flex' }}>

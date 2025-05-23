@@ -1,4 +1,5 @@
-import { Box, TextField, useTheme } from '@mui/material';
+import { Box, TextField, useTheme, InputAdornment, IconButton } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ButtonLogic } from '@/components';
@@ -14,6 +15,7 @@ export const Login = () => {
         username: "",
         password: ""
     });
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async () => {
         const response = await LoginAuth(data.username, data.password);
@@ -61,8 +63,21 @@ export const Login = () => {
                     variant="outlined"
                     fullWidth
                     margin="normal"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={() => setShowPassword((show) => !show)}
+                                    edge="end"
+                                >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        )
+                    }}
                 />
                 <Box sx={{
                     padding: '10px 0px'

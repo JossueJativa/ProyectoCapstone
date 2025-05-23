@@ -86,9 +86,9 @@ export const DishSelected = () => {
                     description={dish.description}
                     linkAR={dish.link_ar}
                     linkTo={null}
-                    allergens={allergens}
-                    dish_id={dish.dish_id}
+                    dish_id={dish.id}
                     has_garrison={dish.has_garrison}
+                    allergens={allergens}
                 />
             </Box>
             <Box sx={{
