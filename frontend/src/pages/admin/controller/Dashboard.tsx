@@ -8,14 +8,9 @@ import {
 } from 'recharts';
 import { SideBar, BoxData } from '@/components';
 import { getDashboardInformation } from '@/controller';
-import { getOrderDishByOrderId } from '@/controller/getters/getByDish';
-import { getDish } from '@/controller/getters/getByDish';
-import { getCategories, getOrders } from '@/controller/getters/getInformation';
-import { IOrder } from '@/interfaces';
 
 export const Dashboard = () => {
     const theme = useTheme();
-    const [orders, setOrders] = useState<IOrder[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<number>(1);
     const [dishes, setDishes] = useState<{ name: string; count: number }[]>([]);
     const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
@@ -48,99 +43,6 @@ export const Dashboard = () => {
 
         fetchDashboardInfo();
     }, [selectedMonth]);
-
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const year = new Date().getFullYear();
-                await getDashboardInformation(year, selectedMonth);
-                const response = await getOrders(selectedMonth);
-                setOrders(response);
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-            }
-        };
-
-        fetchOrders();
-    }, [selectedMonth]);
-
-    useEffect(() => {
-        const fetchFilteredData = async () => {
-            try {
-                const currentYear = new Date().getFullYear();
-                const filteredOrders = orders.filter(order => {
-                    const [year, day, month] = order.date.split('-');
-                    const formattedDate = `${year}-${month}-${day}`;
-                    const orderDate = new Date(formattedDate);
-
-                    return orderDate.getFullYear() === currentYear && orderDate.getMonth() + 1 === selectedMonth;
-                });
-
-                const totalDishes = filteredOrders.reduce((sum, order) => sum + order.order_dish.length, 0);
-                const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total_price, 0);
-                const averageDishesPerTable = filteredOrders.length > 0
-                    ? (totalDishes / filteredOrders.length).toFixed(2)
-                    : 0;
-
-                setTotalDishes(totalDishes);
-                setTotalRevenue(totalRevenue);
-                setAverageDishesPerTable(Number(averageDishesPerTable));
-
-                const dishCounts: Record<string, number> = {};
-                for (const order of filteredOrders) {
-                    const orderDishes = await getOrderDishByOrderId(order.id);
-
-                    for (const dishId of orderDishes) {
-                        const dishQuantity = dishId.quantity;
-                        const dishName = dishId.dish.name;
-
-                        if (dishCounts[dishName]) {
-                            dishCounts[dishName] += dishQuantity;
-                        } else {
-                            dishCounts[dishName] = dishQuantity;
-                        }
-                    }
-                }
-                const dishArray = Object.entries(dishCounts).map(([name, count]) => ({ name, count }));
-                dishArray.sort((a, b) => b.count - a.count);
-                setDishes(dishArray);
-
-                const categoryCounts: Record<string, number> = {};
-                const categoriesData = await getCategories();
-                const categoryMap = categoriesData.reduce((map: Record<number, string>, category: any) => {
-                    map[category.id] = category.category_name;
-                    return map;
-                }, {} as Record<number, string>);
-
-                for (const order of filteredOrders) {
-                    const orderDishes = await getOrderDishByOrderId(order.id);
-
-                    for (const dishId of orderDishes) {
-                        const dish = await getDish(dishId.dish.id);
-                        const categoryDish = dish.category;
-
-                        const categoryName = categoryMap[categoryDish];
-                        const dishQuantity = dishId.quantity;
-
-                        if (categoryCounts[categoryName]) {
-                            categoryCounts[categoryName] += dishQuantity;
-                        } else {
-                            categoryCounts[categoryName] = dishQuantity;
-                        }
-                    }
-                }
-
-                const categoryArray = Object.entries(categoryCounts).map(([name, count]) => ({ name, count }));
-                setCategories(categoryArray);
-            } catch (error) {
-                console.error('Error fetching filtered data:', error);
-            }
-        };
-
-        if (orders.length > 0) {
-            fetchFilteredData();
-        }
-    }, [orders, selectedMonth]);
 
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28DFF'];
 
