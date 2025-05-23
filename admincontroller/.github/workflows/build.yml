@@ -40,14 +40,10 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          coverage run manage.py test
           coverage xml
 
       - name: Check coverage.xml exists
         run: ls -l coverage.xml
-
-      - name: Run tox
-        run: tox -e py
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4

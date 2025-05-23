@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from .models import User
 from .serializer import UserSerializer
 
+# Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -59,7 +60,6 @@ class UserViewSet(viewsets.ModelViewSet):
                 'access': access_token,
                 'refresh': refresh_token,
             }, status=status.HTTP_200_OK)
-
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
