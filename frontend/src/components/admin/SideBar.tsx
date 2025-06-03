@@ -59,7 +59,7 @@ export const SideBar = ({ onMonthChange }: SideBarProps) => {
             { key: 'Ingredientes', icon: <LocalDining />, text: 'Ingredientes', route: '/admin/ingredient' },
             { key: 'Platos', icon: <BrunchDining />, text: 'Platos', route: '/admin/dish' },
             { key: 'Guarniciones', icon: <KebabDining />, text: 'Guarniciones', route: '/admin/garrisons' },
-            { key: 'Facturas', icon: <HistoryEdu />, text: 'Facturas', route: '/admin/invoices' },
+            { key: 'Consumos', icon: <HistoryEdu />, text: 'Consumos', route: '/admin/invoices' },
             { key: 'Ordenes', icon: <DinnerDining />, text: 'Ordenes', route: '/admin/orders' },
         ].map(({ key, icon, text, route }, index, array) => (
             <React.Fragment key={key}> {/* Agregar key único aquí */}

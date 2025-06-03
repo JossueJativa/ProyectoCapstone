@@ -13,7 +13,7 @@
         "makeOrder": "Make order",
         "accept": "Accept",
         "continue": "Continue",
-        "makeInvoice": "Make invoice",
+        "makeInvoice": "Make sales order",
         "divideAccount": "Divide account"
     },
     "labels": {
@@ -32,11 +32,11 @@
         "amount": "Amount",
         "dish": "Dish",
         "howManyPeople": "How many people?",
-        "invoice": "Invoice",
-        "selectItem": "Select items for the invoice",
-        "invoiceCreated": "Invoice created",
-        "invoiceCreatedMessage": "The invoice has been successfully created.",
-        "invoiceCreationError": "Error creating invoice",
+        "invoice": "Sales order",
+        "selectItem": "Select items for the sales order",
+        "invoiceCreated": "Sales order created",
+        "invoiceCreatedMessage": "The sales order has been successfully created.",
+        "invoiceCreationError": "Error creating sales order",
         "garrisons": "Garrisons",
         "selectGarrison": "Select two garrisons"
     },
