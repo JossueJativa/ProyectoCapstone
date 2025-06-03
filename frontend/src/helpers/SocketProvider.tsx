@@ -18,8 +18,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     const location = useLocation();
 
     useEffect(() => {
-        const socketInstance = io("https://bistroalpasoar.com", {
-            path: "/ws/socket.io",
+        const socketInstance = io("http://localhost:3000", {
             transports: ["websocket"],
             reconnectionAttempts: 3,
             reconnectionDelay: 1000,

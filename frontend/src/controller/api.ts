@@ -1,7 +1,7 @@
 import axios, { AxiosResponse, Method } from "axios";
 
 class API {
-    private url = "https://bistroalpasoar.com/api";
+    private url = "http://localhost:8000/api";
     private headers: Record<string, string> = { "Content-Type": "application/json" };
 
     private getToken() {
