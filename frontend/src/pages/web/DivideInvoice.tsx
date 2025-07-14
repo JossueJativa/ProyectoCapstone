@@ -16,6 +16,7 @@ export const DivideInvoice = () => {
     const [openPopup, setOpenPopup] = useState(false);
     const [selectedOption, setSelectedOption] = useState(texts.labels.amount);
     const [peopleCount, setPeopleCount] = useState(0);
+    const [errorPeopleCount, setErrorPeopleCount] = useState("");
 
     const handleOpenPopup = () => setOpenPopup(true);
     const handleClosePopup = () => setOpenPopup(false);
@@ -25,7 +26,13 @@ export const DivideInvoice = () => {
     };
 
     const handlePeopleCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPeopleCount(parseInt(event.target.value, 10) || 0);
+        const value = parseInt(event.target.value, 10) || 0;
+        if (value > totalQuantity) {
+            setErrorPeopleCount(texts.errors.peopleExceedDishes || "No puede ser mayor que la cantidad de platos");
+            return;
+        }
+        setErrorPeopleCount("");
+        setPeopleCount(value);
     };
 
     useEffect(() => {
@@ -190,6 +197,8 @@ export const DivideInvoice = () => {
                             fullWidth
                             value={peopleCount}
                             onChange={handlePeopleCountChange}
+                            error={!!errorPeopleCount}
+                            helperText={errorPeopleCount}
                             sx={{
                                 backgroundColor: theme.background.primary,
                                 borderRadius: theme.button.border.corners,

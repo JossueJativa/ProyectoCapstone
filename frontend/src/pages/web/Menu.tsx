@@ -127,6 +127,10 @@ export const Menu = () => {
         }
     };
 
+    useEffect(() => {
+        setSelectedCategory(null);
+    }, [language]);
+
     return (
         <>
             <Box sx={{ display: 'flex', flexDirection: 'column', padding: '15px' }}>

@@ -13,7 +13,7 @@
         "makeOrder": "Realizar pedido",
         "accept": "Aceptar",
         "continue": "Continuar",
-        "makeInvoice": "Realizar factura",
+        "makeInvoice": "Realizar la orden de compra",
         "divideAccount": "Dividir cuenta"
     },
     "labels": {
@@ -32,11 +32,11 @@
         "amount": "Monto",
         "dish": "Plato",
         "howManyPeople": "¿Cuántas personas?",
-        "invoice": "Factura",
-        "selectItem": "Selecciona los artículos para la factura",
-        "invoiceCreated": "Factura creada",
-        "invoiceCreatedMessage": "La factura ha sido creada exitosamente.",
-        "invoiceCreationError": "Error al crear la factura",
+        "invoice": "Orden de compra",
+        "selectItem": "Selecciona los artículos para la orden de compra",
+        "invoiceCreated": "Orden de compra creada",
+        "invoiceCreatedMessage": "La orden de compra ha sido creada exitosamente.",
+        "invoiceCreationError": "Error al crear la orden de compra",
         "garrisons": "Guarniciones",
         "selectGarrison": "Selecciona dos guarniciones"
     },

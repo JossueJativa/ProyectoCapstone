@@ -75,7 +75,7 @@ export const CreateInvoices = () => {
                                     backgroundColor: '#f9f9f9',
                                 }}
                             >
-                                <p><strong>Factura Número:</strong> {selectedInvoice.id}</p>
+                                <p><strong>Consumo Número:</strong> {selectedInvoice.id}</p>
                                 <p><strong>Orden:</strong> {selectedInvoice.order || 'N/A'}</p>
                                 <p><strong>Total:</strong> ${selectedInvoice.totalPrice.toFixed(2)}</p>
                                 <h4>Platos:</h4>
@@ -88,7 +88,7 @@ export const CreateInvoices = () => {
                                 </ul>
                             </Box>
                         ) : (
-                            <p>Seleccione una factura para ver los detalles.</p>
+                            <p>Seleccione un consumo para ver los detalles.</p>
                         )}
                     </Box>
 
