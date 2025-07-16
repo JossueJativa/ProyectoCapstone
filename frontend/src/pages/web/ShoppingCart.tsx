@@ -101,7 +101,7 @@ export const ShoppingCart = () => {
         if (cartDishes.length > 0) {
             fetchDishDetails();
         }
-    }, [cartDishes]);
+    }, [cartDishes, language, fetchedDishIds]);
 
     useEffect(() => {
         if (socket && deskId) {
@@ -119,43 +119,121 @@ export const ShoppingCart = () => {
 
     useEffect(() => {
         const updateDishDetailsOnLanguageChange = async () => {
-            if (cartDishes.length > 0) {
+            if (cartDishes.length > 0 && !loading) {
+                console.log("🔄 INICIANDO TRADUCCIÓN - Idioma:", language);
+                console.log("🔄 Platos en carrito:", cartDishes.length);
+                
+                // Crear un estado temporal para evitar conflictos
                 const updatedDishes = await Promise.all(
-                    cartDishes.map(async (dish) => {
-                        const dishDetails = await getDish(dish.product_id, language);
-                        return {
-                            ...dish,
-                            details: dishDetails,
-                        };
+                    cartDishes.map(async (dish, index) => {
+                        // Solo actualizar si ya tiene detalles (evitar platos sin cargar)
+                        if (dish.details && dish.product_id) {
+                            console.log(`📍 Traduciendo plato ${index + 1}:`, {
+                                product_id: dish.product_id,
+                                current_name: dish.details.dish_name,
+                                current_description: dish.details.description,
+                                language: language
+                            });
+                            
+                            const dishDetails = await getDish(dish.product_id, language);
+                            
+                            console.log(`✅ Respuesta del backend para plato ${index + 1}:`, {
+                                new_name: dishDetails.dish_name,
+                                new_description: dishDetails.description,
+                                price: dishDetails.price,
+                                id: dishDetails.id
+                            });
+                            
+                            // También actualizar las guarniciones si existen
+                            let garrisonDetails = dish.garrisonDetails;
+                            if (dish.garrison && Array.isArray(dish.garrison)) {
+                                console.log(`🥗 Traduciendo guarniciones para plato ${index + 1}:`, dish.garrison);
+                                garrisonDetails = await Promise.all(
+                                    dish.garrison.map(async (garrisonId: number) => {
+                                        const lang = language === "en" ? "EN-GB" : "ES";
+                                        const garrisonData = await getGarrison(String(garrisonId), lang);
+                                        console.log(`🥗 Guarnición ${garrisonId} traducida:`, garrisonData.garrison_name);
+                                        return garrisonData.garrison_name;
+                                    })
+                                );
+                            }
+                            
+                            return {
+                                ...dish,
+                                details: dishDetails,
+                                garrisonDetails,
+                            };
+                        }
+                        console.log(`⏭️ Saltando plato ${index + 1} (sin detalles o product_id)`);
+                        return dish; // Retornar sin cambios si no tiene detalles
                     })
                 );
-                setCartDishes(updatedDishes);
+                
+                // Solo actualizar si hubo cambios reales
+                const hasChanges = updatedDishes.some((dish, index) => 
+                    dish.details && 
+                    cartDishes[index].details && 
+                    (dish.details.dish_name !== cartDishes[index].details.dish_name ||
+                     dish.details.description !== cartDishes[index].details.description)
+                );
+                
+                console.log("🔍 ¿Hubo cambios?", hasChanges);
+                if (hasChanges) {
+                    console.log("💾 Actualizando estado del carrito con nuevas traducciones");
+                    setCartDishes(updatedDishes);
+                } else {
+                    console.log("⚠️ No se detectaron cambios, no se actualiza el estado");
+                }
+            } else {
+                console.log("❌ No se ejecuta traducción:", {
+                    cartDishesLength: cartDishes.length,
+                    loading: loading
+                });
             }
         };
 
+        // Solo ejecutar cuando cambie el idioma y tengamos platos cargados
         updateDishDetailsOnLanguageChange();
-    }, [language]);
+    }, [language]); // Solo depender del language para evitar loops
 
     const mergeCartDishes = async (newDishes: any[]) => {
+        console.log("🔄 MERGE CART DISHES - Idioma actual:", language);
+        console.log("🔄 Platos recibidos:", newDishes.length);
+        
         const updatedDishes = await Promise.all(
-            newDishes.map(async (dish) => {
+            newDishes.map(async (dish, index) => {
                 let garrisonDetails = null;
 
                 if (dish.garrison && Array.isArray(dish.garrison)) {
+                    console.log(`🥗 Cargando guarniciones para plato ${index + 1}:`, dish.garrison);
                     garrisonDetails = await Promise.all(
                         dish.garrison.map(async (garrisonId: number) => {
                             const lang = language === "en" ? "EN-GB" : "ES";
                             const garrisonData = await getGarrison(String(garrisonId), lang);
+                            console.log(`🥗 Guarnición ${garrisonId} cargada:`, garrisonData.garrison_name);
                             return garrisonData.garrison_name;
                         })
                     );
                 }
 
+                console.log(`📍 Cargando detalles del plato ${index + 1}:`, {
+                    product_id: dish.product_id,
+                    language: language
+                });
+                
                 const dishDetails = await getDish(dish.product_id, language); // Pasar el idioma al método getDish
+                
+                console.log(`✅ Detalles cargados para plato ${index + 1}:`, {
+                    dish_name: dishDetails.dish_name,
+                    description: dishDetails.description,
+                    price: dishDetails.price
+                });
+                
                 return { ...dish, details: dishDetails, garrisonDetails };
             })
         );
 
+        console.log("💾 Estableciendo platos actualizados en el estado");
         setCartDishes(updatedDishes);
 
         setFetchedDishIds(new Set(newDishes.map((dish) => dish.id)));
