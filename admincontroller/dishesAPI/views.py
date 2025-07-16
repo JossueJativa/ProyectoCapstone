@@ -189,7 +189,7 @@ class DishViewSet(ManualJWTProtectedActionsMixin, BaseProtectedViewSet):
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             data = serializer.data
-            self.translate_response([data], ['dish_name'], request)
+            self.translate_response([data], ['dish_name', 'description'], request)
             return Response(data)
         except ValueError as e:
             return Response({'error': str(e)}, status=400)
