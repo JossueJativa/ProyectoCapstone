@@ -122,7 +122,7 @@ export const ShoppingCart = () => {
             if (cartDishes.length > 0 && !loading) {
                 // Crear un estado temporal para evitar conflictos
                 const updatedDishes = await Promise.all(
-                    cartDishes.map(async (dish, index) => {
+                    cartDishes.map(async (dish) => {
                         // Solo actualizar si ya tiene detalles (evitar platos sin cargar)
                         if (dish.details && dish.product_id) {
                             const dishDetails = await getDish(dish.product_id, language);
@@ -164,7 +164,7 @@ export const ShoppingCart = () => {
 
     const mergeCartDishes = async (newDishes: any[]) => {
         const updatedDishes = await Promise.all(
-            newDishes.map(async (dish, index) => {
+            newDishes.map(async (dish) => {
                 let garrisonDetails = null;
                 if (dish.garrison && Array.isArray(dish.garrison)) {
                     garrisonDetails = await Promise.all(
