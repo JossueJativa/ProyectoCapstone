@@ -43,7 +43,7 @@ export const DishSelected = () => {
             setDish(dish);
         };
         fetchDish();
-    }, [dishId]);
+    }, [dishId, language]);
 
     useEffect(() => {
         const fetchAllergens = async () => {
